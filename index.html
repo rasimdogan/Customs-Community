@@ -818,8 +818,8 @@ html.cc-auth-pending body{overflow:hidden}.cc-auth-gate{position:fixed;inset:0;z
 <button class="game-hub-card scene" onclick="nav('scene')"><span class="game-icon">⏱️</span><div><b>60 Saniyede GTİP Avı</b><p>25 günlük hayat sahnesindeki kartlarla uyumlu görünür eşyalara doğru tarifeleri eşleştir.</p></div><span class="game-go">Başla →</span></button>
 <button class="game-hub-card spy" onclick="nav('spy')"><span class="game-icon">🕶️</span><div><b>Fasıl Casusu</b><p>Beş eşyanın dördü aynı fasıldan. Araya sızan tek yabancıyı yakala.</p></div><span class="game-go">Casusu Bul →</span></button>
 <div class="mp-hub-title">🌐 Çok Oyunculu Oyunlarım</div>
-<button class="game-hub-card multiplayer conquest" onclick="nav('mpconquest')"><span class="game-icon">🗺️</span><div><b>GTİP Avı · Sahneyi Ele Geçir</b><p>Fasılları seç, kartlardan oluşan sahneyi doğru cevaplarla kendi veya takım renginle boya.</p></div><span class="game-go">Canlı Oyna →</span></button>
-<button class="game-hub-card multiplayer duel" onclick="nav('mpduel')"><span class="game-icon">⚔️</span><div><b>Rakibine Sor · GTİP Düellosu</b><p>1–5 puanlık kartları stratejik seç. Rakibin bilirse puan ona, bilemezse sana geçer.</p></div><span class="game-go">Düelloya Gir →</span></button>
+<button type="button" id="ccOpenConquest" class="game-hub-card multiplayer conquest" onclick="return CC_OPEN_MP('conquest',event)"><span class="game-icon">🗺️</span><div><b>GTİP Avı · Sahneyi Ele Geçir</b><p>Fasılları seç, kartlardan oluşan sahneyi doğru cevaplarla kendi veya takım renginle boya.</p></div><span class="game-go">Canlı Oyna →</span></button>
+<button type="button" id="ccOpenDuel" class="game-hub-card multiplayer duel" onclick="return CC_OPEN_MP('duel',event)"><span class="game-icon">⚔️</span><div><b>Rakibine Sor · GTİP Düellosu</b><p>1–5 puanlık kartları stratejik seç. Rakibin bilirse puan ona, bilemezse sana geçer.</p></div><span class="game-go">Düelloya Gir →</span></button>
 </div></section>
 <section class="view hidden" id="view-mpconquest">
 <div class="hero mp-hero"><div><h2>🗺️ GTİP Avı · Sahneyi Ele Geçir</h2><p>Seçilen fasıllardaki kartlardan oluşan sahneyi doğru pozisyonları bularak kendi renginle veya takımının rengiyle ele geçir.</p></div><div class="badge" id="mpcHeroBadge">Çok Oyunculu</div></div>
@@ -1782,6 +1782,23 @@ window.GTA_SCENE_ADMIN=(()=>{
 <div class="admin-scene-crop-note"><b>İpucu:</b> Önce görseli sürükleyerek istediğin bölümü çerçeveye getir, sonra yakınlaştır. Uyguladığında görüntü oyunun 3:1 sahne oranına kırpılır; kalite gereksiz yere düşürülmez.</div>
 </div>
 </div>
+<script id="cc-mp-direct-open-v10214">
+window.CC_OPEN_MP=function(game,ev){
+ try{if(ev){ev.preventDefault();ev.stopPropagation();}
+ var v=game==='duel'?'mpduel':'mpconquest';
+ document.querySelectorAll('.view').forEach(function(x){x.classList.add('hidden')});
+ var target=document.getElementById('view-'+v);
+ if(!target){alert('Oyun ekranı bulunamadı.');return false;}
+ target.classList.remove('hidden');
+ document.body.classList.remove('admin-view','home-view');
+ var ts=document.querySelector('.topsearch');if(ts)ts.style.display='';
+ document.querySelectorAll('.nav button').forEach(function(x){x.classList.toggle('active',x.dataset.view==='games')});
+ window.scrollTo(0,0);
+ setTimeout(function(){try{if(window.GTA_MP&&typeof GTA_MP.prepare==='function')GTA_MP.prepare(game)}catch(e){console.error('MP prepare',e)}},0);
+ }catch(e){console.error('MP open',e);alert('Oyun ekranı açılırken hata oluştu: '+e.message);}
+ return false;
+};
+</script>
 <script id="gta-multiplayer-v99">
 window.GTA_MP=(()=>{
  const SETTINGS_KEY='gta_mp_connection_v2',LEGACY_SETTINGS_KEY='gta_mp_connection_v1',PROFILE_KEY='gta_mp_profile_v1';
@@ -1967,4 +1984,4 @@ window.CC_AUTH={login,logout,bootstrapAdmin,createUser,listUsers,setUserActive,p
 document.documentElement.classList.add('cc-auth-pending');
 document.addEventListener('DOMContentLoaded',()=>{let f=$id('ccLoginForm');if(f)f.addEventListener('submit',login);setTimeout(()=>{guardNav();hookSave();restore()},0)});
 })();
-</script><script>window.CC_BUILD="V102.13";</script></body></html>
+</script><script>window.CC_BUILD="V102.14";</script></body></html>
