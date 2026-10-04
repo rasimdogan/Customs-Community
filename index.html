@@ -1786,9 +1786,9 @@ window.GTA_SCENE_ADMIN=(()=>{
 window.GTA_MP=(()=>{
  const SETTINGS_KEY='gta_mp_connection_v2',LEGACY_SETTINGS_KEY='gta_mp_connection_v1',PROFILE_KEY='gta_mp_profile_v1';
  let sbClient=null,session=null,tick=null,cardTick=null,hostLostTimer=null,selectedTile=null,selectedWeapon=null,arsenalSeed=0,arsenalCards=[];
+ const q=id=>document.getElementById(id), clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
  const MP_INITIAL_UI={conquestQuestion:q('mpcQuestion')?.innerHTML||'',duelQuestion:q('mpdQuestionCard')?.innerHTML||'',duelArsenal:q('mpdArsenal')?.innerHTML||''};
  let claimLocks=new Set(),pendingClaimTile=null,conquestPenaltyUntil=0,duelResolveLock=null,chatLog=[],chatUnread=0;
- const q=id=>document.getElementById(id), clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
  const safe=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
  const stripCode=t=>String(t||'').replace(/^\s*\d{4}\s*/,'').trim();
  const cardById=id=>CARDS.find(c=>String(c.id)===String(id));
