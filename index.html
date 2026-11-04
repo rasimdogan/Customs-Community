@@ -7297,8 +7297,7 @@ html.cc-auth-ok img{-webkit-user-drag:none!important;user-drag:none!important}
    }
   }else{
    feedback.innerHTML='<b style="color:#ff9a9a">✕ Yanlış cevap.</b><br>Doğru GTİP: <b>'+esc(a.q.answer)+'</b><br><span>'+esc(String(a.q.source.text||'').slice(0,650))+'</span>';
-   if(a.type==='main')target.cursor++;
-   else target.cursor++;
+   if(a.type!=='main')target.cursor++;
    log('Yanlış cevap. Doğru GTİP: '+a.q.answer+'. Aynı noktayı yeniden deneyebilirsin.');
   }
   $('fsQuestionNext').classList.remove('fs-hidden');$('fsQuestionNext').textContent=ok?'Haritaya dön →':'Açıklamayı gördüm →';
