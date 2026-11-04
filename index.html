@@ -7260,7 +7260,7 @@ html.cc-auth-ok img{-webkit-user-drag:none!important;user-drag:none!important}
   $('fsBlueCaptured').textContent=g.blueCaptured;$('fsRedCaptured').textContent='—';
   $('fsBlueDefence').innerHTML=g.defense.map(x=>'<div class="fs-defence-item"><span>🛡️ '+String(x.chapter).padStart(2,'0')+'. Fasıl</span><b>'+(x.captured?'Fethedildi':'2 puan')+'</b></div>').join('');
   $('fsRedDefence').innerHTML='<div class="fs-defence-item"><span>🏰 Ana kale</span><b>'+g.mainCorrect+'/50</b></div>';
-  const tile=(x,i)=>'<button class="fs-tile '+(x.type==='fort'?'fort':x.type==='main'?'main':'')+' '+(x.captured?'captured':'')+'" '+(x.captured?'disabled':'')+' onclick="FASIL_SAVASI.attack(\''+x.type+'\','+i+')"><span class="em">'+(x.captured?'🏳️':x.type==='main'?'🏰':x.type==='fort'?'🛡️':'🧩')+'</span><b>'+(x.type==='main'?'ANA KALE · SINIFLANDIRMA KARARLARI':String(x.chapter).padStart(2,'0')+'. Fasıl'+(x.type==='fort'?' · SAVUNMA KALESİ':''))+'</b><small>'+(x.captured?'Fethedildi':x.type==='main'?g.mainCorrect+'/50 doğru · 3 birim puan':(x.type==='fort'?'2 birim puan':'1 birim puan')+' · '+x.questions.length+' karar')+'</small></button>';
+  const tile=(x,i)=>'<button class="fs-tile '+(x.type==='fort'?'fort':x.type==='main'?'main':'')+' '+(x.captured?'captured':'')+'" '+(x.captured?'disabled':'')+' onclick="FASIL_SAVASI.attack(\''+x.type+'\','+i+')"><span class="em">'+(x.captured?'🏳️':x.type==='main'?'🏰':x.type==='fort'?'🛡️':'🧩')+'</span><b>'+(x.type==='main'?'ANA KALE · SINIFLANDIRMA KARARLARI':String(x.chapter).padStart(2,'0')+'. Fasıl'+(x.type==='fort'?' · SAVUNMA KALESİ':''))+'</b><small>'+(x.captured?'Fethedildi':x.type==='main'?g.mainCorrect+'/50 doğru · 3 birim puan':x.cursor+'/'+x.questions.length+' karar · '+x.points+' birim puan')+'</small></button>';
   const map=$('fsMapGrid');map.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:13px;min-height:380px;padding:22px;border-radius:18px;background:radial-gradient(ellipse at center,#315b47 0%,#1d493e 48%,#122d2c 100%);border:1px solid #527d68;box-shadow:inset 0 0 55px #071b1b;';
   map.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#d8e9cf;font-size:11px;letter-spacing:2px;font-weight:900">🗺️ FASIL SAVAŞ HARİTASI · TIKLAYARAK KEŞFET</div>'+tile(g.main,0)+g.defense.map((x,i)=>tile(x,i)).join('')+g.field.map((x,i)=>tile(x,i)).join('');
  }
@@ -7274,7 +7274,7 @@ html.cc-auth-ok img{-webkit-user-drag:none!important;user-drag:none!important}
   if(!q){alert(String(target.chapter||'Ana kale')+'. Fasıl için sınıflandırma kararı bulunamadı.');return}
   state.activeQuestion={type,index,target,q,answered:false,selected:null};
   $('fsQuestionType').textContent=type==='main'?'🏰 ANA KALE · 3 BİRİM PUAN':type==='fort'?'🛡️ SAVUNMA KALESİ · 2 BİRİM PUAN':'🧩 ORTAK FASIL · 1 BİRİM PUAN';
-  $('fsQuestionProgress').textContent=type==='main'?'Ana kale: '+g.mainCorrect+'/50 doğru':String(target.chapter).padStart(2,'0')+'. Fasıl · '+target.questions.length+' karar';
+  $('fsQuestionProgress').textContent=type==='main'?'Ana kale: '+g.mainCorrect+'/50 doğru':String(target.chapter).padStart(2,'0')+'. Fasıl · '+target.cursor+'/'+target.questions.length+' karar';
   $('fsQuestionTitle').textContent='Bu sınıflandırma kararında doğru GTİP hangisidir?';
   $('fsQuestionContext').textContent=q.source.text||'Sınıflandırma kararı';
   $('fsQuestionOptions').innerHTML=q.options.map((o,i)=>'<button class="fs-option" onclick="FASIL_SAVASI.answer('+i+')">'+esc(o)+'</button>').join('');
@@ -7289,15 +7289,17 @@ html.cc-auth-ok img{-webkit-user-drag:none!important;user-drag:none!important}
    feedback.innerHTML='<b style="color:#78e0a9">✓ Doğru cevap!</b><br>Doğru GTİP: <b>'+esc(a.q.answer)+'</b><br><span>'+esc(String(a.q.source.text||'').slice(0,650))+'</span>';
    const target=a.target;
    if(a.type==='main'){
-    target.cursor++;target.correct++;g.mainCorrect=target.correct;g.redDamage=g.mainCorrect*20;g.blueScore+=3;g.blueArea+=3;g.blueCaptured++;log('Ana kale kararı doğru: +3 puan. '+g.mainCorrect+'/50.');
-    if(g.mainCorrect>=50){target.captured=true;target.cursor=50;log('Ana kale fethedildi! Oyun tamamlandı.');}
+    target.cursor++;target.correct++;g.mainCorrect=target.correct;g.redDamage=g.mainCorrect*20;g.blueScore+=3;g.blueArea+=3;
+    log('Ana kale kararı doğru: +3 puan. '+g.mainCorrect+'/50.');
+    if(g.mainCorrect>=50){target.captured=true;target.cursor=50;g.blueCaptured++;log('Ana kale fethedildi! Oyun tamamlandı.');}
    }else{
-    target.captured=true;g.blueScore+=target.points;g.blueArea+=target.area;g.blueCaptured++;g.blueDamage+=target.points;
-    log(String(target.chapter).padStart(2,'0')+'. Fasıl fethedildi: +'+target.points+' puan, '+target.area+' alan birimi.');
+    target.cursor++;g.blueScore+=target.points;g.blueArea+=target.area;g.blueDamage+=target.points;
+    if(target.cursor>=target.questions.length){target.captured=true;g.blueCaptured++;log(String(target.chapter).padStart(2,'0')+'. Fasılın tüm kararları çözüldü: kale fethedildi! +'+target.points+' puan/karar.');}
+    else log(String(target.chapter).padStart(2,'0')+'. Fasıl kararı doğru: +'+target.points+' puan. '+target.cursor+'/'+target.questions.length+' tamamlandı.');
    }
   }else{
    feedback.innerHTML='<b style="color:#ff9a9a">✕ Yanlış cevap.</b><br>Doğru GTİP: <b>'+esc(a.q.answer)+'</b><br><span>'+esc(String(a.q.source.text||'').slice(0,650))+'</span>';
-   if(a.type!=='main')target.cursor++;
+   // Yanlış cevapta aynı karar tekrar sorulur; ilerleme yapılmaz.
    log('Yanlış cevap. Doğru GTİP: '+a.q.answer+'. Aynı noktayı yeniden deneyebilirsin.');
   }
   $('fsQuestionNext').classList.remove('fs-hidden');$('fsQuestionNext').textContent=ok?'Haritaya dön →':'Açıklamayı gördüm →';
