@@ -7212,7 +7212,7 @@ html.cc-auth-ok img{-webkit-user-drag:none!important;user-drag:none!important}
  function toggleDefense(n,on){if(on&&state.defense.length>=3){renderChoices();return}state.defense=on?[...state.defense,n]:state.defense.filter(x=>x!==n);if(state.defense.length===3){const keys=['north','center','south'];keys.forEach((k,i)=>state.placement[k]=state.defense[i])}else{Object.keys(state.placement).forEach(k=>{if(!state.defense.includes(state.placement[k]))state.placement[k]=state.defense[0]||0})}renderChoices()}
  function toggleShared(n,on){if(on&&state.shared.length>=8){renderChoices();return}state.shared=on?[...state.shared,n]:state.shared.filter(x=>x!==n);renderChoices()}
  function place(slot,v){state.placement[slot]=Number(v);renderChoices()}
- function open(){renderChoices();renderPreview()}
+ function open(){renderChoices();renderPreview();setTimeout(renderChoices,900);setTimeout(renderChoices,2500)}
  function makeQuestion(x){const answer=codeOf(x),pool=records().map(codeOf).filter(c=>c&&c!==answer);const wrong=shuffle([...new Set(pool)]).slice(0,3);const opts=shuffle([answer,...wrong]);return{source:x,answer,accepted:[answer,...(Array.isArray(x.codes)?x.codes:[])].map(String),options:opts}}
  function prepareQuestions(){
   const all=shuffle(records());if(all.length<50)return false;
