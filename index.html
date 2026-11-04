@@ -7216,7 +7216,7 @@ html.cc-auth-ok img{-webkit-user-drag:none!important;user-drag:none!important}
  function makeQuestion(x){const answer=codeOf(x),pool=records().map(codeOf).filter(c=>c&&c!==answer);const wrong=shuffle([...new Set(pool)]).slice(0,3);const opts=shuffle([answer,...wrong]);return{source:x,answer,accepted:[answer,...(Array.isArray(x.codes)?x.codes:[])].map(String),options:opts}}
  function prepareQuestions(){
   const all=shuffle(records());if(all.length<50)return false;
-  state.questionPool=all;state.questionCursor=0;
+  state.questionPool=all;state.questionCursor=50;
   return true;
  }
  function nextQ(){if(!state.questionPool.length)return null;if(state.questionCursor>=state.questionPool.length)state.questionCursor=0;return makeQuestion(state.questionPool[state.questionCursor++])}
@@ -7243,7 +7243,7 @@ html.cc-auth-ok img{-webkit-user-drag:none!important;user-drag:none!important}
   $('fsBlueDefence').innerHTML=Object.entries(state.placement).map(([k,n])=>'<div class="fs-defence-item"><span>🛡️ '+String(n).padStart(2,'0')+'. Fasıl</span><b>3x</b></div>').join('');
   $('fsRedDefence').innerHTML=g.enemy.map(x=>'<div class="fs-defence-item"><span>🛡️ '+String(x.chapter).padStart(2,'0')+'. Fasıl</span><b>'+(x.captured?'Fethedildi':'3x')+'</b></div>').join('');
   const fields=g.field.map((x,i)=>'<button class="fs-tile '+(x.captured?'captured':'')+'" '+(x.captured?'disabled':'')+' onclick="FASIL_SAVASI.attack(\'field\','+i+')"><span class="em">'+(x.captured?'🟦':'🧩')+'</span><b>'+String(x.chapter).padStart(2,'0')+'. Fasıl</b><small>'+(x.captured?'Fethedildi':'100 puan · 1 alan')+'</small></button>').join('');
-  const forts=g.enemy.map((x,i)=>'<button class="fs-tile fort '+(x.captured?'captured':'')+'" '+(x.captured?'disabled':'')+' onclick="FASIL_SAVASI.attack(\'fort\','+i+')"><span class="em">'+(x.captured?'🏳️':'🏯')+'</span><b>'+String(x.chapter).padStart(2,'0')+'. Savunma kalesi</b><small>'+(x.captured?'Fethedildi':'300 puan · 3 alan')+'</small></button>').join('');
+  const fortsOpen=g.field.some(x=>x.captured);const forts=g.enemy.map((x,i)=>'<button class="fs-tile fort '+(x.captured?'captured':'')+'" '+((x.captured||!fortsOpen)?'disabled':'')+' onclick="FASIL_SAVASI.attack(\'fort\','+i+')"><span class="em">'+(x.captured?'🏳️':'🏯')+'</span><b>'+String(x.chapter).padStart(2,'0')+'. Savunma kalesi</b><small>'+(x.captured?'Fethedildi':(!fortsOpen?'Önce ortak alanı fethet':'300 puan · 3 alan'))+'</small></button>').join('');
   const unlocked=g.enemy.every(x=>x.captured);
   const main='<button class="fs-tile main '+(unlocked?'unlocked':'')+'" '+(!unlocked?'disabled':'')+' onclick="FASIL_SAVASI.attack(\'main\',0)"><span class="em">🏰</span><b>ANA KALE · '+(unlocked?'SALDIRI AÇIK':'KİLİTLİ')+'</b><small>'+g.mainCorrect+'/50 doğru cevap · '+g.redHP.toLocaleString('tr-TR')+' dayanıklılık</small></button>';
   $('fsMapGrid').innerHTML=fields+forts+main;
@@ -7269,7 +7269,7 @@ html.cc-auth-ok img{-webkit-user-drag:none!important;user-drag:none!important}
   opts.forEach((b,j)=>{b.disabled=true;if(a.q.accepted.includes(String(a.q.options[j])))b.classList.add('correct');else if(j===i)b.classList.add('wrong')});
   const feedback=$('fsQuestionFeedback');feedback.classList.remove('fs-hidden');
   if(ok){
-   feedback.innerHTML='<b style="color:#78e0a9">✓ Doğru cevap!</b><br>Doğru GTİP: <b>'+esc(a.q.answer)+'</b><br><span>Bu kararın gerekçesini inceleyerek öğrenmeni pekiştir.</span>';
+   feedback.innerHTML='<b style="color:#78e0a9">✓ Doğru cevap!</b><br>Doğru GTİP: <b>'+esc(a.q.answer)+'</b><br><span>'+esc(String(a.q.source.text||'').slice(0,650))+'</span>';
    if(a.type==='field'){const t=g.field[a.index];t.captured=true;g.blueScore+=100;g.blueArea+=1;g.blueCaptured++;log(t.chapter+'. Fasıl fethedildi: +100 puan, 1 alan birimi.')}
    else if(a.type==='fort'){const t=g.enemy[a.index];t.captured=true;g.blueScore+=300;g.blueArea+=3;g.blueCaptured++;g.redDamage+=300;log(t.chapter+'. Fasıl savunma kalesi fethedildi: +300 puan, 3 alan birimi.')}
    else{g.mainCorrect++;g.redHP=Math.max(0,1000-g.mainCorrect*20);g.redDamage=1000-g.redHP;g.blueScore+=50;log('Ana kaleye isabet! '+g.mainCorrect+'/50 sınıflandırma kararı doğru.')}
