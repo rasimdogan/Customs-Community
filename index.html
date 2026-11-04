@@ -7395,6 +7395,9 @@ html.cc-auth-ok img{-webkit-user-drag:none!important;user-drag:none!important}
   map.innerHTML=svg+'<div class="fs-map-caption">⚔️ FASIL SAVAŞI · SORU KARELERİNE TIKLA · TEKERLEKLE YAKINLAŞ / UZAKLAŞ</div><div class="fs-player-base" style="left:80px;top:430px">'+art('blue')+'<b>'+esc(state.castleName)+'</b><small>Senin ana kalen</small></div>'+g.defense.map((x,i)=>castle(x,i,pos.own[i],'own')).join('')+g.field.map((x,i)=>fieldRegion(x,i)).join('')+g.enemyDefense.map((x,i)=>castle(x,i,pos.enemy[i],'enemy')).join('')+'<button type="button" class="fs-tile fs-map-node main" style="position:absolute;left:'+pos.main[0]+'px;top:'+pos.main[1]+'px;transform:translate(-50%,-50%)" data-fs-attack="main" data-fs-index="0" '+(g.enemyDefense.every(n=>n.captured)?'':'disabled')+'>'+art('red')+'<b>RAKİP ANA KALE</b><small>'+g.mainCorrect+'/50 karar</small></button>';
   map.addEventListener('click',e=>{if(e.target===map||e.target.classList.contains('fs-cartography')||e.target.classList.contains('fs-smoke'))closeQuestion();});
   const host=map.parentElement;
+  if(host&&!map.dataset.initialScroll){map.dataset.initialScroll='1';host.scrollLeft=0;}
+  if(!map.dataset.zoomBound){map.dataset.zoomBound='1';let z=1;map.addEventListener('wheel',e=>{e.preventDefault();z=Math.max(.55,Math.min(2.1,z+(e.deltaY<0?.1:-.1)));map.style.zoom=String(z);},{passive:false});}
+  const modal=$('fsQuestionModal');if(modal&&!modal.dataset.backdropBound){modal.dataset.backdropBound='1';modal.addEventListener('click',e=>{if(e.target===modal)closeQuestion();});}
   if(!map.dataset.clickBound){map.dataset.clickBound='1';map.addEventListener('click',e=>{const btn=e.target.closest('[data-fs-attack]');if(!btn||btn.disabled)return;const type=btn.dataset.fsAttack,index=Number(btn.dataset.fsIndex),qIndex=btn.dataset.fsQuestionIndex===undefined?undefined:Number(btn.dataset.fsQuestionIndex);if(type)attack(type,index,qIndex)});}
   if(host&&!map.dataset.initialScroll){map.dataset.initialScroll='1';host.scrollLeft=0;}
  }
@@ -7409,6 +7412,7 @@ html.cc-auth-ok img{-webkit-user-drag:none!important;user-drag:none!important}
   if(type==='main'&&target.cursor>=50){finish(true);return}
   if(!Array.isArray(target.doneQuestions))target.doneQuestions=[];
   const qIndex=Number.isInteger(questionIndex)?questionIndex:target.questions.findIndex((_,j)=>!target.doneQuestions[j]);
+  if(Number.isInteger(questionIndex)&&target.doneQuestions[questionIndex])return;
   const q=target.questions[qIndex<0?target.cursor:qIndex];if(!q){if(type==='main')finish(true);else{target.captured=true;renderGame()}return}
   state.activeQuestion={type,index,target,q,questionIndex:qIndex<0?target.cursor:qIndex,answered:false,selected:null,correct:false};
   $('fsQuestionType').textContent=type==='main'?'🏰 RAKİP ANA KALE · SINIFLANDIRMA KARARLARI · 3 PUAN':type==='enemyFort'?'🛡️ RAKİP '+String(target.chapter).padStart(2,'0')+'. FASIL SAVUNMASI · 2 PUAN':'⚔️ ORTAK '+String(target.chapter).padStart(2,'0')+'. FASIL · 1 PUAN';
