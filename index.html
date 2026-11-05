@@ -7551,7 +7551,6 @@ html.cc-auth-ok img{-webkit-user-drag:none!important;user-drag:none!important}
  function attack(type,index,questionIndex){
   const g=state.game;if(!g||g.ended)return;
   if(state.online&&!state.online.host&&!state.applyingRemote){fsSend('attack_request',{attackType:type,index,questionIndex});return}
-  if(state.online?.host&&state.activeQuestion&&!state.applyingRemote)return;
   const target=type==='field'?g.field[index]:type==='fort'?g.defense[index]:type==='enemyFort'?g.enemyDefense[index]:type==='main'?g.main:type==='ownMain'?g.ownMain:null;
   if(!target||target.captured)return;
   if(type==='main'&&target.cursor>=50){finish(true);return}
