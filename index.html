@@ -5657,7 +5657,10 @@ body.dark #ccxOverlay .ccx-header-inner .ccx-brand-title{color:#e5f2f8!important
    <div class="ccx-library-frame"><button id="ccxTabCards" class="ccx-card-library-entry gmt-btn gmt-btn--primary" type="button" onclick="CCCards.openLibrary()">Kart Kütüphanesi</button></div>
    <div class="ccx-library-frame cc94-education-frame"><button id="cc94TabEducation" class="ccx-card-library-entry gmt-btn gmt-btn--ghost" type="button" onclick="CCCommunity.close();nav('edu');window.scrollTo({top:0,behavior:'auto'})">Eğitim Alanı</button></div>
   </div>
- </div>
+
+  <button class="gmt-nav-scroll gmt-nav-prev" type="button" data-gmt-scroll="prev" aria-label="Menü sekmelerini sola kaydır" title="Sola kaydır" hidden>‹</button>
+  <button class="gmt-nav-scroll gmt-nav-next" type="button" data-gmt-scroll="next" aria-label="Menü sekmelerini sağa kaydır" title="Sağa kaydır" hidden>›</button>
+   </div>
 </header>
   <div id="ccxSocialLayout" class="ccx-layout">
    <aside class="ccx-left">
@@ -9277,4 +9280,150 @@ body.ccw-live-open{overflow:hidden!important}
  #ccxHubPanel .ccw-cover:not(.ccw-cover-empty){width:100%!important;height:160px!important}
  #ccxOverlay .cchub-detail-cover-webinar{height:220px!important}
 }
-</style></body></html>
+</style><style id="cc-mobile-scroll-audit-v10414">
+/* Mobile swipe audit 2026-11-19: scoped touch scrolling; keep map/game gestures untouched. */
+#ccxOverlay header.gmt-header .gmt-bar,
+#ccClassDemo header.gmt-header .gmt-bar{position:relative!important}
+#ccxOverlay header.gmt-header .gmt-nav,
+#ccClassDemo header.gmt-header .gmt-nav{
+ min-width:0!important;max-width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;
+ overscroll-behavior-x:contain!important;-webkit-overflow-scrolling:touch!important;
+ touch-action:pan-x!important;scroll-behavior:smooth!important;
+ scrollbar-width:none!important
+}
+#ccxOverlay header.gmt-header .gmt-nav::-webkit-scrollbar,
+#ccClassDemo header.gmt-header .gmt-nav::-webkit-scrollbar{display:none!important}
+#ccxOverlay header.gmt-header .gmt-nav .ccx-nav-social,
+#ccClassDemo header.gmt-header .gmt-nav .ccx-nav-social,
+#ccxOverlay header.gmt-header .gmt-nav .ccx-nav-buttons,
+#ccClassDemo header.gmt-header .gmt-nav .ccx-nav-buttons{
+ width:max-content!important;min-width:max-content!important;max-width:none!important;
+ flex:0 0 max-content!important;flex-wrap:nowrap!important;white-space:nowrap!important
+}
+#ccxOverlay header.gmt-header .gmt-nav .ccx-nav-buttons>button,
+#ccClassDemo header.gmt-header .gmt-nav .ccx-nav-buttons>button{
+ flex:0 0 auto!important;white-space:nowrap!important;touch-action:manipulation!important
+}
+#ccxOverlay header.gmt-header .gmt-nav-scroll,
+#ccClassDemo header.gmt-header .gmt-nav-scroll{display:none!important}
+@media(max-width:900px){
+ /* Community/feed, library, profile and classes must scroll vertically on mobile. */
+ #ccxOverlay .ccx-app,#ccxOverlay #ccxSocialLayout,#ccxOverlay #ccxHubPanel,
+ #ccxOverlay #ccxCardLibraryPanel,#ccxOverlay #ccxUserProfilePage,
+ #ccClassDemo,#ccClassDemo .room{
+  -webkit-overflow-scrolling:touch!important;
+  overscroll-behavior-y:auto!important
+ }
+ #ccxOverlay .ccx-layout,#ccxOverlay .ccx-main,#ccxOverlay .cchub-content,
+ #ccxOverlay .cckl-shell,#ccClassDemo .shell,#ccClassDemo .layout{min-width:0!important}
+ /* Horizontal tab rows, instead of clipped/wrapped navigation. */
+ #ccxOverlay .ccx-user-tabs,
+ #ccxOverlay .cckl-nav,
+ #ccClassDemo .tabs{
+  display:flex!important;flex-wrap:nowrap!important;justify-content:flex-start!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  overflow-x:auto!important;overflow-y:hidden!important;
+  -webkit-overflow-scrolling:touch!important;touch-action:pan-x!important;
+  overscroll-behavior-x:contain!important;scrollbar-width:thin!important;
+ }
+ #ccxOverlay .ccx-user-tabs>button,
+ #ccxOverlay .cckl-nav>button,
+ #ccClassDemo .tabs>.tab{flex:0 0 auto!important;white-space:nowrap!important}
+ #ccxOverlay .cc92-table-scroller,
+ #ccxOverlay .cchub-form,
+ #ccClassDemo .ccd-calendar{max-width:100%!important;-webkit-overflow-scrolling:touch!important}
+}
+@media(max-width:720px){
+ #ccxOverlay header.gmt-header .gmt-bar,
+ #ccClassDemo header.gmt-header .gmt-bar{position:relative!important}
+ #ccxOverlay header.gmt-header .gmt-nav,
+ #ccClassDemo header.gmt-header .gmt-nav{
+  order:3!important;flex:0 0 100%!important;width:100%!important;
+  min-width:0!important;max-width:100%!important;
+  display:flex!important;align-self:auto!important;
+  overflow-x:auto!important;overflow-y:hidden!important;
+  touch-action:pan-x!important;scrollbar-width:none!important;
+  -webkit-overflow-scrolling:touch!important;
+  padding-right:72px!important;scroll-padding-inline:12px!important
+ }
+ #ccxOverlay header.gmt-header .gmt-nav-scroll,
+ #ccClassDemo header.gmt-header .gmt-nav-scroll{
+  position:absolute!important;bottom:3px!important;z-index:5!important;
+  display:grid!important;place-items:center!important;
+  width:31px!important;height:35px!important;padding:0!important;
+  background:rgba(255,255,255,.96)!important;color:#1f3d5c!important;
+  border:1px solid #d9e4ee!important;border-radius:9px!important;
+  font:700 24px/1 system-ui,sans-serif!important;box-shadow:0 1px 4px #21395016!important;
+  cursor:pointer!important;touch-action:manipulation!important
+ }
+ #ccxOverlay header.gmt-header .gmt-nav-prev,
+ #ccClassDemo header.gmt-header .gmt-nav-prev{right:49px!important}
+ #ccxOverlay header.gmt-header .gmt-nav-next,
+ #ccClassDemo header.gmt-header .gmt-nav-next{right:15px!important}
+ #ccxOverlay header.gmt-header .gmt-nav-scroll[hidden],
+ #ccClassDemo header.gmt-header .gmt-nav-scroll[hidden]{display:none!important}
+ #ccxOverlay header.gmt-header .gmt-nav-scroll:disabled,
+ #ccClassDemo header.gmt-header .gmt-nav-scroll:disabled{opacity:.34!important}
+ #ccxOverlay header.gmt-header .gmt-actions,
+ #ccClassDemo header.gmt-header .gmt-actions{max-width:calc(100% - 55px)!important}
+ #ccxOverlay header.gmt-header .gmt-nav .ccx-nav-buttons,
+ #ccClassDemo header.gmt-header .gmt-nav .ccx-nav-buttons{width:max-content!important}
+ #ccxOverlay header.gmt-header .gmt-nav .ccx-nav-buttons>button,
+ #ccClassDemo header.gmt-header .gmt-nav .ccx-nav-buttons>button{
+  min-height:43px!important;height:43px!important;padding:0 13px!important
+ }
+ #ccxOverlay .ccx-user-tabs,#ccxOverlay .cckl-nav,#ccClassDemo .tabs{scroll-padding-inline:8px!important}
+}
+@media(max-width:390px){
+ #ccxOverlay header.gmt-header .gmt-actions .gmt-btn,
+ #ccClassDemo header.gmt-header .gmt-actions .gmt-btn{
+  font-size:10px!important;padding:0 6px!important
+ }
+ #ccxOverlay header.gmt-header .gmt-actions,#ccClassDemo header.gmt-header .gmt-actions{gap:4px!important}
+ #ccxOverlay header.gmt-header .gmt-nav-prev,#ccClassDemo header.gmt-header .gmt-nav-prev{right:45px!important}
+ #ccxOverlay header.gmt-header .gmt-nav-next,#ccClassDemo header.gmt-header .gmt-nav-next{right:11px!important}
+}
+</style><script id="cc-mobile-swipe-controls-v10414">
+(function(){
+  "use strict";
+  function sync(bar){
+    const nav=bar?.querySelector('nav.gmt-nav');
+    const prev=bar?.querySelector('[data-gmt-scroll="prev"]');
+    const next=bar?.querySelector('[data-gmt-scroll="next"]');
+    if(!nav||!prev||!next)return;
+    const needed=nav.scrollWidth>nav.clientWidth+3;
+    prev.hidden=next.hidden=!needed;
+    prev.disabled=!needed||nav.scrollLeft<=2;
+    next.disabled=!needed||nav.scrollLeft>=nav.scrollWidth-nav.clientWidth-3;
+  }
+  function all(){
+    document.querySelectorAll('#ccxOverlay header.gmt-header .gmt-bar,#ccClassDemo header.gmt-header .gmt-bar').forEach(sync);
+  }
+  document.addEventListener('click',e=>{
+    const button=e.target.closest?.('[data-gmt-scroll]');
+    if(!button)return;
+    const bar=button.closest('.gmt-bar'),nav=bar?.querySelector('nav.gmt-nav');
+    if(!nav)return;
+    const direction=button.dataset.gmtScroll==='prev'?-1:1;
+    nav.scrollBy({left:direction*Math.max(165,Math.round(nav.clientWidth*.7)),behavior:'smooth'});
+  });
+  document.addEventListener('scroll',e=>{
+    if(e.target?.matches?.('nav.gmt-nav'))sync(e.target.closest('.gmt-bar'));
+  },true);
+  window.addEventListener('resize',all,{passive:true});
+  function init(){
+    all();
+    if(typeof ResizeObserver!=='undefined'){
+      const ro=new ResizeObserver(all);
+      document.querySelectorAll('nav.gmt-nav').forEach(nav=>ro.observe(nav));
+    }
+    const classes=document.getElementById('ccClassDemo');
+    if(classes){
+      const mo=new MutationObserver(()=>{if(classes.querySelector(':scope > header.gmt-header'))all()});
+      mo.observe(classes,{childList:true});
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
+  else init();
+})();
+</script></body></html>
