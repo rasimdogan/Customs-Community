@@ -5780,7 +5780,7 @@ body.dark #ccxOverlay .ccx-header-inner .ccx-brand-title{color:#e5f2f8!important
    <div id="ccxProfileStatsLine" class="ccx-profile-note"></div>
    <button id="ccxProfileSave" class="ccx-primary ccx-profile-save" onclick="CCCommunity.saveProfile()">Profili Kaydet</button>
    <div class="cc93-profile-shortcut"><div><span aria-hidden="true">◇</span><b>Üyelik ve Ödemeler</b></div><button type="button" onclick="CCCommunity.closeProfile();CC_MEMBERSHIP.showPlans()">Planlarımı Gör →</button></div>
-   <details class="ccx-password cc-safe-section" id="ccSafeGeneral"><summary>Hesap Ayarları</summary><div class="cc-safe-content"><p>Profil bilgilerini, hesabını ve üyelik tercihlerini yönet.</p><button type="button" onclick="CC_ACCOUNT_UI.open('password')">Şifre ve güvenlik</button></div></details>
+   <details class="ccx-password cc-safe-section" id="ccSafeGeneral"><summary>Hesap Ayarları</summary><div class="cc-safe-content"><p>Profil bilgilerini yukarıdaki alanlardan güncelleyebilirsin. Şifreni değiştirmek için aşağıdaki Şifre değiştir bölümünü kullan.</p></div></details>
    <details class="ccx-password cc-safe-section" id="ccSafePayments"><summary>Ödemelerim</summary><div class="cc-safe-content"><b>Henüz ödeme kaydı yok.</b><p>Ödeme altyapısı henüz aktif değil. İşlem geçmişi bağlantı kurulduğunda burada gösterilecek.</p><button type="button" onclick="CCCommunity.closeProfile();CC_MEMBERSHIP.showPlans()">Üyelik paketlerini incele</button></div></details>
    <details class="ccx-password cc-safe-section" id="ccSafeInvoices"><summary>Faturalarım</summary><div class="cc-safe-content"><b>Henüz fatura bulunmuyor.</b><p>Faturalandırma sistemi aktif olduğunda gerçek faturalar ve indirilebilir belgeler bu alanda listelenecek.</p></div></details>
    <details class="ccx-password" id="ccSafePassword">
@@ -8793,4 +8793,27 @@ window.CC_ACCOUNT_UI={
  #ccxOverlay .ccx-header-inner .ccx-top-actions .cc-safe-settings-trigger{min-width:73px!important;padding:0 7px!important;font-size:11px!important}
  #ccxOverlay .ccx-header-inner .ccx-top-actions #ccxNotifBtn{min-width:34px!important;width:34px!important}
 }
-</style></body></html>
+</style><script id="cc-remove-redundant-card-explainer-v10398">
+(function(){
+ const phrases=[
+  /Topluluk kartları\s+Eğitim Alanı ve testlerden tamamen bağımsızdır\.?/gi,
+  /[·•]\s*Topluluğun ana kart paylaşım alanı\.?/gi
+ ];
+ function clean(){
+  const root=document.getElementById('ccxOverlay');if(!root)return;
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+  const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+  for(const node of nodes){
+   let updated=node.nodeValue;
+   for(const p of phrases)updated=updated.replace(p,'');
+   if(updated!==node.nodeValue){
+    node.nodeValue=updated;
+    if(!updated.trim()&&node.parentElement?.childNodes.length===1&&node.parentElement.matches('p,small,.ccx-side-note'))node.parentElement.remove();
+   }
+  }
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',clean,{once:true});else clean();
+ const overlay=document.getElementById('ccxOverlay');
+ if(overlay){let pending=false;const observer=new MutationObserver(()=>{if(pending)return;pending=true;queueMicrotask(()=>{pending=false;clean()})});observer.observe(overlay,{childList:true,subtree:true,characterData:true})}
+})();
+</script></body></html>
