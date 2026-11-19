@@ -9165,7 +9165,16 @@ window.CC_ACCOUNT_UI={
      const originalButtons=original.querySelectorAll('button[id]');
      originalButtons.forEach(src=>{
        const dst=clone.querySelector('[data-gmt-source-id="'+src.id+'"]');
-       if(dst)dst.classList.toggle('active',src.classList.contains('active'));
+       if(!dst)return;
+       // In Classes, the local navigation must point to Classes,
+       // regardless of the previously active Community tab.
+       const isNavTab=!!src.closest('.ccx-nav-buttons');
+       const selected=isNavTab?src.id==='ccxTabClasses':src.classList.contains('active');
+       dst.classList.toggle('active',selected);
+       if(isNavTab){
+         if(selected)dst.setAttribute('aria-current','page');
+         else dst.removeAttribute('aria-current');
+       }
      });
      const realDot=original.querySelector('#ccxNotifDot');
      const dot=clone.querySelector('[data-gmt-source-id="ccxNotifDot"]');
