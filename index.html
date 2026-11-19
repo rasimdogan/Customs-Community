@@ -5639,43 +5639,37 @@ body.dark #ccxOverlay .ccx-header-inner .ccx-brand-title{color:#e5f2f8!important
 
 <div id="ccxOverlay" aria-hidden="true">
  <div class="ccx-app">
-  <header class="ccx-topbar">
-   <div class="ccx-header-inner">
-   <button class="ccx-brand ccx-brand-link" type="button" onclick="CC_ACCOUNT_UI.communityHome()" title="Topluluk ana sayfası" aria-label="Gümrük Meslek Topluluğu - Ana Akış"><span class="ccx-brand-mark">CC</span><span class="ccx-brand-title">Gümrük Meslek Topluluğu</span></button>
-   <nav class="ccx-nav-groups ccx-nav-compact" aria-label="Topluluk bölümleri">
-    <div class="ccx-nav-cluster ccx-nav-social">
-     <span class="ccx-nav-label">TOPLULUK &amp; BİLGİ MERKEZİ</span>
-     <div class="ccx-nav-buttons">
-      <button id="ccxTabAll" class="active" onclick="CCCommunity.setFeed('all')">Ana Akış</button>
-      <button id="ccxTabFollowing" onclick="CCCommunity.setFeed('following')">Takip Ettiklerim</button>
-      <button id="ccxTabArticles" onclick="CCHub.open('articles')">Makaleler</button>
-      <button id="ccxTabNews" onclick="CCHub.open('news')">Haberler</button>
-      <button id="ccxTabWebinars" onclick="CCHub.open('webinars')">Webinar</button><button id="ccxTabClasses" type="button" onclick="CCClassDemo.open()">Sınıflar</button>
-     </div>
-    </div>
-   </nav>
-    <div class="cc94-nav-shortcuts" aria-label="Kütüphane ve eğitim geçişleri">
-     <button id="ccxNotifBtn" class="ccx-notif-btn" onclick="CCCommunity.openNotifications()" aria-label="Bildirimler" title="Bildirimler">🔔<span id="ccxNotifDot" class="ccx-notif-dot"></span></button>
-     <div class="ccx-library-frame">
-      <button id="ccxTabCards" class="ccx-card-library-entry" onclick="CCCards.openLibrary()" type="button" title="Topluluk Kart Kütüphanesi">
-       <span class="ccx-card-library-icon" aria-hidden="true">▦</span>
-       <span><b>Kart Kütüphanesi</b><small>Kart oluştur · paylaş · gönder</small></span>
+  <header class="ccx-topbar cc-ref-header">
+  <div class="ccx-header-inner">
+    <button class="ccx-brand ccx-brand-link" type="button" onclick="CC_ACCOUNT_UI.communityHome()" title="Topluluk ana sayfası" aria-label="Gümrük Meslek Topluluğu - Ana Akış">
+      <span class="ccx-brand-mark">CC</span><span class="ccx-brand-title">Gümrük Meslek Topluluğu</span>
+    </button>
+    <nav class="ccx-nav-groups ccx-nav-compact" aria-label="Topluluk bölümleri">
+      <div class="ccx-nav-cluster ccx-nav-social">
+        <div class="ccx-nav-buttons">
+          <button id="ccxTabAll" class="active" onclick="CCCommunity.setFeed('all')">Ana Akış</button>
+          <button id="ccxTabFollowing" onclick="CCCommunity.setFeed('following')">Takip Ettiklerim</button>
+          <button id="ccxTabArticles" onclick="CCHub.open('articles')">Makaleler</button>
+          <button id="ccxTabNews" onclick="CCHub.open('news')">Haberler</button>
+          <button id="ccxTabWebinars" onclick="CCHub.open('webinars')">Webinar</button>
+          <button id="ccxTabClasses" type="button" onclick="CCClassDemo.open()">Sınıflar</button>
+        </div>
+      </div>
+    </nav>
+    <div class="cc94-nav-shortcuts" aria-label="Bildirimler, kart kütüphanesi ve eğitim">
+      <button id="ccxNotifBtn" class="ccx-notif-btn" type="button" onclick="CCCommunity.openNotifications()" aria-label="Bildirimler" title="Bildirimler">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>
+        <span id="ccxNotifDot" class="ccx-notif-dot"></span>
       </button>
-     </div>
-     <div class="ccx-library-frame cc94-education-frame">
-      <button id="cc94TabEducation" class="ccx-card-library-entry" onclick="CCCommunity.close();nav('edu');window.scrollTo({top:0,behavior:'auto'})" type="button" title="Eğitim Alanına geç">
-       <span class="ccx-card-library-icon" aria-hidden="true">▣</span>
-       <span><b>Eğitim Alanı</b><small>GTİP kartları · öğren · tekrar et</small></span>
-      </button>
-     </div>
+      <div class="ccx-library-frame">
+        <button id="ccxTabCards" class="ccx-card-library-entry" onclick="CCCards.openLibrary()" type="button" title="Topluluk Kart Kütüphanesi"><span class="ccx-card-library-icon" aria-hidden="true">▦</span><span><b>Kart Kütüphanesi</b><small>Kart oluştur · paylaş · gönder</small></span></button>
+      </div>
+      <div class="ccx-library-frame cc94-education-frame">
+        <button id="cc94TabEducation" class="ccx-card-library-entry" onclick="CCCommunity.close();nav('edu');window.scrollTo({top:0,behavior:'auto'})" type="button" title="Eğitim Alanına geç"><span class="ccx-card-library-icon" aria-hidden="true">▣</span><span><b>Eğitim Alanı</b><small>GTİP kartları · öğren · tekrar et</small></span></button>
+      </div>
     </div>
-   <div class="ccx-top-actions">
-    
-    
-    <button class="ccx-mobile-profile" onclick="CCCommunity.openProfile()">Profilim</button>
-   </div>
-   </div>
-  </header>
+  </div>
+</header>
   <div id="ccxSocialLayout" class="ccx-layout">
    <aside class="ccx-left">
     <section class="ccx-card ccx-profile-card">
@@ -8779,23 +8773,38 @@ window.CC_ACCOUNT_UI={
 #ccxOverlay .ccx-header-inner{grid-template-columns:222px minmax(0,1fr) 86px!important}
 @media(max-width:1120px){#ccxOverlay .ccx-header-inner{grid-template-columns:195px minmax(0,1fr) 86px!important}}
 @media(max-width:640px){#ccxOverlay .ccx-header-inner{grid-template-columns:57px minmax(0,1fr) 80px!important}}
-</style><style id="cc-header-stable-v10406">
-#ccxOverlay .ccx-topbar{height:84px!important;min-height:84px!important;overflow:hidden!important}
-#ccxOverlay .ccx-header-inner{display:grid!important;grid-template-columns:clamp(180px,16vw,320px) minmax(0,1fr) max-content!important;grid-template-rows:84px!important;gap:10px!important;align-items:center!important;width:calc(100% - 28px)!important;max-width:none!important;height:84px!important;min-height:84px!important;padding:0!important;margin:0 auto!important}
-#ccxOverlay .ccx-header-inner>.ccx-brand{grid-column:1!important;grid-row:1!important;min-width:0!important}
-#ccxOverlay .ccx-header-inner>nav.ccx-nav-groups.ccx-nav-compact{grid-column:2!important;grid-row:1!important;display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-start!important;width:100%!important;min-width:0!important;max-width:100%!important;height:64px!important;min-height:64px!important;overflow-x:auto!important;overflow-y:hidden!important;gap:0!important;padding:4px!important;scrollbar-width:thin!important}
-#ccxOverlay .ccx-header-inner>nav.ccx-nav-groups.ccx-nav-compact .ccx-nav-social{flex:0 0 auto!important;display:block!important;width:max-content!important;min-width:max-content!important;max-width:none!important}
-#ccxOverlay .ccx-header-inner>nav.ccx-nav-groups.ccx-nav-compact .ccx-nav-buttons{min-width:max-content!important;width:max-content!important;max-width:none!important;flex-wrap:nowrap!important;white-space:nowrap!important}
-#ccxOverlay .ccx-header-inner>.cc94-nav-shortcuts{grid-column:3!important;grid-row:1!important;display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-end!important;align-self:center!important;gap:8px!important;height:66px!important;min-height:66px!important;width:max-content!important;min-width:max-content!important;max-width:none!important;margin:0!important;padding:0!important;overflow:visible!important}
-#ccxOverlay .ccx-header-inner>.cc94-nav-shortcuts>#ccxNotifBtn{display:inline-flex!important;order:0!important;position:relative!important;flex:0 0 48px!important;align-items:center!important;justify-content:center!important;width:48px!important;min-width:48px!important;max-width:48px!important;height:48px!important;min-height:48px!important;margin:0!important;padding:0!important;border:1px solid #bdd4e6!important;border-radius:12px!important;background:#edf5fa!important;font-size:20px!important}
-#ccxOverlay .ccx-header-inner>.cc94-nav-shortcuts>.ccx-library-frame{display:flex!important;order:1!important;flex:0 0 auto!important;align-items:center!important;width:auto!important;min-width:0!important;max-width:none!important;height:64px!important;min-height:64px!important;padding:0!important;margin:0!important;background:transparent!important;border:0!important}
-#ccxOverlay .ccx-header-inner>.cc94-nav-shortcuts>.cc94-education-frame{order:2!important}
-#ccxOverlay .ccx-header-inner>.cc94-nav-shortcuts .ccx-card-library-entry,#ccxOverlay .ccx-header-inner>.cc94-nav-shortcuts #cc94TabEducation{display:flex!important;visibility:visible!important;opacity:1!important;align-items:center!important;justify-content:flex-start!important;width:230px!important;min-width:230px!important;max-width:230px!important;height:64px!important;min-height:64px!important;padding:8px 12px!important;margin:0!important;border-radius:14px!important}
-#ccxOverlay .ccx-header-inner>.cc94-nav-shortcuts .ccx-card-library-entry span:last-child{display:flex!important;flex-direction:column!important;justify-content:center!important;white-space:nowrap!important}
-#ccxOverlay .ccx-header-inner>.cc94-nav-shortcuts .ccx-card-library-entry b{display:block!important;font-size:14px!important;white-space:nowrap!important}
-#ccxOverlay .ccx-header-inner>.cc94-nav-shortcuts .ccx-card-library-entry small{display:block!important;font-size:10px!important;white-space:nowrap!important}
-#ccxOverlay .ccx-header-inner>.cc94-nav-shortcuts .ccx-card-library-icon{display:none!important}
-#ccxOverlay .ccx-header-inner>.ccx-top-actions{display:none!important}
-@media(max-width:1450px){#ccxOverlay .ccx-header-inner{grid-template-columns:195px minmax(0,1fr) max-content!important}#ccxOverlay .ccx-header-inner>.cc94-nav-shortcuts .ccx-card-library-entry,#ccxOverlay .ccx-header-inner>.cc94-nav-shortcuts #cc94TabEducation{width:165px!important;min-width:165px!important;max-width:165px!important;padding:7px!important}#ccxOverlay .ccx-header-inner>.cc94-nav-shortcuts .ccx-card-library-entry b{font-size:11px!important}#ccxOverlay .ccx-header-inner>.cc94-nav-shortcuts .ccx-card-library-entry small{font-size:8px!important}}
-@media(max-width:850px){#ccxOverlay .ccx-header-inner{grid-template-columns:44px minmax(0,1fr) max-content!important}#ccxOverlay .ccx-header-inner .ccx-brand-title{display:none!important}#ccxOverlay .ccx-header-inner>.cc94-nav-shortcuts{gap:4px!important}#ccxOverlay .ccx-header-inner>.cc94-nav-shortcuts .ccx-card-library-entry,#ccxOverlay .ccx-header-inner>.cc94-nav-shortcuts #cc94TabEducation{width:102px!important;min-width:102px!important;max-width:102px!important;height:48px!important;min-height:48px!important}#ccxOverlay .ccx-header-inner>.cc94-nav-shortcuts .ccx-card-library-entry small{display:none!important}#ccxOverlay .ccx-header-inner>.cc94-nav-shortcuts>#ccxNotifBtn{flex-basis:36px!important;width:36px!important;min-width:36px!important;max-width:36px!important;height:36px!important;min-height:36px!important}}
+</style><style id="cc-reference-header-v10407">
+/* Kullanıcının header.html referansından uyarlanan sade menü. */
+#ccxOverlay header.cc-ref-header{position:sticky!important;top:0!important;z-index:50!important;box-sizing:border-box!important;display:block!important;height:76px!important;min-height:76px!important;padding:0!important;margin:0!important;border-top:3px solid #1f3d5c!important;border-bottom:1px solid #e3e8ee!important;background:#fff!important;overflow:visible!important}
+#ccxOverlay header.cc-ref-header>.ccx-header-inner{box-sizing:border-box!important;display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-start!important;gap:24px!important;width:100%!important;max-width:1920px!important;height:72px!important;min-height:72px!important;padding:0 22px!important;margin:0 auto!important;overflow:hidden!important}
+#ccxOverlay header.cc-ref-header .ccx-header-inner>.ccx-brand{box-sizing:border-box!important;display:flex!important;align-items:center!important;gap:12px!important;flex:0 0 auto!important;grid-column:auto!important;grid-row:auto!important;width:auto!important;min-width:0!important;height:auto!important;max-width:none!important;padding:0!important;margin:0!important;white-space:nowrap!important;background:none!important;border:0!important;box-shadow:none!important}
+#ccxOverlay header.cc-ref-header .ccx-brand-mark{display:grid!important;place-items:center!important;width:40px!important;height:40px!important;flex:0 0 40px!important;border-radius:10px!important;background:linear-gradient(135deg,#1f3d5c,#2f6690)!important;color:#fff!important;font-size:15px!important;font-weight:700!important}
+#ccxOverlay header.cc-ref-header .ccx-brand-title{display:block!important;font-size:15px!important;font-weight:650!important;line-height:1.2!important;color:#1b2733!important;white-space:nowrap!important}
+#ccxOverlay header.cc-ref-header .ccx-header-inner>nav.ccx-nav-groups.ccx-nav-compact{box-sizing:border-box!important;display:flex!important;flex:1 1 auto!important;flex-direction:row!important;flex-wrap:nowrap!important;align-self:stretch!important;align-items:stretch!important;justify-content:flex-start!important;grid-column:auto!important;grid-row:auto!important;gap:0!important;width:auto!important;min-width:0!important;max-width:none!important;height:100%!important;min-height:0!important;padding:0!important;margin:0!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none!important}
+#ccxOverlay header.cc-ref-header nav.ccx-nav-groups::-webkit-scrollbar{display:none!important}
+#ccxOverlay header.cc-ref-header nav.ccx-nav-groups .ccx-nav-social{display:flex!important;flex:0 0 auto!important;align-self:stretch!important;align-items:stretch!important;grid-column:auto!important;grid-row:auto!important;width:max-content!important;min-width:max-content!important;max-width:none!important;height:100%!important;margin:0!important;padding:0!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important}
+#ccxOverlay header.cc-ref-header .ccx-nav-label{display:none!important}
+#ccxOverlay header.cc-ref-header .ccx-nav-buttons{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:stretch!important;gap:2px!important;width:max-content!important;min-width:max-content!important;max-width:none!important;height:100%!important;margin:0!important;padding:0!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important}
+#ccxOverlay header.cc-ref-header .ccx-nav-buttons>button{position:relative!important;box-sizing:border-box!important;display:inline-flex!important;flex:0 0 auto!important;align-items:center!important;justify-content:center!important;min-width:0!important;width:auto!important;max-width:none!important;height:100%!important;min-height:0!important;margin:0!important;padding:0 12px!important;background:transparent!important;border:0!important;border-bottom:2px solid transparent!important;border-radius:0!important;box-shadow:none!important;color:#5d6b7a!important;font-size:13px!important;font-weight:550!important;line-height:1!important;white-space:nowrap!important;transform:none!important}
+#ccxOverlay header.cc-ref-header .ccx-nav-buttons>button:hover{color:#1f3d5c!important}
+#ccxOverlay header.cc-ref-header .ccx-nav-buttons>button.active{background:transparent!important;border-bottom:2px solid #1f3d5c!important;color:#1f3d5c!important;font-weight:700!important}
+#ccxOverlay header.cc-ref-header .ccx-header-inner>.cc94-nav-shortcuts{box-sizing:border-box!important;display:flex!important;flex:0 0 auto!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-end!important;align-self:center!important;grid-column:auto!important;grid-row:auto!important;gap:10px!important;width:auto!important;min-width:0!important;max-width:none!important;height:auto!important;min-height:0!important;margin:0!important;padding:0!important;overflow:visible!important;background:none!important;border:0!important}
+#ccxOverlay header.cc-ref-header .cc94-nav-shortcuts>#ccxNotifBtn{position:relative!important;box-sizing:border-box!important;display:grid!important;flex:0 0 40px!important;place-items:center!important;order:0!important;width:40px!important;min-width:40px!important;max-width:40px!important;height:40px!important;min-height:40px!important;margin:0!important;padding:0!important;border:1px solid #e3e8ee!important;border-radius:10px!important;background:#fff!important;box-shadow:none!important;color:#5d6b7a!important;font-size:0!important;transform:none!important}
+#ccxOverlay header.cc-ref-header .cc94-nav-shortcuts>#ccxNotifBtn:hover{background:#f1f5f9!important}
+#ccxOverlay header.cc-ref-header .cc94-nav-shortcuts>#ccxNotifBtn svg{display:block!important;width:20px!important;height:20px!important}
+#ccxOverlay header.cc-ref-header #ccxNotifDot{position:absolute!important;top:6px!important;right:7px!important}
+#ccxOverlay header.cc-ref-header .cc94-nav-shortcuts>.ccx-library-frame{box-sizing:border-box!important;display:flex!important;flex:0 0 auto!important;order:1!important;align-self:center!important;align-items:center!important;justify-content:center!important;width:auto!important;min-width:0!important;max-width:none!important;height:auto!important;min-height:0!important;margin:0!important;padding:0!important;background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+#ccxOverlay header.cc-ref-header .cc94-nav-shortcuts>.cc94-education-frame{order:2!important}
+#ccxOverlay header.cc-ref-header .cc94-nav-shortcuts .ccx-card-library-entry,#ccxOverlay header.cc-ref-header #cc94TabEducation{box-sizing:border-box!important;display:inline-flex!important;visibility:visible!important;opacity:1!important;flex:0 0 auto!important;align-items:center!important;justify-content:center!important;gap:0!important;width:auto!important;min-width:0!important;max-width:none!important;height:40px!important;min-height:40px!important;margin:0!important;padding:0 15px!important;border-radius:10px!important;box-shadow:none!important;transform:none!important;white-space:nowrap!important}
+#ccxOverlay header.cc-ref-header #ccxTabCards{background:#1f3d5c!important;border:1px solid #1f3d5c!important;color:#fff!important}
+#ccxOverlay header.cc-ref-header #ccxTabCards:hover{background:#2f6690!important;border-color:#2f6690!important}
+#ccxOverlay header.cc-ref-header #cc94TabEducation{background:transparent!important;border:1px solid #e3e8ee!important;color:#1f3d5c!important}
+#ccxOverlay header.cc-ref-header #cc94TabEducation:hover{border-color:#1f3d5c!important;background:#f1f5f9!important}
+#ccxOverlay header.cc-ref-header .cc94-nav-shortcuts .ccx-card-library-icon{display:none!important}
+#ccxOverlay header.cc-ref-header .cc94-nav-shortcuts .ccx-card-library-entry span:last-child{display:block!important;width:auto!important;min-width:0!important;max-width:none!important;margin:0!important;padding:0!important;white-space:nowrap!important}
+#ccxOverlay header.cc-ref-header .cc94-nav-shortcuts .ccx-card-library-entry b{display:block!important;margin:0!important;font-size:13px!important;font-weight:650!important;line-height:1.2!important;color:inherit!important;white-space:nowrap!important}
+#ccxOverlay header.cc-ref-header .cc94-nav-shortcuts .ccx-card-library-entry small{display:none!important}
+#ccxOverlay header.cc-ref-header .ccx-header-inner>.ccx-top-actions{display:none!important}
+@media(max-width:1150px){#ccxOverlay header.cc-ref-header>.ccx-header-inner{gap:14px!important;padding:0 14px!important}#ccxOverlay header.cc-ref-header .ccx-brand-title{font-size:12px!important}#ccxOverlay header.cc-ref-header .ccx-nav-buttons>button{padding:0 9px!important;font-size:12px!important}#ccxOverlay header.cc-ref-header .cc94-nav-shortcuts{gap:6px!important}#ccxOverlay header.cc-ref-header .cc94-nav-shortcuts .ccx-card-library-entry{padding:0 10px!important}}
+@media(max-width:720px){#ccxOverlay header.cc-ref-header{height:108px!important;min-height:108px!important}#ccxOverlay header.cc-ref-header>.ccx-header-inner{flex-wrap:wrap!important;align-content:flex-start!important;justify-content:space-between!important;row-gap:0!important;column-gap:8px!important;height:104px!important;min-height:104px!important;padding:8px 12px 0!important;overflow:hidden!important}#ccxOverlay header.cc-ref-header .ccx-brand-title{display:none!important}#ccxOverlay header.cc-ref-header .cc94-nav-shortcuts{margin-left:auto!important}#ccxOverlay header.cc-ref-header .cc94-nav-shortcuts .ccx-card-library-entry{height:38px!important;min-height:38px!important;padding:0 8px!important}#ccxOverlay header.cc-ref-header .cc94-nav-shortcuts .ccx-card-library-entry b{font-size:11px!important}#ccxOverlay header.cc-ref-header .ccx-header-inner>nav.ccx-nav-groups.ccx-nav-compact{order:3!important;flex:0 0 100%!important;align-self:auto!important;height:48px!important;min-height:48px!important;overflow-x:auto!important}#ccxOverlay header.cc-ref-header .ccx-nav-buttons>button{font-size:12px!important}}
 </style></body></html>
