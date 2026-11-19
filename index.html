@@ -5894,7 +5894,7 @@ body.dark #ccxOverlay .ccx-header-inner .ccx-brand-title{color:#e5f2f8!important
      <label><input type="checkbox" class="cchub-repeat-day" value="1"> Pzt</label><label><input type="checkbox" class="cchub-repeat-day" value="2"> Sal</label><label><input type="checkbox" class="cchub-repeat-day" value="3"> Çar</label><label><input type="checkbox" class="cchub-repeat-day" value="4"> Per</label><label><input type="checkbox" class="cchub-repeat-day" value="5"> Cum</label><label><input type="checkbox" class="cchub-repeat-day" value="6"> Cmt</label><label><input type="checkbox" class="cchub-repeat-day" value="7"> Paz</label>
      </div></div>
     <p id="cchubRepeatHint" class="cc-webinar-repeat-hint cchub-span2">Tek seferlik webinar.</p>
-    <div class="cchub-span2 cchub-live-entry-note"><b>▣ Site içi canlı oturum</b><span>Katılımcılar harici Zoom / Teams bağlantısı kullanmadan, etkinliğin kendi sayfasından oturuma katılacak.</span></div>
+    
     <label class="cchub-span2"><span>Program ve açıklama</span><textarea id="cchubWebinarDesc" maxlength="5000" placeholder="Konuşulacak başlıklar, hedef kitle, konuşmacılar ve diğer detaylar…"></textarea></label>
    </div>
    <div class="cchub-editor-actions"><button class="ccx-lite" onclick="CCHub.closeWebinarEditor()">Vazgeç</button><button id="cchubWebinarSave" class="ccx-primary" onclick="CCHub.saveWebinar()">Takvime Ekle</button></div>
@@ -6090,33 +6090,45 @@ window.CCHub=(()=>{
  async function renderWebinarView(){
   setHeader('ETKİNLİK','Webinar Takvimi','Canlı oturumları keşfet, katılacağın yayınları takip et ve site içinden doğrudan yayına bağlan.','<button class="ccx-primary" type="button" onclick="CCHub.openWebinarEditor()">＋ Webinar Oluştur</button>');
   $('cchubContent').innerHTML='<div class="ccx-loading">Webinarlar yükleniyor…</div>';
-  let wr=await sb.rpc('cc_webinar_list',{p_from:new Date(Date.now()-12*3600*1000).toISOString(),p_limit:50});
+  let wr=await sb.rpc('cc_webinar_list',{p_from:new Date(Date.now()-180*24*3600*1000).toISOString(),p_limit:200});
   if(wr.error){$('cchubContent').innerHTML='<div class="cchub-empty">Webinarlar yüklenemedi. Sayfayı yenileyerek tekrar deneyin.</div>';toast(wr.error.message||'Webinar servisine erişilemedi.','err');return}
   let stateResult=await sb.rpc('cc_webinar_live_list');
   if(stateResult.error)console.warn('Webinar yayın durumu okunamadı',stateResult.error);
   const states=new Map((stateResult.data||[]).map(x=>[String(x.webinar_id),!!x.is_live]));
   webinars=await Promise.all((wr.data||[]).map(async w=>({...w,is_live:states.get(String(w.id))===true,avatar_url:await sign(w.avatar_path),cover_url:await sign(w.cover_path)})));
+  const webinarFinished=w=>{
+    if(w.is_live)return false;
+    const time=Date.parse(w.end_at||w.start_at);
+    return Number.isFinite(time)&&time<Date.now();
+  };
+  webinars.sort((a,b)=>{
+    const af=webinarFinished(a),bf=webinarFinished(b);
+    if(af!==bf)return af?1:-1;
+    const ad=Date.parse(a.start_at)||0,bd=Date.parse(b.start_at)||0;
+    return af?bd-ad:ad-bd;
+  });
   const admin=window.CC_AUTH?.getProfile?.()?.role==='admin';
   const cards=webinars.map(w=>{
     const d=dateParts(w.start_at),name=w.display_name||w.username||'Organizatör';
-    const id=esc(String(w.id)),live=!!w.is_live;
+    const id=esc(String(w.id)),live=!!w.is_live,finished=webinarFinished(w);
+    const scheduleStatus=finished?'✓ TAMAMLANDI':live?'● CANLI YAYIN':'📅 '+trDate(w.start_at);
     const canManage=admin||!!w.can_manage;
     return '<article class="cchub-card cchub-webinar-event'+(w.cancelled?' cchub-cancelled':'')+'">'+
       '<div class="ccw-event-top">'+
         (w.cover_url?'<img class="ccw-cover" loading="lazy" decoding="async" alt="" src="'+esc(w.cover_url)+'">':'<div class="ccw-cover ccw-cover-empty" aria-hidden="true">WEBINAR</div>')+
-        '<div class="ccw-event-content"><div class="ccw-badges"><span class="cchub-badge">'+esc(w.category||'Genel')+'</span><span class="ccw-live-state '+(live?'is-live':'')+'">'+(live?'● CANLI YAYIN':'○ PLANLANDI')+'</span></div>'+
+        '<div class="ccw-event-content"><div class="ccw-badges"><span class="cchub-badge">'+esc(w.category||'Genel')+'</span><span class="ccw-live-state '+(finished?'is-complete':live?'is-live':'is-planned')+'">'+esc(scheduleStatus)+'</span></div>'+
         '<h3>'+esc(w.title||'Webinar')+'</h3>'+
         '<p class="ccw-summary">'+esc((w.description||'Açıklama eklenmedi.').slice(0,230))+'</p>'+
         '<div class="ccw-meta"><span>📅 '+esc(trDate(w.start_at))+'</span>'+(w.speaker_name?'<span>🎙 '+esc(w.speaker_name)+'</span>':'')+'<span>👤 '+esc(name)+'</span><span>👥 '+Number(w.attendee_count||0)+' katılımcı</span></div></div>'+
       '</div><div class="ccw-event-actions">'+
         '<button type="button" class="ccx-lite" onclick="CCHub.toggleAttendance(\''+id+'\')">'+(w.attending?'✓ Katılım kaydedildi':'Katılacağım')+'</button>'+
         '<button type="button" class="ccx-lite" onclick="CCHub.openWebinar(\''+id+'\')">Detaylar</button>'+
-        (live?'<button type="button" class="ccx-primary" onclick="CCHub.openWebinarAndJoin(\''+id+'\')">▶ Canlı Yayına Gir</button>':'<span class="ccw-wait-label">Yayın henüz başlamadı</span>')+
+        (live?'<button type="button" class="ccx-primary" onclick="CCHub.openWebinarAndJoin(\''+id+'\')">▶ Canlı Yayına Gir</button>':finished?'<span class="ccw-wait-label">Webinar tamamlandı</span>':'<span class="ccw-wait-label">Yayın henüz başlamadı</span>')+
         (admin?'<button type="button" class="ccw-host-button" onclick="CCHub.setWebinarLive(\''+id+'\','+(live?'false':'true')+')">'+(live?'■ Yayını Bitir':'● Yayını Başlat')+'</button>':'')+
         (canManage?'<button type="button" class="ccx-lite ccw-delete" onclick="CCHub.deleteWebinar(\''+id+'\')">Sil</button>':'')+
       '</div></article>';
   }).join('');
-  const upcoming=webinars.slice(0,8).map(w=>'<button class="ccw-upcoming" type="button" onclick="CCHub.openWebinar(\''+esc(String(w.id))+'\')"><span>'+esc(shortDate(w.start_at))+'</span><b>'+esc(w.title)+'</b><small>'+(w.is_live?'● Şu an canlı':Number(w.attendee_count||0)+' kişi katılacak')+'</small></button>').join('');
+  const upcoming=webinars.slice(0,8).map(w=>'<button class="ccw-upcoming" type="button" onclick="CCHub.openWebinar(\''+esc(String(w.id))+'\')"><span>'+esc(shortDate(w.start_at))+'</span><b>'+esc(w.title)+'</b><small>'+(webinarFinished(w)?'✓ Tamamlandı':w.is_live?'● Şu an canlı':Number(w.attendee_count||0)+' kişi katılacak')+'</small></button>').join('');
   $('cchubContent').innerHTML='<div class="ccw-layout"><main class="ccw-list">'+(cards||'<div class="cchub-empty">Planlanmış webinar yok. Webinar Oluştur ile yeni bir etkinlik ekleyebilirsin.</div>')+'</main><aside class="ccw-side"><section class="cchub-card ccw-calendar"><small>TAKVİM</small><h3>Yaklaşan Webinarlar</h3>'+(upcoming||'<p>Henüz etkinlik bulunmuyor.</p>')+'</section><section class="cchub-card ccw-help"><h3>Canlı yayına nasıl katılırım?</h3><p>Etkinliği seç, <strong>Katılacağım</strong> ile kaydol. Organizatör yayını başlattığında <strong>Canlı Yayına Gir</strong> düğmesini kullan.</p></section></aside></div>';
  } function openWebinarEditor(){
   if(!window.CC_AUTH?.getSession?.()?.access_token){toast('Webinar oluşturmak için giriş yapmalısın.','err');return}
@@ -9224,4 +9236,19 @@ window.CC_ACCOUNT_UI={
 body.ccw-live-open{overflow:hidden!important}
 @media(max-width:1000px){#ccxHubPanel .ccw-layout{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:680px){#ccxHubPanel .ccw-event-top{grid-template-columns:1fr;padding:12px;gap:13px}#ccxHubPanel .ccw-cover{width:100%;height:160px}#ccxHubPanel .ccw-event-actions{padding:10px}#ccxHubPanel .ccw-meta{font-size:11px}#ccwFullscreen .ccw-live-toolbar{padding:6px;gap:6px}#ccwFullscreen .ccw-live-toolbar strong{font-size:10px}#ccwFullscreen .ccw-live-toolbar button{padding:7px;font-size:10px}#ccwFullscreen #ccwLiveTitle{display:none}}
+</style><style id="cc-webinar-status-and-typography-v10412">
+#ccxHubPanel .ccw-event-content h3{font-size:24px!important;line-height:1.35!important}
+#ccxHubPanel .ccw-summary{font-size:15px!important;line-height:1.65!important}
+#ccxHubPanel .ccw-meta{font-size:13px!important;line-height:1.6!important}
+#ccxHubPanel .ccw-live-state{font-size:12px!important;font-weight:850!important;line-height:1.4!important}
+#ccxHubPanel .ccw-live-state.is-complete{color:#657587!important}
+#ccxHubPanel .ccw-live-state.is-planned{color:#245d83!important}
+#ccxHubPanel .ccw-event-actions button{font-size:13px!important}
+#ccxHubPanel .ccw-wait-label{font-size:12px!important}
+#ccxHubPanel .ccw-upcoming span{font-size:12px!important}
+#ccxHubPanel .ccw-upcoming b{font-size:14px!important}
+#ccxHubPanel .ccw-upcoming small{font-size:12px!important}
+#ccxHubPanel .ccw-calendar h3,#ccxHubPanel .ccw-help h3{font-size:19px!important}
+#ccxHubPanel .ccw-help p{font-size:13px!important}
+@media(max-width:680px){#ccxHubPanel .ccw-event-content h3{font-size:20px!important}#ccxHubPanel .ccw-summary{font-size:14px!important}}
 </style></body></html>
