@@ -6885,7 +6885,7 @@ window.CCCards=(()=>{
   const safe=x=>String(x??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const themeCss=[...document.styleSheets].map(sheet=>{try{return [...sheet.cssRules].filter(rule=>/cckl-(theme|frame|tile|card-text|type)/.test(rule.cssText)).map(rule=>rule.cssText).join('\n')}catch(e){return ''}}).join('\n');
   const cards=selected.map(c=>'<article class="cckl-tile pdf-card '+styleClass(c).replace(/[^a-zA-Z0-9_ -]/g,'')+'"><div class="cckl-tile-body"><span class="cckl-type">TOPLULUK KARTI</span><h4>'+safe(c.title)+'</h4><div class="cckl-card-text">'+sanitizeCardMarkup(c.body||'')+'</div><div class="cckl-tile-foot">👤 '+safe(c.owner_display_name||c.owner_username||'')+'</div></div></article>');
-  const style=String.raw\`@page{size:A4 portrait;margin:10mm}
+  const style=String.raw`@page{size:A4 portrait;margin:10mm}
 *{box-sizing:border-box}html,body{margin:0;padding:0}body{font-family:Arial,sans-serif;color:#1f2937}
 .pdf-sheet{width:190mm;min-height:277mm;display:flex;flex-direction:column;align-items:stretch;gap:5mm;break-after:page;page-break-after:always}
 .pdf-sheet:last-child{break-after:auto;page-break-after:auto}
@@ -6898,7 +6898,7 @@ window.CCCards=(()=>{
 .pdf-card .cckl-tile-foot{position:static!important;display:block!important;flex:none!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;margin:6mm 0 0!important;padding:3mm 0 0!important;overflow:visible!important}
 @media screen{body{background:#e9edf2;padding:15px}.pdf-sheet{margin:0 auto 16px;padding:0;background:#fff;box-shadow:0 2px 14px #0002}}
 @media print{body{background:#fff!important}.pdf-sheet{box-shadow:none!important;margin:0!important;padding:0!important}}
-\`;
+`;
   w.document.open();w.document.write('<!doctype html><html lang="tr"><head><meta charset="utf-8"><title>Customs Community - Seçili Kartlar</title><style>'+themeCss+'\n'+style+'</style></head><body><main id="pdfPages"></main></body></html>');w.document.close();
   const prepare=async()=>{
    try{
