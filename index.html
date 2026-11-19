@@ -5670,7 +5670,7 @@ body.dark #ccxOverlay .ccx-header-inner .ccx-brand-title{color:#e5f2f8!important
    </nav>
    <div class="ccx-top-actions">
     <button id="ccxNotifBtn" class="ccx-notif-btn" onclick="CCCommunity.openNotifications()" aria-label="Bildirimler" title="Bildirimler">🔔<span id="ccxNotifDot" class="ccx-notif-dot"></span></button>
-    <button type="button" class="cc-safe-settings-trigger" onclick="CC_ACCOUNT_UI.open('general')" title="Hesap Ayarları">Ayarlar</button>
+    <button type="button" class="cc-safe-settings-trigger" onclick="CC_ACCOUNT_UI.open('general')" title="Hesap Ayarları" aria-label="Hesap Ayarları"><span aria-hidden="true">⋮</span></button>
     <button class="ccx-mobile-profile" onclick="CCCommunity.openProfile()">Profilim</button>
    </div>
    </div>
@@ -8816,4 +8816,22 @@ window.CC_ACCOUNT_UI={
  const overlay=document.getElementById('ccxOverlay');
  if(overlay){let pending=false;const observer=new MutationObserver(()=>{if(pending)return;pending=true;queueMicrotask(()=>{pending=false;clean()})});observer.observe(overlay,{childList:true,subtree:true,characterData:true})}
 })();
-</script></body></html>
+</script><style id="cc-three-dots-menu-v10399">
+/* Üst sağdaki Ayarlar metni yerine kompakt dikey üç nokta */
+#ccxOverlay .ccx-header-inner .ccx-top-actions .cc-safe-settings-trigger{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ width:38px!important;min-width:38px!important;max-width:38px!important;
+ height:38px!important;min-height:38px!important;
+ padding:0!important;border-radius:10px!important;
+ background:#edf5fa!important;border:1px solid #bdd4e6!important;
+ color:#275777!important;line-height:1!important;flex:0 0 38px!important;
+}
+#ccxOverlay .ccx-header-inner .ccx-top-actions .cc-safe-settings-trigger span{
+ display:block!important;font-family:Arial,sans-serif!important;
+ font-size:27px!important;font-weight:800!important;line-height:1!important;
+ transform:translateY(-1px);letter-spacing:0!important;
+}
+#ccxOverlay .ccx-header-inner{grid-template-columns:222px minmax(0,1fr) 86px!important}
+@media(max-width:1120px){#ccxOverlay .ccx-header-inner{grid-template-columns:195px minmax(0,1fr) 86px!important}}
+@media(max-width:640px){#ccxOverlay .ccx-header-inner{grid-template-columns:57px minmax(0,1fr) 80px!important}}
+</style></body></html>
