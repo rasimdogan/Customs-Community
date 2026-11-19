@@ -4020,8 +4020,12 @@ async function openPuzzleCard(c,rect){
  if(back)back.classList.add('loading');
 
  modal.classList.add('open');
+ // Görsel ağdan yüklenirken açılış animasyonunu bekletme.
+ // Önceki dönüşün son karesini temizleyip her tıklamada aynı anda başlat.
  flip.style.animation='none';
- flip.style.transform='translateY(0) scale(1) rotateY(0deg)';
+ flip.style.removeProperty('transform');
+ void flip.offsetWidth;
+ flip.style.animation='puzzleFlip .65s ease forwards';
 
  const ready=await puzzleCardReady(c.image);
  if(seq!==puzzleCardOpenSeq||!modal.classList.contains('open'))return;
@@ -4034,9 +4038,7 @@ async function openPuzzleCard(c,rect){
   back.classList.remove('loading');
   back.innerHTML='<div style="height:100%;display:grid;place-items:center;padding:24px;text-align:center;color:#65798a;font-weight:800">Kart görseli yüklenemedi.</div>';
  }
- flip.style.animation='none';
- void flip.offsetWidth;
- flip.style.animation='puzzleFlip .65s ease forwards'
+ // Görsel hazır olduğunda animasyonu yeniden başlatma.
 }
 function closePuzzleCard(e){
  if(e&&e.target!==$('#puzzleCardModal')&&e.target.tagName!=='BUTTON')return;
