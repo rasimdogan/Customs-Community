@@ -5654,6 +5654,7 @@ body.dark #ccxOverlay .ccx-header-inner .ccx-brand-title{color:#e5f2f8!important
      </div>
     </div>
     <div class="cc94-nav-shortcuts" aria-label="Kütüphane ve eğitim geçişleri">
+     <button id="ccxNotifBtn" class="ccx-notif-btn" onclick="CCCommunity.openNotifications()" aria-label="Bildirimler" title="Bildirimler">🔔<span id="ccxNotifDot" class="ccx-notif-dot"></span></button>
      <div class="ccx-library-frame">
       <button id="ccxTabCards" class="ccx-card-library-entry" onclick="CCCards.openLibrary()" type="button" title="Topluluk Kart Kütüphanesi">
        <span class="ccx-card-library-icon" aria-hidden="true">▦</span>
@@ -5669,8 +5670,8 @@ body.dark #ccxOverlay .ccx-header-inner .ccx-brand-title{color:#e5f2f8!important
     </div>
    </nav>
    <div class="ccx-top-actions">
-    <button id="ccxNotifBtn" class="ccx-notif-btn" onclick="CCCommunity.openNotifications()" aria-label="Bildirimler" title="Bildirimler">🔔<span id="ccxNotifDot" class="ccx-notif-dot"></span></button>
-    <button type="button" class="cc-safe-settings-trigger" onclick="CC_ACCOUNT_UI.open('general')" title="Hesap Ayarları" aria-label="Hesap Ayarları"><span aria-hidden="true">⋮</span></button>
+    
+    
     <button class="ccx-mobile-profile" onclick="CCCommunity.openProfile()">Profilim</button>
    </div>
    </div>
@@ -6963,7 +6964,22 @@ window.CCCards=(()=>{
 @media screen{body{background:#e9edf2;padding:15px}.pdf-sheet{margin:0 auto 16px;padding:0;background:#fff;box-shadow:0 2px 14px #0002}}
 @media print{body{background:#fff!important}.pdf-sheet{box-shadow:none!important;margin:0!important;padding:0!important}}
 `;
-  w.document.open();w.document.write('<!doctype html><html lang="tr"><head><meta charset="utf-8"><title>Customs Community - Seçili Kartlar</title><style>'+themeCss+'\n'+style+'</style></head><body><main id="pdfPages"></main></body></html>');w.document.close();
+  w.document.open();w.document.write('<!doctype html><html lang="tr"><head><meta charset="utf-8"><title>Customs Community - Seçili Kartlar</title><style>'+themeCss+'\n'+style+'</style></head><body><main id="pdfPages"></main><style id="cc-header-notification-order-v10400">
+/* Bildirimler -> Kart Kütüphanesi -> Eğitim Alanı; Ayarlar üst menüden kaldırıldı. */
+#ccxOverlay .ccx-header-inner{grid-template-columns:222px minmax(0,1fr) 0px!important}
+#ccxOverlay .ccx-header-inner .cc94-nav-shortcuts>#ccxNotifBtn{
+ flex:0 0 38px!important;order:0!important;width:38px!important;min-width:38px!important;
+ height:38px!important;min-height:38px!important;margin:0!important;padding:0!important;
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ border:1px solid #bdd4e6!important;border-radius:10px!important;
+ background:#edf5fa!important;color:#275777!important;font-size:17px!important;
+}
+#ccxOverlay .ccx-header-inner .cc94-nav-shortcuts>.ccx-library-frame{order:1!important}
+#ccxOverlay .ccx-header-inner .cc94-nav-shortcuts>.cc94-education-frame{order:2!important}
+#ccxOverlay .ccx-header-inner>.ccx-top-actions{display:none!important}
+@media(max-width:1120px){#ccxOverlay .ccx-header-inner{grid-template-columns:195px minmax(0,1fr) 0px!important}}
+@media(max-width:640px){#ccxOverlay .ccx-header-inner{grid-template-columns:57px minmax(0,1fr) 0px!important}}
+</style></body></html>');w.document.close();
   const prepare=async()=>{
    try{
     await w.document.fonts.ready;
