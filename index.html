@@ -8399,7 +8399,7 @@ body.dark #ccxOverlay .ccx-topic{background:#1b3a51!important;color:#a9d8ee!impo
   <section class="hero"><div class="herocopy"><small>ÖĞREN · PAYLAŞ · BİR ARAYA GEL</small><h1>Sınıflar ve canlı eğitimler</h1><p>Farklı kurumların eğitimlerine katıl, meslektaşlarınla çalışma grupları oluştur ve canlı sınıflarda buluş.</p><div class="herotags"><span>Canlı dersler</span><span>Mesleki gruplar</span><span>Ortak çalışma</span></div></div><div class="heroaside"><button type="button" class="hero-back" onclick="CCClassDemo.close()">← Topluluğa Geri Dön</button></div></section>
   <div class="tabs"><button class="tab active" onclick="CCClassDemo.filter('all',this)">Tüm sınıflar</button><button class="tab" onclick="CCClassDemo.filter('live',this)">Canlı</button><button class="tab" onclick="CCClassDemo.filter('upcoming',this)">Yaklaşan</button><button class="tab" onclick="CCClassDemo.filter('mine',this)">Katıldıklarım</button></div>
   <div class="layout"><main><h2 id="ccdTitle">Keşfedilecek sınıflar</h2><div class="ccd-manage"><button type="button" class="btn primary" onclick="CCClassDemo.create()">＋ Yeni Sınıf Oluştur</button><span id="ccdLiveStatus" role="status"></span></div>
-<div id="ccdClassForm" class="ccd-form" hidden><h3 id="ccdFormTitle">Yeni sınıf oluştur</h3><input type="hidden" id="ccdEditId"><label>Sınıf adı<input id="ccdName" maxlength="120" placeholder="Örn. Gümrük Mevzuatı Atölyesi"></label><label>Açıklama<textarea id="ccdDesc" maxlength="2000" rows="3" placeholder="Dersin içeriği"></textarea></label><label>Kategori<select id="ccdCategory"><option>Genel</option><option>GTİP</option><option>Mevzuat</option><option>Dış Ticaret</option><option>Etüt</option></select></label><label>Ders tarihi (isteğe bağlı)<input id="ccdStarts" type="datetime-local"></label><div class="ccd-form-actions"><button type="button" class="btn primary" onclick="CCClassDemo.save()">Kaydet</button><button type="button" class="btn" onclick="CCClassDemo.cancelForm()">Vazgeç</button></div></div>
+<div id="ccdClassForm" class="ccd-form" hidden><h3 id="ccdFormTitle">Yeni sınıf oluştur</h3><input type="hidden" id="ccdEditId"><label>Sınıf adı<input id="ccdName" maxlength="120" placeholder="Örn. Gümrük Mevzuatı Atölyesi"></label><label>Açıklama<textarea id="ccdDesc" maxlength="2000" rows="3" placeholder="Dersin içeriği"></textarea></label><label>Kategori<select id="ccdCategory"><option>Genel</option><option>GTİP</option><option>Mevzuat</option><option>Dış Ticaret</option><option>Etüt</option></select></label><label>İlk ders tarihi ve saati<input id="ccdStarts" type="datetime-local"></label><label>Tekrar düzeni<select id="ccdRepeat" onchange="CCClassDemo.repeatChanged()"><option value="none">Tek seferlik</option><option value="daily">Her gün</option><option value="weekly">Her hafta</option><option value="monthly">Her ay</option></select></label><div id="ccdRepeatOptions" hidden><div id="ccdWeekdays" hidden><span class="ccd-form-hint">Ders günleri</span><div class="ccd-day-options"><label><input type="checkbox" value="1"> Pzt</label><label><input type="checkbox" value="2"> Sal</label><label><input type="checkbox" value="3"> Çar</label><label><input type="checkbox" value="4"> Per</label><label><input type="checkbox" value="5"> Cum</label><label><input type="checkbox" value="6"> Cmt</label><label><input type="checkbox" value="0"> Paz</label></div></div><label>Tekrar bitiş tarihi (isteğe bağlı)<input id="ccdRepeatUntil" type="date"></label></div><div class="ccd-form-actions"><button type="button" class="btn primary" onclick="CCClassDemo.save()">Kaydet</button><button type="button" class="btn" onclick="CCClassDemo.cancelForm()">Vazgeç</button></div></div>
 <div class="grid" id="ccdGrid"></div><div class="note">Sınıflar üyeler tarafından oluşturulur ve yönetilir. Jitsi bağlantıları sınıf içinden açılır. Toplantı bağlantısını bilen kişiler erişebilir; özel ders güvenliği ve moderasyon henüz bulunmuyor.</div></main>
    <aside class="class-sidebar">
 <section class="side"><h3>📅 Yaklaşan dersler</h3><div id="ccdSchedule"><p>Planlanmış ders bulunmuyor.</p></div></section>
@@ -8435,7 +8435,12 @@ body.dark #ccxOverlay .ccx-topic{background:#1b3a51!important;color:#a9d8ee!impo
 #ccClassDemo .btn:hover{filter:brightness(.96)}
 #ccClassDemo .btn.primary{background:#246ea8;border-color:#246ea8;color:white}
 #ccClassDemo .ccd-form{box-shadow:0 14px 38px rgba(20,50,90,.08)}
-#ccClassDemo .ccd-live-badge{background:#dc263d;color:white;border-radius:99px;padding:6px 11px;box-shadow:0 3px 10px rgba(220,38,61,.18)}
+#ccClassDemo .ccd-live-badge{background:#fff5f5;color:#b33a47;border:1px solid #f1cdd1;border-radius:99px;padding:5px 10px;box-shadow:none}
+#ccClassDemo .ccd-day-options{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+#ccClassDemo .ccd-day-options label{display:flex;align-items:center;gap:5px;border:1px solid #d7e3ee;border-radius:9px;padding:8px 10px;background:#f8fbff;font-size:12px}
+#ccClassDemo .ccd-day-options input{width:auto!important}
+#ccClassDemo .ccd-form-hint{font-size:13px;font-weight:700}
+#ccClassDemo #ccdRepeatOptions[hidden],#ccClassDemo #ccdWeekdays[hidden]{display:none!important}
 #ccClassDemo .ccd-room-manage{border-radius:15px}
 @media(max-width:850px){#ccClassDemo .hero{padding:23px 19px}#ccClassDemo .layout{display:block}#ccClassDemo .class-sidebar{margin-top:20px}#ccClassDemo .tabs .tab{padding:9px 12px}#ccClassDemo .grid{grid-template-columns:1fr}}
 </style>
@@ -8454,13 +8459,15 @@ body.dark #ccxOverlay .ccx-topic{background:#1b3a51!important;color:#a9d8ee!impo
 #ccClassDemo .ccd-form-actions{display:flex;gap:10px}
 #ccClassDemo .ccd-empty{padding:25px;background:#fff;border-radius:12px}
 #ccClassDemo #ccdLiveStatus{font-size:12px;color:#496579}
-#ccClassDemo .ccd-live-badge{display:inline-block;background:#c82132;color:#fff;font-weight:800;border-radius:6px;padding:5px 9px;margin-right:8px;font-size:12px}
+#ccClassDemo .ccd-live-badge{display:inline-flex;align-items:center;gap:5px;background:#fff5f5;color:#b33a47;border:1px solid #f1cdd1;border-radius:99px;padding:5px 10px;margin-right:8px;font-size:11px;font-weight:750;letter-spacing:.45px}
 </style><script id="cc-class-live-v10378">
 (function(){
 let rows=[],members=new Set(),filter='all',active=null,jitsiApi=null,jitsiRoom='',sdkPromise=null,loading=false;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const auth=()=>{const v=window.CC_AUTH?.getSession?.();return v?.user||null};
+const repeatText=x=>x.repeat_type==='daily'?'Her gün':x.repeat_type==='weekly'?'Her hafta':x.repeat_type==='monthly'?'Her ay':'';
+const nextDate=x=>{if(!x.starts_at)return null;const base=new Date(x.starts_at),now=new Date();if(x.repeat_type==='none'||!x.repeat_type)return base;let d=new Date(base);const days=Array.isArray(x.repeat_days)?x.repeat_days:[];for(let i=0;i<370&&d<now;i++){if(x.repeat_type==='daily')d.setDate(d.getDate()+1);else if(x.repeat_type==='monthly')d.setMonth(d.getMonth()+1);else{d.setDate(d.getDate()+1);while(days.length&&!days.includes(d.getDay()))d.setDate(d.getDate()+1)}}if(x.repeat_until&&d>new Date(x.repeat_until+'T23:59:59'))return null;return d};
 const isLive=x=>!!(x?.live_started_at&&x?.live_heartbeat_at&&(!x.live_ended_at||new Date(x.live_ended_at)<new Date(x.live_started_at))&&(Date.now()-new Date(x.live_heartbeat_at).getTime()<90000));
 let liveTimer=null,refreshTimer=null;
 async function liveWrite(patch){if(!active||active.owner_id!==auth()?.id)return false;const db=await client();const q=await db.from('cc_live_classes').update(patch).eq('id',active.id).eq('owner_id',auth().id).select('*').single();if(q.error)throw q.error;active=q.data;rows=rows.map(x=>x.id===active.id?active:x);render();return true}
@@ -8485,11 +8492,11 @@ async function load(){
  }catch(e){notice('Sınıflar yüklenemedi: '+(e.message||e));}finally{loading=false}
 }
 function render(){
- const user=auth();const list=rows.filter(x=>filter==='all'||filter==='mine'&&(x.owner_id===user?.id||members.has(x.id))||filter==='upcoming'&&x.starts_at&&new Date(x.starts_at)>new Date()||filter==='live'&&isLive(x));
+ const user=auth();const list=rows.filter(x=>filter==='all'||filter==='mine'&&(x.owner_id===user?.id||members.has(x.id))||filter==='upcoming'&&nextDate(x)&&nextDate(x)>new Date()||filter==='live'&&isLive(x));
  $('ccdTitle').textContent=filter==='mine'?'Sınıflarım':filter==='upcoming'?'Yaklaşan dersler':filter==='live'?'Başlayan sınıflar':'Keşfedilecek sınıflar';
- $('ccdGrid').innerHTML=list.map(x=>{const own=x.owner_id===user?.id,joined=members.has(x.id)||own;return '<article class="card">'+(isLive(x)?'<span class="ccd-live-badge">● CANLI</span>':'')+'<span class="pill">'+esc(x.category)+'</span><div style="font-size:27px">🎓</div><h3>'+esc(x.title)+'</h3><p>'+esc(x.description||'Açıklama eklenmedi.')+'</p><div class="meta">'+(x.starts_at?'📅 '+esc(new Date(x.starts_at).toLocaleString('tr-TR')):'🟢 Süresiz sınıf')+'</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:13px"><button class="btn primary" onclick="CCClassDemo.enter(\''+x.id+'\')">'+(joined?'Canlı sınıfa gir':'Sınıfı görüntüle')+'</button>'+(user&&!own?'<button class="btn" onclick="CCClassDemo.join(\''+x.id+'\')">'+(joined?'✓ Katıldın · Ayrıl':'+ Katıl')+'</button>':'')+(own?'<button class="btn" onclick="CCClassDemo.edit(\''+x.id+'\')">Düzenle</button><button class="btn" onclick="CCClassDemo.remove(\''+x.id+'\')">Sil</button>':'')+'</div></article>'}).join('')||'<div class="ccd-empty">Bu bölümde henüz sınıf yok. Yeni sınıf oluşturabilirsin.</div>';
- const schedule=rows.filter(x=>x.starts_at&&new Date(x.starts_at)>new Date()).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at)).slice(0,5);
- $('ccdSchedule').innerHTML=schedule.length?schedule.map(x=>'<div class="event"><b>'+esc(x.title)+'</b><small>'+esc(new Date(x.starts_at).toLocaleString('tr-TR',{dateStyle:'medium',timeStyle:'short'}))+'</small></div>').join(''):'<p>Yaklaşan ders bulunmuyor.</p>';
+ $('ccdGrid').innerHTML=list.map(x=>{const own=x.owner_id===user?.id,joined=members.has(x.id)||own;return '<article class="card">'+(isLive(x)?'<span class="ccd-live-badge">● CANLI</span>':'')+'<span class="pill">'+esc(x.category)+'</span><div style="font-size:27px">🎓</div><h3>'+esc(x.title)+'</h3><p>'+esc(x.description||'Açıklama eklenmedi.')+'</p><div class="meta">'+(x.starts_at?'📅 '+esc(nextDate(x)?.toLocaleString('tr-TR')||'Bitiş')+(repeatText(x)?' · '+esc(repeatText(x)):''):'🟢 Süresiz sınıf')+'</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:13px"><button class="btn primary" onclick="CCClassDemo.enter(\''+x.id+'\')">'+(joined?'Canlı sınıfa gir':'Sınıfı görüntüle')+'</button>'+(user&&!own?'<button class="btn" onclick="CCClassDemo.join(\''+x.id+'\')">'+(joined?'✓ Katıldın · Ayrıl':'+ Katıl')+'</button>':'')+(own?'<button class="btn" onclick="CCClassDemo.edit(\''+x.id+'\')">Düzenle</button><button class="btn" onclick="CCClassDemo.remove(\''+x.id+'\')">Sil</button>':'')+'</div></article>'}).join('')||'<div class="ccd-empty">Bu bölümde henüz sınıf yok. Yeni sınıf oluşturabilirsin.</div>';
+ const schedule=rows.filter(x=>nextDate(x)&&nextDate(x)>new Date()).sort((a,b)=>nextDate(a)-nextDate(b)).slice(0,5);
+ $('ccdSchedule').innerHTML=schedule.length?schedule.map(x=>'<div class="event"><b>'+esc(x.title)+'</b><small>'+esc(nextDate(x).toLocaleString('tr-TR',{dateStyle:'medium',timeStyle:'short'}))+(repeatText(x)?' · '+esc(repeatText(x)):'')+'</small></div>').join(''):'<p>Yaklaşan ders bulunmuyor.</p>';
  const mine=rows.filter(x=>x.owner_id===user?.id||members.has(x.id));
  $('ccdMyCount').textContent=String(mine.length);
  $('ccdMyClasses').innerHTML=mine.length?mine.slice(0,6).map(x=>'<button class="ccd-my-item" type="button" onclick="CCClassDemo.enter(\''+x.id+'\')"><b>'+esc(x.title)+'</b><small>'+(x.owner_id===user?.id?'Yönettiğin sınıf':'Üyesi olduğun sınıf')+'</small></button>').join(''):'<p>Henüz katıldığın sınıf yok.</p>';
@@ -8502,13 +8509,14 @@ function form(row){
  $('ccdName').value=row?.title||'';$('ccdDesc').value=row?.description||'';
  $('ccdCategory').value=row?.category||'Genel';
  $('ccdStarts').value=row?.starts_at?new Date(new Date(row.starts_at).getTime()-new Date(row.starts_at).getTimezoneOffset()*60000).toISOString().slice(0,16):'';
- $('ccdClassForm').hidden=false;$('ccdName').focus();
+ $('ccdRepeat').value=row?.repeat_type||'none';$('ccdRepeatUntil').value=row?.repeat_until||'';document.querySelectorAll('#ccdWeekdays input').forEach(el=>el.checked=(row?.repeat_days||[]).includes(Number(el.value)));repeatChanged();$('ccdClassForm').hidden=false;$('ccdName').focus();
 }
+function repeatChanged(){const type=$('ccdRepeat').value;$('ccdRepeatOptions').hidden=type==='none';$('ccdWeekdays').hidden=type!=='weekly'}
 async function save(){
  const user=auth();if(!user){alert('Giriş yapmalısın.');return}
  const title=$('ccdName').value.trim(),description=$('ccdDesc').value.trim(),category=$('ccdCategory').value.trim();
  if(title.length<3||title.length>120){alert('Sınıf adı 3-120 karakter olmalı.');return}
- const data={title,description,category,starts_at:$('ccdStarts').value?new Date($('ccdStarts').value).toISOString():null};
+ const repeat_type=$('ccdRepeat').value,repeat_days=[...document.querySelectorAll('#ccdWeekdays input:checked')].map(el=>Number(el.value)),repeat_until=$('ccdRepeatUntil').value||null;if(repeat_type!=='none'&&!$('ccdStarts').value){alert('Tekrarlayan ders için ilk ders tarihini seç.');return}if(repeat_type==='weekly'&&!repeat_days.length){alert('En az bir ders günü seç.');return}if(repeat_until&&$('ccdStarts').value&&repeat_until<$('ccdStarts').value.slice(0,10)){alert('Bitiş tarihi ilk dersten önce olamaz.');return}const data={title,description,category,starts_at:$('ccdStarts').value?new Date($('ccdStarts').value).toISOString():null,repeat_type,repeat_days:repeat_type==='weekly'?repeat_days:[],repeat_until:repeat_type==='none'?null:repeat_until};
  try{
   const db=await client(),id=$('ccdEditId').value;
   const q=id?db.from('cc_live_classes').update(data).eq('id',id).eq('owner_id',user.id):db.from('cc_live_classes').insert({...data,owner_id:user.id});
@@ -8550,7 +8558,7 @@ window.CCClassDemo={
  create(){form(null)},edit(id){const row=rows.find(x=>x.id===id);if(row?.owner_id===auth()?.id)form(row)},
  save,join,remove,enter,
  cancelForm(){$('ccdClassForm').hidden=true},
- startLive,stopLive,joinLive(){if(active&&(members.has(active.id)||active.owner_id===auth()?.id)&&isLive(active))connectLive()},
+ startLive,stopLive,repeatChanged,joinLive(){if(active&&(members.has(active.id)||active.owner_id===auth()?.id)&&isLive(active))connectLive()},
  openJitsiTab(){if(jitsiRoom)window.open('https://meet.jit.si/'+encodeURIComponent(jitsiRoom),'_blank','noopener,noreferrer')},
  toggle(){},notice(){alert('Kamera, mikrofon, sohbet ve ekran paylaşımı için Jitsi toplantısının içindeki düğmeleri kullanın.')}
 };
