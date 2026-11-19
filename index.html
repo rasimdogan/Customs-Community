@@ -6964,21 +6964,62 @@ window.CCCards=(()=>{
 @media screen{body{background:#e9edf2;padding:15px}.pdf-sheet{margin:0 auto 16px;padding:0;background:#fff;box-shadow:0 2px 14px #0002}}
 @media print{body{background:#fff!important}.pdf-sheet{box-shadow:none!important;margin:0!important;padding:0!important}}
 `;
-  w.document.open();w.document.write('<!doctype html><html lang="tr"><head><meta charset="utf-8"><title>Customs Community - Seçili Kartlar</title><style>'+themeCss+'\n'+style+'</style></head><body><main id="pdfPages"></main><style id="cc-header-notification-order-v10400">
-/* Bildirimler -> Kart Kütüphanesi -> Eğitim Alanı; Ayarlar üst menüden kaldırıldı. */
-#ccxOverlay .ccx-header-inner{grid-template-columns:222px minmax(0,1fr) 0px!important}
-#ccxOverlay .ccx-header-inner .cc94-nav-shortcuts>#ccxNotifBtn{
- flex:0 0 38px!important;order:0!important;width:38px!important;min-width:38px!important;
- height:38px!important;min-height:38px!important;margin:0!important;padding:0!important;
- display:inline-flex!important;align-items:center!important;justify-content:center!important;
- border:1px solid #bdd4e6!important;border-radius:10px!important;
- background:#edf5fa!important;color:#275777!important;font-size:17px!important;
+  w.document.open();w.document.write('<!doctype html><html lang="tr"><head><meta charset="utf-8"><title>Customs Community - Seçili Kartlar</title><style>'+themeCss+'\n'+style+'</style></head><body><main id="pdfPages"></main><style id="cc-header-notification-order-v10401">
+/* FINAL layout override: logo | social nav + [bell, library, education] in ONE row. */
+#ccxOverlay .ccx-topbar{height:66px!important;min-height:66px!important;overflow:hidden!important}
+#ccxOverlay .ccx-header-inner{
+ display:grid!important;grid-template-columns:222px minmax(0,1fr)!important;
+ grid-template-rows:66px!important;gap:12px!important;
+ height:66px!important;min-height:66px!important;align-items:center!important
 }
-#ccxOverlay .ccx-header-inner .cc94-nav-shortcuts>.ccx-library-frame{order:1!important}
+#ccxOverlay .ccx-header-inner>.ccx-brand{grid-column:1!important;grid-row:1!important}
+#ccxOverlay .ccx-header-inner>.ccx-nav-groups.ccx-nav-compact{
+ grid-column:2!important;grid-row:1!important;display:flex!important;
+ flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;
+ justify-content:flex-start!important;gap:9px!important;
+ width:100%!important;min-width:0!important;height:66px!important;
+ overflow-x:auto!important;overflow-y:hidden!important
+}
+#ccxOverlay .ccx-header-inner .ccx-nav-social{
+ flex:0 0 auto!important;align-self:center!important;width:auto!important;min-width:0!important
+}
+#ccxOverlay .ccx-header-inner .cc94-nav-shortcuts{
+ display:flex!important;grid-template-columns:none!important;
+ flex-direction:row!important;flex-wrap:nowrap!important;flex:0 0 auto!important;
+ width:max-content!important;min-width:max-content!important;
+ height:100%!important;align-items:center!important;align-self:center!important;
+ gap:8px!important;margin:0!important;padding:0!important
+}
+#ccxOverlay .ccx-header-inner .cc94-nav-shortcuts>#ccxNotifBtn{
+ position:relative!important;display:inline-flex!important;order:0!important;
+ align-items:center!important;justify-content:center!important;align-self:center!important;
+ flex:0 0 38px!important;width:38px!important;min-width:38px!important;
+ height:38px!important;min-height:38px!important;margin:0!important;padding:0!important;
+ border:1px solid #bdd4e6!important;border-radius:10px!important;
+ background:#edf5fa!important;color:#275777!important;font-size:17px!important
+}
+#ccxOverlay .ccx-header-inner .cc94-nav-shortcuts>.ccx-library-frame{
+ order:1!important;display:flex!important;flex:0 0 auto!important;
+ width:auto!important;min-width:0!important;height:auto!important;align-self:center!important
+}
 #ccxOverlay .ccx-header-inner .cc94-nav-shortcuts>.cc94-education-frame{order:2!important}
+#ccxOverlay .ccx-header-inner .cc94-nav-shortcuts .ccx-card-library-entry{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ width:auto!important;min-width:0!important;max-width:none!important;
+ height:39px!important;min-height:39px!important;white-space:nowrap!important
+}
 #ccxOverlay .ccx-header-inner>.ccx-top-actions{display:none!important}
-@media(max-width:1120px){#ccxOverlay .ccx-header-inner{grid-template-columns:195px minmax(0,1fr) 0px!important}}
-@media(max-width:640px){#ccxOverlay .ccx-header-inner{grid-template-columns:57px minmax(0,1fr) 0px!important}}
+@media(max-width:1120px){
+ #ccxOverlay .ccx-header-inner{grid-template-columns:195px minmax(0,1fr)!important}
+}
+@media(max-width:640px){
+ #ccxOverlay .ccx-topbar{height:60px!important;min-height:60px!important}
+ #ccxOverlay .ccx-header-inner{
+  grid-template-columns:57px minmax(0,1fr)!important;grid-template-rows:60px!important;
+  height:60px!important;min-height:60px!important
+ }
+ #ccxOverlay .ccx-header-inner>.ccx-nav-groups.ccx-nav-compact{height:60px!important}
+}
 </style></body></html>');w.document.close();
   const prepare=async()=>{
    try{
