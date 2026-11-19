@@ -8835,82 +8835,84 @@ window.CC_ACCOUNT_UI={
 #ccxOverlay .ccx-header-inner{grid-template-columns:222px minmax(0,1fr) 86px!important}
 @media(max-width:1120px){#ccxOverlay .ccx-header-inner{grid-template-columns:195px minmax(0,1fr) 86px!important}}
 @media(max-width:640px){#ccxOverlay .ccx-header-inner{grid-template-columns:57px minmax(0,1fr) 80px!important}}
-</style><style id="cc-header-layout-v10402">
-/* Final authoritative header: social navigation and shortcuts share ONE line. */
-#ccxOverlay .ccx-topbar{display:block!important;height:72px!important;min-height:72px!important;overflow:hidden!important}
+</style><style id="cc-header-layout-v10403">
+/* Keep both shortcuts visible: reserve right column for bell/library/education. */
+#ccxOverlay .ccx-topbar{height:76px!important;min-height:76px!important;overflow:visible!important}
 #ccxOverlay .ccx-header-inner{
- width:calc(100% - 28px)!important;max-width:none!important;margin:0 auto!important;
- height:72px!important;min-height:72px!important;padding:0!important;
- display:grid!important;grid-template-columns:320px minmax(0,1fr)!important;
- grid-template-rows:72px!important;gap:12px!important;align-items:center!important
+ display:grid!important;grid-template-columns:minmax(185px,300px) minmax(0,1fr)!important;
+ grid-template-rows:76px!important;align-items:center!important;
+ width:calc(100% - 30px)!important;max-width:none!important;
+ height:76px!important;min-height:76px!important;gap:14px!important;margin:auto!important;padding:0!important
 }
 #ccxOverlay .ccx-header-inner>.ccx-brand{grid-column:1!important;grid-row:1!important;min-width:0!important}
 #ccxOverlay .ccx-header-inner>.ccx-nav-groups.ccx-nav-compact{
- grid-column:2!important;grid-row:1!important;display:flex!important;
- flex-direction:row!important;flex-wrap:nowrap!important;justify-content:space-between!important;
- align-items:center!important;min-width:0!important;width:100%!important;height:72px!important;
- gap:12px!important;overflow:hidden!important
+ grid-column:2!important;grid-row:1!important;display:grid!important;
+ grid-template-columns:minmax(0,1fr) max-content!important;grid-template-rows:1fr!important;
+ align-items:center!important;gap:12px!important;
+ min-width:0!important;max-width:100%!important;width:100%!important;height:76px!important;
+ overflow:visible!important
 }
 #ccxOverlay .ccx-header-inner .ccx-nav-social{
- display:flex!important;flex:1 1 auto!important;width:auto!important;min-width:0!important;
- height:auto!important;max-width:none!important;align-items:center!important;
- overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none!important
+ grid-column:1!important;grid-row:1!important;min-width:0!important;width:100%!important;
+ max-width:100%!important;display:block!important;overflow-x:auto!important;overflow-y:hidden!important;
+ scrollbar-width:none!important
 }
 #ccxOverlay .ccx-header-inner .ccx-nav-social::-webkit-scrollbar{display:none!important}
-#ccxOverlay .ccx-header-inner .ccx-nav-buttons{
- flex-wrap:nowrap!important;white-space:nowrap!important;min-width:max-content!important;
- width:max-content!important;max-width:none!important
-}
+#ccxOverlay .ccx-header-inner .ccx-nav-buttons{min-width:max-content!important;width:max-content!important;flex-wrap:nowrap!important}
 #ccxOverlay .ccx-header-inner .cc94-nav-shortcuts{
- display:flex!important;grid-template-columns:none!important;
- flex-direction:row!important;flex-wrap:nowrap!important;justify-content:flex-end!important;
- align-items:center!important;align-self:center!important;
- flex:0 0 auto!important;width:max-content!important;min-width:max-content!important;
- max-width:none!important;height:48px!important;min-height:48px!important;
- gap:8px!important;margin:0!important;padding:0!important;overflow:visible!important
+ grid-column:2!important;grid-row:1!important;display:flex!important;
+ grid-template-columns:none!important;flex-direction:row!important;flex-wrap:nowrap!important;
+ align-self:center!important;align-items:center!important;justify-content:flex-end!important;
+ width:max-content!important;min-width:max-content!important;max-width:none!important;
+ height:60px!important;min-height:60px!important;gap:8px!important;
+ margin:0!important;padding:0!important;overflow:visible!important
 }
 #ccxOverlay .ccx-header-inner .cc94-nav-shortcuts>#ccxNotifBtn{
- position:relative!important;display:inline-flex!important;order:0!important;
- align-items:center!important;justify-content:center!important;align-self:center!important;
- flex:0 0 42px!important;width:42px!important;min-width:42px!important;max-width:42px!important;
- height:42px!important;min-height:42px!important;margin:0!important;padding:0!important;
- border:1px solid #bdd4e6!important;border-radius:11px!important;background:#edf5fa!important;
- color:#275777!important;font-size:18px!important;line-height:1!important
+ order:0!important;position:relative!important;display:flex!important;
+ flex:0 0 44px!important;width:44px!important;min-width:44px!important;max-width:44px!important;
+ height:44px!important;min-height:44px!important;align-items:center!important;justify-content:center!important;
+ margin:0!important;padding:0!important;font-size:19px!important;
+ border:1px solid #bdd4e6!important;border-radius:11px!important;background:#edf5fa!important
 }
-#ccxOverlay .ccx-header-inner .cc94-nav-shortcuts>.ccx-library-frame{
- display:flex!important;order:1!important;flex:0 0 auto!important;
- align-items:center!important;align-self:center!important;
+#ccxOverlay .ccx-header-inner .cc94-nav-shortcuts>.ccx-library-frame,
+#ccxOverlay .ccx-header-inner .cc94-nav-shortcuts>.cc94-education-frame{
+ display:flex!important;flex:0 0 auto!important;align-self:center!important;
  width:auto!important;min-width:0!important;max-width:none!important;
- height:48px!important;min-height:48px!important;margin:0!important;padding:0!important
+ height:60px!important;min-height:60px!important;margin:0!important;padding:0!important
 }
+#ccxOverlay .ccx-header-inner .cc94-nav-shortcuts>.ccx-library-frame{order:1!important}
 #ccxOverlay .ccx-header-inner .cc94-nav-shortcuts>.cc94-education-frame{order:2!important}
-#ccxOverlay .ccx-header-inner .cc94-nav-shortcuts .ccx-card-library-entry{
- display:inline-flex!important;flex:0 0 auto!important;align-items:center!important;
- justify-content:center!important;width:auto!important;min-width:0!important;max-width:none!important;
- height:42px!important;min-height:42px!important;margin:0!important;
- padding:0 15px!important;white-space:nowrap!important;border-radius:11px!important
+#ccxOverlay .ccx-header-inner .cc94-nav-shortcuts .ccx-card-library-entry,
+#ccxOverlay .ccx-header-inner #cc94TabEducation{
+ display:flex!important;visibility:visible!important;opacity:1!important;
+ flex:0 0 auto!important;align-items:center!important;justify-content:center!important;
+ width:auto!important;min-width:max-content!important;max-width:none!important;
+ height:54px!important;min-height:54px!important;margin:0!important;
+ padding:0 14px!important;border-radius:12px!important;white-space:nowrap!important
 }
 #ccxOverlay .ccx-header-inner .cc94-nav-shortcuts .ccx-card-library-entry span:last-child{
  display:block!important;white-space:nowrap!important
 }
 #ccxOverlay .ccx-header-inner>.ccx-top-actions{display:none!important}
-@media(max-width:1500px){
- #ccxOverlay .ccx-header-inner{grid-template-columns:260px minmax(0,1fr)!important;gap:8px!important}
+@media(max-width:1300px){
+ #ccxOverlay .ccx-header-inner{grid-template-columns:205px minmax(0,1fr)!important;gap:7px!important}
+ #ccxOverlay .ccx-header-inner .ccx-brand-title{font-size:11px!important}
+ #ccxOverlay .ccx-header-inner>.ccx-nav-groups.ccx-nav-compact{gap:5px!important}
  #ccxOverlay .ccx-header-inner .cc94-nav-shortcuts{gap:5px!important}
  #ccxOverlay .ccx-header-inner .cc94-nav-shortcuts .ccx-card-library-entry{padding:0 9px!important}
 }
-@media(max-width:850px){
- #ccxOverlay .ccx-header-inner{grid-template-columns:60px minmax(0,1fr)!important}
+@media(max-width:900px){
+ #ccxOverlay .ccx-header-inner{grid-template-columns:48px minmax(0,1fr)!important}
  #ccxOverlay .ccx-header-inner .ccx-brand-title{display:none!important}
- #ccxOverlay .ccx-header-inner .ccx-nav-buttons button{font-size:10px!important}
+ #ccxOverlay .ccx-header-inner .cc94-nav-shortcuts .ccx-card-library-entry small{display:none!important}
+ #ccxOverlay .ccx-header-inner .cc94-nav-shortcuts .ccx-card-library-entry{height:42px!important;min-height:42px!important}
 }
 @media(max-width:640px){
  #ccxOverlay .ccx-topbar{height:64px!important;min-height:64px!important}
- #ccxOverlay .ccx-header-inner{grid-template-rows:64px!important;height:64px!important;min-height:64px!important}
- #ccxOverlay .ccx-header-inner>.ccx-nav-groups.ccx-nav-compact{height:64px!important}
- #ccxOverlay .ccx-header-inner .cc94-nav-shortcuts{height:42px!important;min-height:42px!important}
- #ccxOverlay .ccx-header-inner .cc94-nav-shortcuts>#ccxNotifBtn{width:35px!important;min-width:35px!important;flex-basis:35px!important;height:35px!important;min-height:35px!important}
- #ccxOverlay .ccx-header-inner .cc94-nav-shortcuts .ccx-card-library-entry{height:35px!important;min-height:35px!important;padding:0 7px!important}
- #ccxOverlay .ccx-header-inner .cc94-nav-shortcuts .ccx-card-library-entry b{font-size:10px!important}
+ #ccxOverlay .ccx-header-inner{height:64px!important;min-height:64px!important;grid-template-rows:64px!important}
+ #ccxOverlay .ccx-header-inner>.ccx-nav-groups.ccx-nav-compact{height:64px!important;overflow-x:auto!important}
+ #ccxOverlay .ccx-header-inner .cc94-nav-shortcuts{height:48px!important;min-height:48px!important}
+ #ccxOverlay .ccx-header-inner .cc94-nav-shortcuts>#ccxNotifBtn{width:36px!important;min-width:36px!important;flex-basis:36px!important;height:36px!important;min-height:36px!important}
+ #ccxOverlay .ccx-header-inner .cc94-nav-shortcuts .ccx-card-library-entry{height:38px!important;min-height:38px!important}
 }
 </style></body></html>
