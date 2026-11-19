@@ -6692,7 +6692,7 @@ window.CCCommunity=(()=>{
 body.dark #ccklEditorBackdrop .cckl-paste-help{color:#aac2d1}
 body.dark #ccklEditorBackdrop .cckl-clean-format-btn{background:#1e3b50!important;color:#d5edf9!important;border-color:#3a6278!important}
 </style>
-<script id="cc-community-cards-js-v10250">
+<style id="cckl-folders-modern-v10386">#ccklFolders{display:flex;flex-direction:column;gap:6px;margin-top:9px}#ccklFolders .cckl-folder{display:flex;align-items:center;gap:9px;width:100%;padding:10px 11px;border:1px solid transparent;border-radius:11px;background:transparent;text-align:left;color:#334c66;font-size:13px;font-weight:650;transition:.15s}#ccklFolders .cckl-folder:hover{background:#f0f5fa;border-color:#e1eaf3}#ccklFolders .cckl-folder.active{background:#eaf2fd;border-color:#cbdff7;color:#1b5b9c}#ccklFolders .cckl-folder-icon{display:grid;place-items:center;flex:0 0 30px;height:30px;border-radius:9px;background:#e8f1fb;color:#3b75ad;font-size:23px}#ccklFolders .cckl-folder-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#ccklFolders .cckl-folder-count{font-size:11px;color:#70869a;background:#edf2f6;border-radius:99px;padding:3px 7px}#ccklFolders .cckl-folder.cckl-drop-target{background:#dcecff;border:1px dashed #3279bb;transform:translateX(3px)}#ccklGrid .cckl-tile[draggable=true]{cursor:grab}#ccklGrid .cckl-tile.cckl-dragging{opacity:.45}</style><script id="cc-community-cards-js-v10250">
 window.CCCards=(()=>{
  let sb=null,session=null,section='library',folderId=null,rows=[],folders=[],detailRows=[],detailIndex=-1;
  let editorRow=null,sendCard=null,weeklyRows=[],feedCardMap=new Map(),mediaCache=new Map();
@@ -6931,7 +6931,7 @@ window.CCCards=(()=>{
   let peer='';
   if(section==='received'&&c.peer_display_name)peer=`<span class="cckl-send-peer">Gönderen: ${esc(c.peer_display_name||c.peer_username)}</span>`;
   if(section==='sent'&&c.peer_display_name)peer=`<span class="cckl-send-peer">Gönderilen: ${esc(c.peer_display_name||c.peer_username)}</span>`;
-  return `<article class="cckl-tile ${styleClass(c)}" onclick="CCCards.openDetail(${i})">
+  return `<article class="cckl-tile ${styleClass(c)}" ${section==='library'?`draggable="true" ondragstart="CCCards.dragCard(event,${i})" ondragend="CCCards.dragEnd(event)"`:``} onclick="CCCards.openDetail(${i})">
    ${section==='library'?'<label class="cckl-pdf-pick" onclick="event.stopPropagation()"><input type="checkbox" aria-label="PDF için kart seç" '+(pdfSelection.has(String(c.card_id))?'checked':'')+' onchange="CCCards.pdfToggle('+i+',this.checked)"> PDF</label>':''}
    ${statusText(c)?`<span class="cckl-status">${esc(statusText(c))}</span>`:''}
    <div class="cckl-tile-body"><span class="cckl-type">TOPLULUK KARTI</span><h4>${esc(c.title)}</h4><div class="cckl-card-text">${sanitizeCardMarkup(c.body||'')}</div>${peer}
@@ -6971,8 +6971,14 @@ window.CCCards=(()=>{
   if(error){toast(error.message,'err');return}
   folders=data||[];
   let box=$('ccklFolders');if(!box)return;
-  box.innerHTML=folders.map(f=>`<button class="cckl-folder" onclick="CCCards.selectFolder('${f.id}',this)"><span>📁 ${esc(f.name)}</span><span>${fmt(f.card_count)}</span></button>`).join('')
+  box.innerHTML=folders.map(f=>`<button class="cckl-folder ${String(folderId)===String(f.id)?'active':''}" onclick="CCCards.selectFolder('${f.id}',this)" ondragover="CCCards.dragOver(event)" ondragleave="CCCards.dragLeave(event)" ondrop="CCCards.dropCard(event,'${f.id}')"><span class="cckl-folder-icon">▱</span><span class="cckl-folder-name">${esc(f.name)}</span><span class="cckl-folder-count">${fmt(f.card_count)}</span></button>`).join('')
  }
+ let draggedCardId=null;
+ function dragCard(event,i){if(section!=='library'||!rows[i])return;draggedCardId=String(rows[i].card_id);event.dataTransfer.effectAllowed='move';event.dataTransfer.setData('text/plain',draggedCardId);event.currentTarget.classList.add('cckl-dragging')}
+ function dragEnd(event){draggedCardId=null;event.currentTarget.classList.remove('cckl-dragging');document.querySelectorAll('#ccklFolders .cckl-folder').forEach(x=>x.classList.remove('cckl-drop-target'))}
+ function dragOver(event){if(!draggedCardId)return;event.preventDefault();event.dataTransfer.dropEffect='move';event.currentTarget.classList.add('cckl-drop-target')}
+ function dragLeave(event){event.currentTarget.classList.remove('cckl-drop-target')}
+ async function dropCard(event,id){event.preventDefault();event.currentTarget.classList.remove('cckl-drop-target');const cardId=draggedCardId||event.dataTransfer.getData('text/plain');draggedCardId=null;const c=rows.find(x=>String(x.card_id)===String(cardId));if(!c||!c.in_library||String(c.folder_id||'')===String(id))return;const {error}=await sb.rpc('cc_card_set_library',{p_card_id:c.card_id,p_folder_id:id,p_archived:!!c.archived});if(error){toast('Kart taşınamadı: '+error.message,'err');return}c.folder_id=id;toast('Kart klasöre taşındı.','ok');await loadFolders();await loadRows()}
  function toggleFolderCreate(){
   let b=$('ccklFolderCreate');if(!b)return;b.hidden=!b.hidden;if(!b.hidden){$('ccklFolderName').value='';$('ccklFolderName').focus()}
  }
@@ -6987,7 +6993,7 @@ window.CCCards=(()=>{
   if(error){grid.innerHTML='<div class="ccx-empty">Kartlar yüklenemedi.</div>';toast(error.message,'err');return}
   rows=(await hydrate(data||[])).map(normalize);detailRows=rows;pdfSelection.clear();pdfRefresh();
   let titles={library:'Kütüphanem',received:'Bana Gönderilenler',sent:'Gönderdiklerim',archive:'Arşiv'};
-  $('ccklSectionTitle').textContent=titles[section]||'Kartlar';$('ccklCount').textContent=rows.length+' kart';
+  $('ccklSectionTitle').textContent=(section==='library'&&folderId?folders.find(f=>String(f.id)===String(folderId))?.name||'Klasör':titles[section]||'Kartlar');$('ccklCount').textContent=rows.length+' kart';
   grid.innerHTML=rows.length?rows.map(tileHTML).join(''):`<div class="ccx-card ccx-empty">${section==='library'?'Kütüphanen henüz boş. Yeni bir kart oluşturabilir veya topluluktan kart ekleyebilirsin.':section==='received'?'Sana gönderilmiş kart yok.':section==='sent'?'Henüz kart göndermedin.':'Arşivde kart yok.'}</div>`
  }
  function openDetail(i){
@@ -7202,7 +7208,7 @@ window.CCCards=(()=>{
  },true);
  document.addEventListener('DOMContentLoaded',()=>{$('ccklSendSearch')?.addEventListener('keydown',e=>{if(e.key==='Enter')searchSendUsers()});$('ccklFolderName')?.addEventListener('keydown',e=>{if(e.key==='Enter')createFolder()})});
 
- return{pdfToggle,pdfClear,pdfSelectAll,pdfExport,openLibrary,closeLibraryView,isOpen,reload,setSection,selectFolder,toggleFolderCreate,createFolder,openDetail,openExternalWeekly,openOwner,moveDetail,closeDetail,closeTransient,openEditor,editCurrent,closeEditor,richCmd,cleanPaste,cleanEditor,previewStyle,saveCard,deleteCurrent,shareCurrent,toggleFav,toggleLibrary,moveFolder,toggleArchive,openSend,closeSend,searchSendUsers,sendTo,acceptCurrentSend,dismissCurrentSend,openReceivedFromNotification,refreshWeekly,renderUserCards,openProfileCard,openProfileLibraryCard,decorateFeed,openFeedCard,quickFav,quickLibrary};
+ return{pdfToggle,pdfClear,pdfSelectAll,pdfExport,dragCard,dragEnd,dragOver,dragLeave,dropCard,openLibrary,closeLibraryView,isOpen,reload,setSection,selectFolder,toggleFolderCreate,createFolder,openDetail,openExternalWeekly,openOwner,moveDetail,closeDetail,closeTransient,openEditor,editCurrent,closeEditor,richCmd,cleanPaste,cleanEditor,previewStyle,saveCard,deleteCurrent,shareCurrent,toggleFav,toggleLibrary,moveFolder,toggleArchive,openSend,closeSend,searchSendUsers,sendTo,acceptCurrentSend,dismissCurrentSend,openReceivedFromNotification,refreshWeekly,renderUserCards,openProfileCard,openProfileLibraryCard,decorateFeed,openFeedCard,quickFav,quickLibrary};
 })();
 </script>
 <script id="cc-personal-ui-v10244">
