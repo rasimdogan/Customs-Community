@@ -5652,6 +5652,8 @@ body.dark #ccxOverlay .ccx-header-inner .ccx-brand-title{color:#e5f2f8!important
     <button id="ccxTabClasses" type="button" onclick="CCClassDemo.open()">Sınıflar</button>
    </div></div>
   </nav>
+  <button type="button" class="ccm-scroll-arrow ccm-scroll-prev" aria-label="Önceki sekmeler" title="Sola kaydır">‹</button>
+  <button type="button" class="ccm-scroll-arrow ccm-scroll-next" aria-label="Sonraki sekmeler" title="Sağa kaydır">›</button>
   <div class="cc94-nav-shortcuts gmt-actions">
    <button id="ccxNotifBtn" class="ccx-notif-btn gmt-bell" type="button" onclick="CCCommunity.openNotifications()" aria-label="Bildirimler" title="Bildirimler"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg><span id="ccxNotifDot" class="ccx-notif-dot"></span></button>
    <div class="ccx-library-frame"><button id="ccxTabCards" class="ccx-card-library-entry gmt-btn gmt-btn--primary" type="button" onclick="CCCards.openLibrary()">Kart Kütüphanesi</button></div>
@@ -9425,5 +9427,176 @@ body.ccw-live-open{overflow:hidden!important}
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();
+})();
+</script><style id="cc-mobile-swipe-audit-v10414">
+/* Mobile swipe audit: retain native horizontal momentum, never intercept map gestures. */
+:is(#ccxOverlay,#ccClassDemo) header.gmt-header .ccm-scroll-arrow{display:none!important}
+@media(max-width:720px){
+ :is(#ccxOverlay,#ccClassDemo) header.gmt-header{
+  width:100%!important;height:114px!important;min-height:114px!important;
+  max-width:100%!important;overflow:visible!important
+ }
+ :is(#ccxOverlay,#ccClassDemo) header.gmt-header>.gmt-bar{
+  box-sizing:border-box!important;display:flex!important;flex-flow:row wrap!important;
+  align-content:flex-start!important;align-items:center!important;
+  justify-content:space-between!important;gap:0 8px!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  height:110px!important;min-height:110px!important;
+  padding:8px 10px 0!important;margin:0!important;overflow:visible!important
+ }
+ :is(#ccxOverlay,#ccClassDemo) header.gmt-header .gmt-brand{
+  flex:0 0 40px!important;width:40px!important;min-width:40px!important;
+  max-width:40px!important;order:0!important;overflow:visible!important
+ }
+ :is(#ccxOverlay,#ccClassDemo) header.gmt-header .gmt-name{display:none!important}
+ :is(#ccxOverlay,#ccClassDemo) header.gmt-header .gmt-actions{
+  display:flex!important;order:1!important;flex:0 0 auto!important;
+  align-items:center!important;justify-content:flex-end!important;flex-wrap:nowrap!important;
+  gap:5px!important;width:auto!important;min-width:0!important;max-width:calc(100% - 48px)!important;
+  padding:0!important;margin:0 0 0 auto!important;overflow:visible!important
+ }
+ :is(#ccxOverlay,#ccClassDemo) header.gmt-header .gmt-actions .gmt-btn{
+  display:inline-flex!important;flex:0 0 auto!important;white-space:nowrap!important;
+  width:auto!important;min-width:0!important;max-width:none!important;
+  height:38px!important;min-height:38px!important;
+  padding:0 8px!important;font-size:11px!important
+ }
+ :is(#ccxOverlay,#ccClassDemo) header.gmt-header .gmt-bell{
+  display:grid!important;flex:0 0 36px!important;width:36px!important;min-width:36px!important;
+  max-width:36px!important;height:36px!important;min-height:36px!important
+ }
+ :is(#ccxOverlay,#ccClassDemo) header.gmt-header nav.gmt-nav{
+  position:relative!important;display:flex!important;order:3!important;
+  flex:0 0 100%!important;align-self:auto!important;align-items:stretch!important;
+  width:100%!important;min-width:0!important;max-width:100%!important;
+  height:46px!important;min-height:46px!important;
+  margin:8px 0 0!important;padding:0 38px!important;
+  box-sizing:border-box!important;
+  overflow-x:auto!important;overflow-y:hidden!important;
+  touch-action:pan-x!important;overscroll-behavior-x:contain!important;
+  scroll-behavior:smooth!important;scrollbar-width:none!important;
+  -webkit-overflow-scrolling:touch!important;scroll-padding-inline:38px!important
+ }
+ :is(#ccxOverlay,#ccClassDemo) header.gmt-header nav.gmt-nav::-webkit-scrollbar{display:none!important}
+ :is(#ccxOverlay,#ccClassDemo) header.gmt-header nav.gmt-nav .ccx-nav-social,
+ :is(#ccxOverlay,#ccClassDemo) header.gmt-header nav.gmt-nav .ccx-nav-buttons{
+  display:flex!important;flex:0 0 max-content!important;align-self:stretch!important;align-items:stretch!important;
+  flex-direction:row!important;flex-wrap:nowrap!important;justify-content:flex-start!important;
+  width:max-content!important;min-width:max-content!important;max-width:none!important;
+  height:100%!important;min-height:0!important;
+  padding:0!important;margin:0!important;overflow:visible!important;
+  touch-action:pan-x!important;white-space:nowrap!important
+ }
+ :is(#ccxOverlay,#ccClassDemo) header.gmt-header nav.gmt-nav .ccx-nav-buttons>button{
+  display:inline-flex!important;flex:0 0 auto!important;white-space:nowrap!important;
+  height:100%!important;min-height:0!important;touch-action:pan-x!important;
+  padding:0 13px!important;font-size:13px!important
+ }
+ :is(#ccxOverlay,#ccClassDemo) header.gmt-header .ccm-scroll-arrow{
+  position:absolute!important;z-index:60!important;bottom:7px!important;
+  display:grid!important;place-items:center!important;flex:none!important;
+  width:32px!important;min-width:32px!important;max-width:32px!important;
+  height:34px!important;min-height:34px!important;
+  padding:0!important;margin:0!important;border-radius:8px!important;
+  background:rgba(241,245,249,.96)!important;border:1px solid #d8e3ec!important;
+  box-shadow:0 1px 3px #20384d17!important;color:#204d70!important;
+  font-size:24px!important;font-weight:650!important;line-height:1!important;
+  cursor:pointer!important;touch-action:manipulation!important
+ }
+ :is(#ccxOverlay,#ccClassDemo) header.gmt-header .ccm-scroll-prev{left:10px!important}
+ :is(#ccxOverlay,#ccClassDemo) header.gmt-header .ccm-scroll-next{right:10px!important}
+ :is(#ccxOverlay,#ccClassDemo) header.gmt-header .ccm-scroll-arrow[hidden]{display:none!important}
+ /* Additional horizontal strips that previously shrank or clipped controls. */
+ #ccxOverlay .cckl-nav,
+ #ccClassDemo .tabs,
+ .cc92-tabs,
+ .home-chapter-launch,
+ .home-work-grid,
+ .content .toolbar,
+ .content>.tabs{
+  box-sizing:border-box!important;display:flex!important;flex-direction:row!important;
+  flex-wrap:nowrap!important;max-width:100%!important;min-width:0!important;
+  overflow-x:auto!important;overflow-y:hidden!important;
+  touch-action:pan-x!important;overscroll-behavior-x:contain!important;
+  -webkit-overflow-scrolling:touch!important;scrollbar-width:thin!important
+ }
+ #ccxOverlay .cckl-nav>button,
+ #ccClassDemo .tabs>.tab,
+ .cc92-tabs>button,
+ .home-chapter-launch>button,
+ .home-work-grid>.home-work-card,
+ .content .toolbar>button,
+ .content>.tabs>button{flex:0 0 auto!important;white-space:nowrap!important}
+ #ccxOverlay .cckl-nav{gap:6px!important;padding-bottom:10px!important}
+ #ccClassDemo .tabs{gap:6px!important;scroll-snap-type:x proximity!important;padding-bottom:7px!important}
+ #ccClassDemo .tabs>.tab{scroll-snap-align:start!important}
+ .cc92-tabs{gap:4px!important}
+ #ccxOverlay .ccx-compose-tools{min-width:0!important;max-width:100%!important;flex-wrap:wrap!important}
+ #ccxOverlay .cchub-panel,#ccxOverlay .cckl-panel{min-width:0!important;max-width:100%!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important}
+ #ccxOverlay .cchub-shell,#ccxOverlay .ccw-layout,
+ #ccxOverlay .cckl-shell,#ccxOverlay .ccx-layout{box-sizing:border-box!important;min-width:0!important;max-width:100%!important}
+ #ccxOverlay .cchub-head{flex-wrap:wrap!important;align-items:flex-start!important}
+ #ccxOverlay .cchub-actions{min-width:0!important;flex-wrap:wrap!important}
+ #ccxOverlay .cchub-detail,#ccxOverlay .cchub-editor{
+  box-sizing:border-box!important;max-width:calc(100vw - 16px)!important;
+  max-height:calc(100dvh - 24px)!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important
+ }
+ /* Leave map, image crop and game drag surfaces untouched (they own their gestures). */
+}
+@media(max-width:380px){
+ :is(#ccxOverlay,#ccClassDemo) header.gmt-header .gmt-actions{gap:4px!important}
+ :is(#ccxOverlay,#ccClassDemo) header.gmt-header .gmt-actions .gmt-btn{
+  height:36px!important;min-height:36px!important;padding:0 6px!important;font-size:10px!important
+ }
+ :is(#ccxOverlay,#ccClassDemo) header.gmt-header .gmt-bell{
+  flex-basis:34px!important;width:34px!important;min-width:34px!important;max-width:34px!important
+ }
+ :is(#ccxOverlay,#ccClassDemo) header.gmt-header nav.gmt-nav .ccx-nav-buttons>button{
+  font-size:12px!important;padding:0 11px!important
+ }
+}
+</style><script id="cc-mobile-swipe-controls-v10414">
+(function(){
+ const selector='#ccxOverlay header.gmt-header, #ccClassDemo > header.gmt-header';
+ const observed=new WeakSet();
+ let queued=false;
+ function headers(){return Array.from(document.querySelectorAll(selector))}
+ function update(header){
+  const nav=header?.querySelector('nav.gmt-nav');
+  if(!nav)return;
+  const prev=header.querySelector('.ccm-scroll-prev');
+  const next=header.querySelector('.ccm-scroll-next');
+  if(!prev||!next)return;
+  const enabled=window.matchMedia('(max-width:720px)').matches;
+  const room=nav.scrollWidth-nav.clientWidth;
+  prev.hidden=!enabled||room<4||nav.scrollLeft<=2;
+  next.hidden=!enabled||room<4||nav.scrollLeft>=room-2;
+  nav.setAttribute('data-ccm-scrollable',enabled&&room>4?'true':'false');
+  if(!observed.has(nav)){
+   observed.add(nav);
+   nav.addEventListener('scroll',()=>update(header),{passive:true});
+   if(window.ResizeObserver)new ResizeObserver(()=>update(header)).observe(nav);
+  }
+ }
+ function sync(){queued=false;headers().forEach(update)}
+ function schedule(){if(queued)return;queued=true;requestAnimationFrame(sync)}
+ document.addEventListener('click',function(event){
+  const arrow=event.target.closest?.('.ccm-scroll-arrow');
+  if(arrow){
+   const header=arrow.closest('header.gmt-header'),nav=header?.querySelector('nav.gmt-nav');
+   if(!nav)return;
+   event.preventDefault();
+   nav.scrollBy({left:(arrow.classList.contains('ccm-scroll-prev')?-1:1)*Math.max(190,nav.clientWidth*.75),behavior:'smooth'});
+   setTimeout(()=>update(header),400);
+   return;
+  }
+  const tab=event.target.closest?.('header.gmt-header nav.gmt-nav .ccx-nav-buttons>button');
+  if(tab){tab.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});setTimeout(schedule,350)}
+ });
+ window.addEventListener('resize',schedule,{passive:true});
+ document.addEventListener('DOMContentLoaded',schedule,{once:true});
+ if(document.readyState!=='loading')schedule();
+ const classPage=document.getElementById('ccClassDemo');
+ if(classPage)new MutationObserver(schedule).observe(classPage,{childList:true,attributes:true,attributeFilter:['style']});
 })();
 </script></body></html>
