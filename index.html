@@ -9415,13 +9415,18 @@ body.ccw-live-open{overflow:hidden!important}
   window.addEventListener('resize',all,{passive:true});
   function init(){
     all();
+    let ro=null;
     if(typeof ResizeObserver!=='undefined'){
-      const ro=new ResizeObserver(all);
+      ro=new ResizeObserver(all);
       document.querySelectorAll('nav.gmt-nav').forEach(nav=>ro.observe(nav));
     }
     const classes=document.getElementById('ccClassDemo');
     if(classes){
-      const mo=new MutationObserver(()=>{if(classes.querySelector(':scope > header.gmt-header'))all()});
+      const mo=new MutationObserver(()=>{
+        const nav=classes.querySelector(':scope > header.gmt-header nav.gmt-nav');
+        if(nav&&ro)ro.observe(nav);
+        requestAnimationFrame(all);
+      });
       mo.observe(classes,{childList:true});
     }
   }
@@ -9699,5 +9704,23 @@ body.ccw-live-open{overflow:hidden!important}
  #ccxOverlay header.gmt-header .gmt-actions .gmt-btn,#ccClassDemo header.gmt-header .gmt-actions .gmt-btn{
   padding:0 6px!important;font-size:10.5px!important
  }
+}
+</style><style id="cc-mobile-scroll-extra-v10415">
+/* Classification opinions: three study tabs stay usable on narrow phones. */
+@media(max-width:900px){
+ .sg-tabs{
+  display:flex!important;grid-template-columns:none!important;
+  flex-wrap:nowrap!important;gap:7px!important;
+  max-width:100%!important;min-width:0!important;
+  overflow-x:auto!important;overflow-y:hidden!important;
+  -webkit-overflow-scrolling:touch!important;touch-action:pan-x!important;
+  overscroll-behavior-x:contain!important;padding:5px 0!important
+ }
+ .sg-tabs>button{flex:0 0 auto!important;white-space:nowrap!important}
+ .sg-navrow{flex-wrap:wrap!important;max-width:100%!important}
+ .sg-navrow>button{max-width:100%!important}
+ .edu-filters,.edu-order-actions,.edu-status-buttons{max-width:100%!important}
+ .edu-filters select,.edu-filters input{max-width:100%!important;min-width:0!important}
+ #ccMembershipModal .cc92-table-scroller{max-width:100%!important;overflow-x:auto!important;touch-action:pan-x!important;-webkit-overflow-scrolling:touch!important}
 }
 </style></body></html>
