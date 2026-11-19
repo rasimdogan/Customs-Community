@@ -8425,12 +8425,21 @@ body.dark #ccxOverlay .ccx-topic{background:#1b3a51!important;color:#a9d8ee!impo
 #ccClassDemo .ccd-form-actions{display:flex;gap:10px}
 #ccClassDemo .ccd-empty{padding:25px;background:#fff;border-radius:12px}
 #ccClassDemo #ccdLiveStatus{font-size:12px;color:#496579}
+#ccClassDemo .ccd-live-badge{display:inline-block;background:#c82132;color:#fff;font-weight:800;border-radius:6px;padding:5px 9px;margin-right:8px;font-size:12px}
 </style><script id="cc-class-live-v10378">
 (function(){
 let rows=[],members=new Set(),filter='all',active=null,jitsiApi=null,jitsiRoom='',sdkPromise=null,loading=false;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const auth=()=>{const v=window.CC_AUTH?.getSession?.();return v?.user||null};
+const isLive=x=>!!(x?.live_started_at&&x?.live_heartbeat_at&&(!x.live_ended_at||new Date(x.live_ended_at)<new Date(x.live_started_at))&&(Date.now()-new Date(x.live_heartbeat_at).getTime()<90000));
+let liveTimer=null,refreshTimer=null;
+async function liveWrite(patch){if(!active||active.owner_id!==auth()?.id)return false;const db=await client();const q=await db.from('cc_live_classes').update(patch).eq('id',active.id).eq('owner_id',auth().id).select('*').single();if(q.error)throw q.error;active=q.data;rows=rows.map(x=>x.id===active.id?active:x);render();return true}
+async function refreshLive(){if(!document.getElementById('ccClassDemo')||document.getElementById('ccClassDemo').style.display==='none')return;try{const db=await client();const q=await db.from('cc_live_classes').select('*').order('created_at',{ascending:false}).limit(100);if(!q.error){rows=q.data||[];if(active){active=rows.find(x=>x.id===active.id)||active;const owner=active.owner_id===auth()?.id;if(!owner){document.getElementById('ccdJoinLive').hidden=!isLive(active);document.getElementById('ccdRoomState').textContent=isLive(active)?'🔴 CANLI · Ders devam ediyor.':'Eğitmen yayını başlattığında derse katılabilirsin.'}}render()}}catch(e){console.warn('Canlı durum yenilenemedi',e)}}
+function startRefresh(){if(refreshTimer)clearInterval(refreshTimer);refreshTimer=setInterval(refreshLive,15000)}
+function stopRefresh(){if(refreshTimer)clearInterval(refreshTimer);refreshTimer=null}
+function stopHeartbeat(){if(liveTimer)clearInterval(liveTimer);liveTimer=null}
+function startHeartbeat(){stopHeartbeat();liveTimer=setInterval(async()=>{try{await liveWrite({live_heartbeat_at:new Date().toISOString()})}catch(e){console.warn('Canlı yayın kalp atışı başarısız',e)}},30000)}
 const client=async()=>{if(!window.CC_AUTH?.getClient)throw Error('Giriş altyapısı hazır değil');const db=await window.CC_AUTH.getClient();const session=window.CC_AUTH.getSession?.();if(session?.access_token){const current=await db.auth.getSession();if(current.data?.session?.access_token!==session.access_token){const r=await db.auth.setSession({access_token:session.access_token,refresh_token:session.refresh_token});if(r.error)throw r.error}}return db};
 function notice(msg){$('ccdLiveStatus').textContent=msg||''}
 function stop(){try{jitsiApi?.dispose()}catch(e){}jitsiApi=null;jitsiRoom='';$('ccdJitsiMount')?.replaceChildren()}
@@ -8447,9 +8456,9 @@ async function load(){
  }catch(e){notice('Sınıflar yüklenemedi: '+(e.message||e));}finally{loading=false}
 }
 function render(){
- const user=auth();const list=rows.filter(x=>filter==='all'||filter==='mine'&&(x.owner_id===user?.id||members.has(x.id))||filter==='upcoming'&&x.starts_at&&new Date(x.starts_at)>new Date()||filter==='live'&&(!x.starts_at||new Date(x.starts_at)<=new Date()));
+ const user=auth();const list=rows.filter(x=>filter==='all'||filter==='mine'&&(x.owner_id===user?.id||members.has(x.id))||filter==='upcoming'&&x.starts_at&&new Date(x.starts_at)>new Date()||filter==='live'&&isLive(x));
  $('ccdTitle').textContent=filter==='mine'?'Sınıflarım':filter==='upcoming'?'Yaklaşan dersler':filter==='live'?'Başlayan sınıflar':'Keşfedilecek sınıflar';
- $('ccdGrid').innerHTML=list.map(x=>{const own=x.owner_id===user?.id,joined=members.has(x.id)||own;return '<article class="card"><span class="pill">'+esc(x.category)+'</span><div style="font-size:27px">🎓</div><h3>'+esc(x.title)+'</h3><p>'+esc(x.description||'Açıklama eklenmedi.')+'</p><div class="meta">'+(x.starts_at?'📅 '+esc(new Date(x.starts_at).toLocaleString('tr-TR')):'🟢 Süresiz sınıf')+'</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:13px"><button class="btn primary" onclick="CCClassDemo.enter(\''+x.id+'\')">'+(joined?'Canlı sınıfa gir':'Sınıfı görüntüle')+'</button>'+(user&&!own?'<button class="btn" onclick="CCClassDemo.join(\''+x.id+'\')">'+(joined?'✓ Katıldın · Ayrıl':'+ Katıl')+'</button>':'')+(own?'<button class="btn" onclick="CCClassDemo.edit(\''+x.id+'\')">Düzenle</button><button class="btn" onclick="CCClassDemo.remove(\''+x.id+'\')">Sil</button>':'')+'</div></article>'}).join('')||'<div class="ccd-empty">Bu bölümde henüz sınıf yok. Yeni sınıf oluşturabilirsin.</div>';
+ $('ccdGrid').innerHTML=list.map(x=>{const own=x.owner_id===user?.id,joined=members.has(x.id)||own;return '<article class="card">'+(isLive(x)?'<span class="ccd-live-badge">● CANLI</span>':'')+'<span class="pill">'+esc(x.category)+'</span><div style="font-size:27px">🎓</div><h3>'+esc(x.title)+'</h3><p>'+esc(x.description||'Açıklama eklenmedi.')+'</p><div class="meta">'+(x.starts_at?'📅 '+esc(new Date(x.starts_at).toLocaleString('tr-TR')):'🟢 Süresiz sınıf')+'</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:13px"><button class="btn primary" onclick="CCClassDemo.enter(\''+x.id+'\')">'+(joined?'Canlı sınıfa gir':'Sınıfı görüntüle')+'</button>'+(user&&!own?'<button class="btn" onclick="CCClassDemo.join(\''+x.id+'\')">'+(joined?'✓ Katıldın · Ayrıl':'+ Katıl')+'</button>':'')+(own?'<button class="btn" onclick="CCClassDemo.edit(\''+x.id+'\')">Düzenle</button><button class="btn" onclick="CCClassDemo.remove(\''+x.id+'\')">Sil</button>':'')+'</div></article>'}).join('')||'<div class="ccd-empty">Bu bölümde henüz sınıf yok. Yeni sınıf oluşturabilirsin.</div>';
  const schedule=rows.filter(x=>x.starts_at&&new Date(x.starts_at)>new Date()).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at)).slice(0,5);
  $('ccdSchedule').innerHTML=schedule.length?schedule.map(x=>'<div class="event"><b>'+esc(x.title)+'</b><small>'+esc(new Date(x.starts_at).toLocaleString('tr-TR',{dateStyle:'medium',timeStyle:'short'}))+'</small></div>').join(''):'<p>Yaklaşan ders bulunmuyor.</p>';
  const mine=rows.filter(x=>x.owner_id===user?.id||members.has(x.id));
@@ -8458,7 +8467,7 @@ function render(){
 
 }
 function form(row){
- if(!auth()){alert('Sınıf oluşturmak için giriş yapmalısın.');return}
+ if(!auth()){alert('Sınıf oluşturmak için giriş yapmalısın. Oturumun henüz hazır değilse sayfayı yenileyip tekrar dene.');return}
  $('ccdEditId').value=row?.id||'';
  $('ccdFormTitle').textContent=row?'Sınıfı düzenle':'Yeni sınıf oluştur';
  $('ccdName').value=row?.title||'';$('ccdDesc').value=row?.description||'';
@@ -8495,24 +8504,24 @@ async function enter(id){
  const owner=row.owner_id===user.id;
  $('ccdStartLive').hidden=!owner;$('ccdStopLive').hidden=true;
  $('ccdRoomState').textContent=owner?'Hazır olduğunda canlı yayını başlat.':'Eğitmen yayını başlattığında derse katılabilirsin.';
- if(!owner){$('ccdStartLive').hidden=true;$('ccdJoinLive').hidden=false}else $('ccdJoinLive').hidden=true;
+ if(!owner){$('ccdStartLive').hidden=true;$('ccdJoinLive').hidden=!isLive(row);$('ccdRoomState').textContent=isLive(row)?'🔴 CANLI · Ders devam ediyor.':'Eğitmen yayını başlattığında derse katılabilirsin.'}else $('ccdJoinLive').hidden=true;
 }
 async function connectLive(){
  if(!active)return;const room=active.room_name;jitsiRoom=room;$('ccdJitsiPanel').hidden=false;$('ccdJitsiError').textContent='Canlı ders hazırlanıyor…';
  try{await sdk();if(jitsiRoom!==room)return;jitsiApi=new window.JitsiMeetExternalAPI('meet.jit.si',{roomName:room,parentNode:$('ccdJitsiMount'),width:'100%',height:580,configOverwrite:{prejoinPageEnabled:true,startWithAudioMuted:true,startWithVideoMuted:true}});$('ccdJitsiError').textContent=''}catch(e){if(jitsiRoom===room)$('ccdJitsiError').textContent='Bağlantı kurulamadı. Yeni sekmede açmayı deneyin.'}
 }
-function startLive(){if(!active||active.owner_id!==auth()?.id)return;$('ccdStartLive').hidden=true;$('ccdStopLive').hidden=false;$('ccdRoomState').textContent='Canlı toplantı bağlantısı açılıyor.';connectLive()}
-function stopLive(){stop();$('ccdJitsiPanel').hidden=true;$('ccdStartLive').hidden=false;$('ccdStopLive').hidden=true;$('ccdRoomState').textContent='Bu tarayıcıdaki canlı yayın bağlantısı kapatıldı.'}
+async function startLive(){if(!active||active.owner_id!==auth()?.id)return;try{const now=new Date().toISOString();await liveWrite({live_started_at:now,live_heartbeat_at:now,live_ended_at:null});startHeartbeat();$('ccdStartLive').hidden=true;$('ccdStopLive').hidden=false;$('ccdRoomState').textContent='🔴 CANLI · Toplantı bağlantısı açılıyor.';connectLive()}catch(e){alert('Canlı yayın başlatılamadı: '+(e.message||e))}}
+async function stopLive(){stopHeartbeat();try{await liveWrite({live_ended_at:new Date().toISOString()})}catch(e){alert('Yayın durumu güncellenemedi: '+(e.message||e));return}stop();$('ccdJitsiPanel').hidden=true;$('ccdStartLive').hidden=false;$('ccdStopLive').hidden=true;$('ccdRoomState').textContent='Canlı yayın kapatıldı.'}
 
 window.CCClassDemo={
- open(){ $('ccClassDemo').style.display='block';document.body.style.overflow='hidden';load()},
- close(){stop();active=null;$('ccdRoom').style.display='none';$('ccdDashboard').style.display='block';$('ccClassDemo').style.display='none';document.body.style.overflow=''},
- back(){stop();active=null;$('ccdRoom').style.display='none';$('ccdDashboard').style.display='block'},
+ open(){ $('ccClassDemo').style.display='block';document.body.style.overflow='hidden';load();startRefresh()},
+ close(){stopHeartbeat();stopRefresh();if(active?.owner_id===auth()?.id&&isLive(active))liveWrite({live_ended_at:new Date().toISOString()}).catch(console.warn);stop();active=null;$('ccdRoom').style.display='none';$('ccdDashboard').style.display='block';$('ccClassDemo').style.display='none';document.body.style.overflow=''},
+ back(){stopHeartbeat();if(active?.owner_id===auth()?.id&&isLive(active))liveWrite({live_ended_at:new Date().toISOString()}).catch(console.warn);stop();active=null;$('ccdRoom').style.display='none';$('ccdDashboard').style.display='block'},
  filter(v,b){filter=v;document.querySelectorAll('#ccClassDemo .tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');render()},
  create(){form(null)},edit(id){const row=rows.find(x=>x.id===id);if(row?.owner_id===auth()?.id)form(row)},
  save,join,remove,enter,
  cancelForm(){$('ccdClassForm').hidden=true},
- startLive,stopLive,joinLive(){if(active&&members.has(active.id))connectLive()},
+ startLive,stopLive,joinLive(){if(active&&(members.has(active.id)||active.owner_id===auth()?.id)&&isLive(active))connectLive()},
  openJitsiTab(){if(jitsiRoom)window.open('https://meet.jit.si/'+encodeURIComponent(jitsiRoom),'_blank','noopener,noreferrer')},
  toggle(){},notice(){alert('Kamera, mikrofon, sohbet ve ekran paylaşımı için Jitsi toplantısının içindeki düğmeleri kullanın.')}
 };
