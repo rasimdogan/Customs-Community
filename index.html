@@ -4020,12 +4020,9 @@ async function openPuzzleCard(c,rect){
  if(back)back.classList.add('loading');
 
  modal.classList.add('open');
- // Görsel ağdan yüklenirken açılış animasyonunu bekletme.
- // Önceki dönüşün son karesini temizleyip her tıklamada aynı anda başlat.
+ // Ön yüzü sabit tut: arka görsel hazır olmadan çevrilip boş görünmesin.
  flip.style.animation='none';
- flip.style.removeProperty('transform');
- void flip.offsetWidth;
- flip.style.animation='puzzleFlip .65s ease forwards';
+ flip.style.transform='rotateY(0deg)';
 
  const ready=await puzzleCardReady(c.image);
  if(seq!==puzzleCardOpenSeq||!modal.classList.contains('open'))return;
@@ -4033,12 +4030,19 @@ async function openPuzzleCard(c,rect){
  if(ready&&img){
   img.src=ready;
   img.alt=String(c.code||'')+' kartı';
+  // Ağ yüklemesi bitse bile görselin ilk çizimi tamamlanmamış olabilir.
+  try{if(typeof img.decode==='function')await img.decode()}catch(e){}
+  if(seq!==puzzleCardOpenSeq||!modal.classList.contains('open'))return;
   if(back)back.classList.remove('loading');
  }else if(back){
   back.classList.remove('loading');
-  back.innerHTML='<div style="height:100%;display:grid;place-items:center;padding:24px;text-align:center;color:#65798a;font-weight:800">Kart görseli yüklenemedi.</div>';
+  if(img)img.removeAttribute('src');
  }
- // Görsel hazır olduğunda animasyonu yeniden başlatma.
+ // Yalnızca arka yüz hazırken tek bir dönüş başlat.
+ flip.style.animation='none';
+ flip.style.removeProperty('transform');
+ void flip.offsetWidth;
+ flip.style.animation='puzzleFlip .65s ease forwards';
 }
 function closePuzzleCard(e){
  if(e&&e.target!==$('#puzzleCardModal')&&e.target.tagName!=='BUTTON')return;
