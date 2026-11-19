@@ -6088,18 +6088,38 @@ window.CCHub=(()=>{
  async function deleteNews(id){if(!confirm('Bu yayın silinsin mi?'))return;let {error}=await sb.rpc('cc_news_delete',{p_id:id});if(error){toast(error.message,'err');return}toast('Yayın silindi.','ok');await renderNewsView()}
 
  async function renderWebinarView(){
-  setHeader('ETKİNLİK','Webinar Takvimi','Yaklaşan canlı eğitimleri inceleyin, katılımınızı bildirin ve oturumlara Customs Community içinden katılın.','<button class="ccx-primary" onclick="CCHub.openWebinarEditor()">＋ Webinar Oluştur</button>');
-  $('cchubContent').innerHTML='<div class="ccx-loading">Webinar takvimi hazırlanıyor…</div>';
+  setHeader('ETKİNLİK','Webinar Takvimi','Canlı oturumları keşfet, katılacağın yayınları takip et ve site içinden doğrudan yayına bağlan.','<button class="ccx-primary" type="button" onclick="CCHub.openWebinarEditor()">＋ Webinar Oluştur</button>');
+  $('cchubContent').innerHTML='<div class="ccx-loading">Webinarlar yükleniyor…</div>';
   let wr=await sb.rpc('cc_webinar_list',{p_from:new Date(Date.now()-12*3600*1000).toISOString(),p_limit:50});
-  if(wr.error){$('cchubContent').innerHTML='<div class="cchub-empty">Webinar takvimi yüklenemedi.</div>';return}
-  const stateResult=await sb.rpc('cc_webinar_live_list');
-  if(stateResult.error)console.warn('Webinar yayın durumu yüklenemedi',stateResult.error);
+  if(wr.error){$('cchubContent').innerHTML='<div class="cchub-empty">Webinarlar yüklenemedi. Sayfayı yenileyerek tekrar deneyin.</div>';toast(wr.error.message||'Webinar servisine erişilemedi.','err');return}
+  let stateResult=await sb.rpc('cc_webinar_live_list');
+  if(stateResult.error)console.warn('Webinar yayın durumu okunamadı',stateResult.error);
   const states=new Map((stateResult.data||[]).map(x=>[String(x.webinar_id),!!x.is_live]));
   webinars=await Promise.all((wr.data||[]).map(async w=>({...w,is_live:states.get(String(w.id))===true,avatar_url:await sign(w.avatar_path),cover_url:await sign(w.cover_path)})));
-  $('cchubContent').innerHTML=`<div class="cchub-webinar-layout"><main class="cchub-main">${webinars.length?webinars.map(w=>{let d=dateParts(w.start_at),name=w.display_name||w.username;return `<article class="cchub-card cchub-webinar cchub-webinar-event ${w.cancelled?'cchub-cancelled':''}">${w.cover_url?`<div class="cchub-webinar-cover"><img src="${esc(w.cover_url)}" loading="lazy" decoding="async" alt=""></div>`:`<div class="cchub-webinar-cover cchub-webinar-cover-empty"><span>WEBINAR</span></div>`}<div class="cchub-webinar-event-grid"><div class="cchub-webinar-date"><strong>${d.day}</strong><span>${esc(d.mon)}</span></div><div class="cchub-webinar-body"><div class="cchub-webinar-kicker"><span class="cchub-badge">${esc(w.category||'Genel')}</span>${w.speaker_name?`<span>🎙 ${esc(w.speaker_name)}</span>`:''}</div><h3>${esc(w.title)}</h3><p>${esc((w.description||'').slice(0,260))}</p><div class="cchub-webinar-meta"><span>🕒 ${esc(trDate(w.start_at))}</span><span>👤 ${esc(name)}</span><span>👥 ${Number(w.attendee_count||0)} katılacak</span></div><div class="cchub-webinar-actions"><button class="ccx-lite cchub-attend ${w.attending?'active':''}" onclick="CCHub.toggleAttendance('${w.id}')">${w.attending?'✓ Katılacağım':'Katılacağım'}</button><button class="ccx-primary" onclick="CCHub.openWebinar('${w.id}')">Oturum Detayları</button><button class="ccx-lite cchub-jitsi-entry" onclick="CCHub.openWebinarAndJoin('${w.id}')">${w.is_live?'Canlı Yayına Katıl': 'Yayın Kapalı'}</button>${w.can_manage?`<button class="ccx-lite" onclick="CCHub.deleteWebinar('${w.id}')">Sil</button>`:''}</div></div></div></article>`}).join(''):'<div class="cchub-empty">Planlanmış webinar yok. İlk webinarı oluşturabilirsin.</div>'}</main><aside class="cchub-side"><section class="cchub-card cchub-section cchub-calendar-side"><div class="cchub-section-title"><div><small>TAKVİM</small><h3>Yaklaşan Webinarlar</h3></div></div>${webinars.length?webinars.slice(0,6).map(w=>`<button class="cchub-mini-event" onclick="CCHub.openWebinar('${w.id}')"><span>${esc(shortDate(w.start_at))}</span><b>${esc(w.title)}</b><small>${Number(w.attendee_count||0)} kişi katılacak</small></button>`).join(''):'<div class="cchub-empty">Takvim boş.</div>'}</section>
-  </aside></div>`
- }
- function openWebinarEditor(){
+  const admin=window.CC_AUTH?.getProfile?.()?.role==='admin';
+  const cards=webinars.map(w=>{
+    const d=dateParts(w.start_at),name=w.display_name||w.username||'Organizatör';
+    const id=esc(String(w.id)),live=!!w.is_live;
+    const canManage=admin||!!w.can_manage;
+    return '<article class="cchub-card cchub-webinar-event'+(w.cancelled?' cchub-cancelled':'')+'">'+
+      '<div class="ccw-event-top">'+
+        (w.cover_url?'<img class="ccw-cover" loading="lazy" decoding="async" alt="" src="'+esc(w.cover_url)+'">':'<div class="ccw-cover ccw-cover-empty" aria-hidden="true">WEBINAR</div>')+
+        '<div class="ccw-event-content"><div class="ccw-badges"><span class="cchub-badge">'+esc(w.category||'Genel')+'</span><span class="ccw-live-state '+(live?'is-live':'')+'">'+(live?'● CANLI YAYIN':'○ PLANLANDI')+'</span></div>'+
+        '<h3>'+esc(w.title||'Webinar')+'</h3>'+
+        '<p class="ccw-summary">'+esc((w.description||'Açıklama eklenmedi.').slice(0,230))+'</p>'+
+        '<div class="ccw-meta"><span>📅 '+esc(trDate(w.start_at))+'</span>'+(w.speaker_name?'<span>🎙 '+esc(w.speaker_name)+'</span>':'')+'<span>👤 '+esc(name)+'</span><span>👥 '+Number(w.attendee_count||0)+' katılımcı</span></div></div>'+
+      '</div><div class="ccw-event-actions">'+
+        '<button type="button" class="ccx-lite" onclick="CCHub.toggleAttendance(\''+id+'\')">'+(w.attending?'✓ Katılım kaydedildi':'Katılacağım')+'</button>'+
+        '<button type="button" class="ccx-lite" onclick="CCHub.openWebinar(\''+id+'\')">Detaylar</button>'+
+        (live?'<button type="button" class="ccx-primary" onclick="CCHub.openWebinarAndJoin(\''+id+'\')">▶ Canlı Yayına Gir</button>':'<span class="ccw-wait-label">Yayın henüz başlamadı</span>')+
+        (admin?'<button type="button" class="ccw-host-button" onclick="CCHub.setWebinarLive(\''+id+'\','+(live?'false':'true')+')">'+(live?'■ Yayını Bitir':'● Yayını Başlat')+'</button>':'')+
+        (canManage?'<button type="button" class="ccx-lite ccw-delete" onclick="CCHub.deleteWebinar(\''+id+'\')">Sil</button>':'')+
+      '</div></article>';
+  }).join('');
+  const upcoming=webinars.slice(0,8).map(w=>'<button class="ccw-upcoming" type="button" onclick="CCHub.openWebinar(\''+esc(String(w.id))+'\')"><span>'+esc(shortDate(w.start_at))+'</span><b>'+esc(w.title)+'</b><small>'+(w.is_live?'● Şu an canlı':Number(w.attendee_count||0)+' kişi katılacak')+'</small></button>').join('');
+  $('cchubContent').innerHTML='<div class="ccw-layout"><main class="ccw-list">'+(cards||'<div class="cchub-empty">Planlanmış webinar yok. Webinar Oluştur ile yeni bir etkinlik ekleyebilirsin.</div>')+'</main><aside class="ccw-side"><section class="cchub-card ccw-calendar"><small>TAKVİM</small><h3>Yaklaşan Webinarlar</h3>'+(upcoming||'<p>Henüz etkinlik bulunmuyor.</p>')+'</section><section class="cchub-card ccw-help"><h3>Canlı yayına nasıl katılırım?</h3><p>Etkinliği seç, <strong>Katılacağım</strong> ile kaydol. Organizatör yayını başlattığında <strong>Canlı Yayına Gir</strong> düğmesini kullan.</p></section></aside></div>';
+ } function openWebinarEditor(){
+  if(!window.CC_AUTH?.getSession?.()?.access_token){toast('Webinar oluşturmak için giriş yapmalısın.','err');return}
   ['cchubWebinarTitle','cchubWebinarStart','cchubWebinarEnd','cchubWebinarDesc','cchubWebinarSpeaker'].forEach(id=>$(id).value='');
   $('cchubWebinarCategory').value='Etüd';$('cchubWebinarRepeat').value='once';$('cchubRepeatUntil').value='';
   document.querySelectorAll('.cchub-repeat-day').forEach(x=>x.checked=false);
@@ -6154,21 +6174,56 @@ async function setWebinarLive(id,enabled){
  if(error){toast('Yayın durumu değiştirilemedi: '+error.message,'err');return}
  w.is_live=!!enabled;
  if(!enabled)leaveWebinarRoom();
- openWebinar(id);
- toast(enabled?'Webinar yayını açıldı. Katılımcılar şimdi girebilir.':'Webinar yayını kapatıldı.','ok');
+ await renderWebinarView();
+ if(enabled){await joinWebinarRoom(id);}else{closeDetail();}
+ toast(enabled?'Canlı yayın açıldı. Yönetici odası tam ekran açılıyor.':'Canlı yayın sonlandırıldı.','ok');
 }
 
  async function openWebinarAndJoin(id){openWebinar(id);if(!$('cchubDetailBackdrop')?.classList.contains('open'))return;await joinWebinarRoom(id)}
 function webinarSdk(){if(window.JitsiMeetExternalAPI)return Promise.resolve();if(webinarSdkPromise)return webinarSdkPromise;webinarSdkPromise=new Promise((resolve,reject)=>{const el=document.createElement('script');el.src='https://meet.jit.si/external_api.js';el.onload=()=>window.JitsiMeetExternalAPI?resolve():reject(Error('Jitsi başlatılamadı'));el.onerror=()=>reject(Error('Jitsi yüklenemedi'));document.head.appendChild(el)}).catch(e=>{webinarSdkPromise=null;throw e});return webinarSdkPromise}
-function leaveWebinarRoom(){try{webinarJitsi?.dispose()}catch(e){}webinarJitsi=null;$('cchubWebinarJitsi')?.remove()}
-async function joinWebinarRoom(id){const w=webinars.find(x=>String(x.id)===String(id));if(!w)return;
- if(!window.CC_AUTH?.getSession?.()?.access_token){toast('Webinara katılmak için giriş yapmalısın.','err');return}
+function leaveWebinarRoom(){
+ try{webinarJitsi?.dispose()}catch(e){}
+ webinarJitsi=null;
+ const overlay=document.getElementById('ccwFullscreen');
+ if(overlay)overlay.remove();
+ document.body.classList.remove('ccw-live-open');
+}
+async function joinWebinarRoom(id){
+ const w=webinars.find(x=>String(x.id)===String(id));if(!w)return;
+ if(!window.CC_AUTH?.getSession?.()?.access_token){toast('Canlı yayına katılmak için giriş yapmalısın.','err');return}
  const check=await sb.rpc('cc_webinar_live_list');
- if(check.error){toast('Webinar durumu kontrol edilemedi.','err');return}
+ if(check.error){toast('Canlı yayın durumu doğrulanamadı.','err');return}
  const state=(check.data||[]).find(x=>String(x.webinar_id)===String(id));
- if(!state?.is_live){w.is_live=false;toast('Yönetici henüz yayını başlatmadı.','info');openWebinar(id);return}
+ if(!state?.is_live){w.is_live=false;toast('Organizatör henüz yayını başlatmadı.','info');await renderWebinarView();return}
  w.is_live=true;
- leaveWebinarRoom();const detail=$('cchubDetail');if(!detail)return;const panel=document.createElement('section');panel.id='cchubWebinarJitsi';panel.className='cchub-jitsi-panel';panel.innerHTML='<div class="cchub-jitsi-head"><strong>● Canlı Webinar</strong><button type="button" class="ccx-lite" onclick="CCHub.leaveWebinarRoom()">Yayından Ayrıl</button></div><div id="cchubJitsiStatus">Görüntülü görüşme hazırlanıyor…</div><div id="cchubJitsiMount"></div>';detail.appendChild(panel);panel.scrollIntoView({behavior:'smooth',block:'nearest'});try{await webinarSdk();if(!$('cchubJitsiMount'))return;const room='CustomsCommunityWebinar'+String(w.id).replace(/[^a-zA-Z0-9]/g,'');webinarJitsi=new window.JitsiMeetExternalAPI('meet.jit.si',{roomName:room,parentNode:$('cchubJitsiMount'),width:'100%',height:520,configOverwrite:{prejoinPageEnabled:true,startWithAudioMuted:true,startWithVideoMuted:true},userInfo:{displayName:window.CC_AUTH?.getProfile?.()?.full_name||window.CC_AUTH?.getProfile?.()?.display_name||'Katılımcı'}});webinarJitsi.addListener('videoConferenceJoined',()=>{if($('cchubJitsiStatus'))$('cchubJitsiStatus').textContent='Canlı odaya bağlandınız.'});webinarJitsi.addListener('videoConferenceLeft',leaveWebinarRoom)}catch(e){if($('cchubJitsiStatus'))$('cchubJitsiStatus').textContent='Bağlantı kurulamadı: '+(e.message||e)}}
+ leaveWebinarRoom();
+ closeDetail();
+ const root=document.createElement('section');
+ root.id='ccwFullscreen';root.setAttribute('role','dialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-label','Canlı webinar');
+ root.innerHTML='<div class="ccw-live-toolbar"><div><strong>● CANLI WEBINAR</strong><span id="ccwLiveTitle"></span></div><div><button type="button" id="ccwLiveFull" class="ccx-lite">⛶ Tam Ekran</button><button type="button" id="ccwLiveExit" class="ccx-primary">Yayından Ayrıl</button></div></div><div id="ccwLiveStatus" role="status">Canlı oda hazırlanıyor…</div><div id="ccwLiveMount"></div>';
+ document.body.appendChild(root);document.body.classList.add('ccw-live-open');
+ root.querySelector('#ccwLiveTitle').textContent=w.title||'Canlı oturum';
+ root.querySelector('#ccwLiveExit').addEventListener('click',leaveWebinarRoom);
+ root.querySelector('#ccwLiveFull').addEventListener('click',()=>{
+   if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});
+   else root.requestFullscreen?.().catch(()=>{});
+ });
+ try{
+   await webinarSdk();
+   const mount=document.getElementById('ccwLiveMount');
+   if(!mount)return;
+   const room='CustomsCommunityWebinar'+String(w.id).replace(/[^a-zA-Z0-9]/g,'');
+   webinarJitsi=new window.JitsiMeetExternalAPI('meet.jit.si',{
+     roomName:room,parentNode:mount,width:'100%',height:'100%',
+     configOverwrite:{prejoinPageEnabled:true,startWithAudioMuted:true,startWithVideoMuted:true},
+     userInfo:{displayName:window.CC_AUTH?.getProfile?.()?.full_name||window.CC_AUTH?.getProfile?.()?.display_name||'Katılımcı'}
+   });
+   webinarJitsi.addListener('videoConferenceJoined',()=>{
+     const status=document.getElementById('ccwLiveStatus');if(status)status.textContent='Canlı odaya bağlandınız.';
+   });
+   webinarJitsi.addListener('videoConferenceLeft',leaveWebinarRoom);
+ }catch(e){const status=document.getElementById('ccwLiveStatus');if(status)status.textContent='Bağlantı kurulamadı: '+(e.message||e)}
+}
  async function deleteWebinar(id){if(!confirm('Bu webinar takvimden silinsin mi?'))return;let {error}=await sb.rpc('cc_webinar_delete',{p_webinar_id:id});if(error){toast(error.message,'err');return}toast('Webinar silindi.','ok');await renderWebinarView()}
  function closeDetail(){leaveWebinarRoom();$('cchubDetailBackdrop')?.classList.remove('open')}
 
@@ -9128,4 +9183,45 @@ window.CC_ACCOUNT_UI={
    document.addEventListener('DOMContentLoaded',()=>{if(!wrap()){const attempt=setInterval(()=>{if(wrap())clearInterval(attempt)},100);setTimeout(()=>clearInterval(attempt),5000)}},{once:true});
  }
 })();
-</script></body></html>
+</script><style id="cc-webinar-redesign-v10411">
+/* Scoped webinar cards: explicitly override inherited 2-column card grid. */
+#ccxHubPanel .ccw-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,315px);gap:20px;align-items:start;width:100%}
+#ccxHubPanel .ccw-list{display:grid;gap:18px;min-width:0}
+#ccxHubPanel .ccw-list>.cchub-webinar-event{display:block!important;grid-template-columns:none!important;padding:0!important;overflow:hidden;border-radius:16px}
+#ccxHubPanel .ccw-event-top{display:grid;grid-template-columns:190px minmax(0,1fr);gap:20px;align-items:stretch;padding:18px}
+#ccxHubPanel .ccw-cover{width:190px;height:158px;max-width:100%;object-fit:cover;border-radius:12px;background:linear-gradient(125deg,#203d5b,#347c9f);display:block;color:white}
+#ccxHubPanel .ccw-cover-empty{display:grid;place-items:center;font-size:15px;font-weight:850;letter-spacing:2px}
+#ccxHubPanel .ccw-event-content{min-width:0;display:flex;flex-direction:column;align-items:stretch;gap:9px;overflow-wrap:anywhere}
+#ccxHubPanel .ccw-badges{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+#ccxHubPanel .ccw-live-state{display:inline-flex;align-items:center;font-size:10px;font-weight:800;color:#60768a}
+#ccxHubPanel .ccw-live-state.is-live{color:#b31e38}
+#ccxHubPanel .ccw-event-content h3{margin:0!important;font-size:21px!important;line-height:1.3!important;color:#1d3f58!important;overflow-wrap:anywhere}
+#ccxHubPanel .ccw-summary{font-size:13px!important;line-height:1.55!important;margin:0!important;color:#617587!important;max-width:75ch}
+#ccxHubPanel .ccw-meta{display:flex;gap:8px 15px;flex-wrap:wrap;margin-top:auto;color:#4e6880;font-size:12px;line-height:1.5}
+#ccxHubPanel .ccw-event-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:13px 18px;background:#f5f8fb;border-top:1px solid #e4eaf0}
+#ccxHubPanel .ccw-event-actions button{width:auto!important;min-width:0!important;min-height:38px!important;height:auto!important;display:inline-flex!important;align-items:center;justify-content:center;padding:10px 13px!important;font-size:12px!important;line-height:1.25!important;border-radius:9px!important;white-space:normal!important}
+#ccxHubPanel .ccw-wait-label{color:#71859a;font-size:11px}
+#ccxHubPanel .ccw-host-button{background:#1f3d5c!important;color:white!important;border:1px solid #1f3d5c!important;font-weight:800!important}
+#ccxHubPanel .ccw-delete{margin-left:auto;color:#a63d44!important}
+#ccxHubPanel .ccw-side{display:grid;gap:14px;align-content:start;min-width:0}
+#ccxHubPanel .ccw-calendar,#ccxHubPanel .ccw-help{padding:20px!important}
+#ccxHubPanel .ccw-calendar>small{font-size:10px;letter-spacing:1px;font-weight:800;color:#688197}
+#ccxHubPanel .ccw-calendar h3,#ccxHubPanel .ccw-help h3{font-size:17px!important;margin:6px 0 12px!important;color:#203f56!important}
+#ccxHubPanel .ccw-upcoming{width:100%;display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:5px;padding:12px 0;background:transparent;border:0;border-top:1px solid #e5eaf0;cursor:pointer}
+#ccxHubPanel .ccw-upcoming span{font-size:11px;color:#2f6f9d;font-weight:800}
+#ccxHubPanel .ccw-upcoming b{font-size:13px;color:#24455f;line-height:1.35}
+#ccxHubPanel .ccw-upcoming small{font-size:11px;color:#79899b}
+#ccxHubPanel .ccw-help p{font-size:12px;line-height:1.6;color:#667e91;margin:0}
+#ccwFullscreen{position:fixed!important;inset:0!important;z-index:2147483000!important;display:flex!important;flex-direction:column!important;background:#0b1724!important;color:#fff!important;width:100vw!important;height:100dvh!important;padding:0!important;margin:0!important;overflow:hidden!important}
+#ccwFullscreen .ccw-live-toolbar{height:60px;min-height:60px;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:8px 18px;background:#182d42;border-bottom:1px solid #34536a}
+#ccwFullscreen .ccw-live-toolbar>div{display:flex;align-items:center;gap:12px;min-width:0}
+#ccwFullscreen .ccw-live-toolbar strong{font-size:12px;color:#f1bbbb;white-space:nowrap}
+#ccwFullscreen #ccwLiveTitle{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#ccwFullscreen .ccw-live-toolbar button{padding:9px 13px;border-radius:8px;font-size:12px;white-space:nowrap}
+#ccwFullscreen #ccwLiveStatus{font-size:11px;color:#bbcbda;padding:4px 16px;min-height:24px}
+#ccwFullscreen #ccwLiveMount{flex:1 1 auto;min-height:0;width:100%;overflow:hidden}
+#ccwFullscreen #ccwLiveMount iframe{width:100%!important;height:100%!important;display:block;border:0}
+body.ccw-live-open{overflow:hidden!important}
+@media(max-width:1000px){#ccxHubPanel .ccw-layout{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:680px){#ccxHubPanel .ccw-event-top{grid-template-columns:1fr;padding:12px;gap:13px}#ccxHubPanel .ccw-cover{width:100%;height:160px}#ccxHubPanel .ccw-event-actions{padding:10px}#ccxHubPanel .ccw-meta{font-size:11px}#ccwFullscreen .ccw-live-toolbar{padding:6px;gap:6px}#ccwFullscreen .ccw-live-toolbar strong{font-size:10px}#ccwFullscreen .ccw-live-toolbar button{padding:7px;font-size:10px}#ccwFullscreen #ccwLiveTitle{display:none}}
+</style></body></html>
