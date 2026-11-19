@@ -3402,7 +3402,7 @@ html.cc-auth-pending body{overflow:hidden}.cc-auth-gate{position:fixed;inset:0;z
   <div class="cc-chat-compose"><textarea id="mpChatInput" maxlength="500" placeholder="Takımına/rakibine mesaj yaz…"></textarea><button onclick="GTA_MP.chatSend()" type="button">Gönder</button></div>
 </div>
 <button aria-label="Kitap Modunu aç veya kapat" id="bookFloatLauncher" title="Kitap Modu — sürükleyerek taşı, tıklayarak aç/kapat" type="button">📖<span class="book-float-dot"></span></button>
-<div class="app"><aside class="side"><div class="brand"><div class="logo cc-logo"><span>C</span><span>C</span></div><div><h1>Customs Community</h1><p>Bilgiyle doğru sınıflandırma</p></div></div><div class="nav"><button data-view="home" onclick="nav('home')">⌂   Ana Sayfa</button><button data-view="edu" onclick="nav('edu')">▣   Eğitim Alanı</button><button onclick="BOOK.open()" type="button">📖   Kitap Modu</button><button id="cnNavBtn" onclick="CN.openEditor()" type="button">✎   Bölüm / Fasıl Notu Ekle</button><button data-view="test" onclick="nav('test')">✓   Pozisyon Testi</button>
+<div class="app"><aside class="side"><div class="brand" role="button" tabindex="0" title="Eğitim ana sayfası" onclick="nav('home')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('home')}"><div class="logo cc-logo"><span>C</span><span>C</span></div><div><h1>Customs Community</h1><p>Bilgiyle doğru sınıflandırma</p></div></div><div class="nav"><button data-view="home" onclick="nav('home')">⌂   Ana Sayfa</button><button data-view="edu" onclick="nav('edu')">▣   Eğitim Alanı</button><button onclick="BOOK.open()" type="button">📖   Kitap Modu</button><button id="cnNavBtn" onclick="CN.openEditor()" type="button">✎   Bölüm / Fasıl Notu Ekle</button><button data-view="test" onclick="nav('test')">✓   Pozisyon Testi</button>
 <button data-view="classification" onclick="nav('classification')"><span style="color:#e6ad32">⚖</span>   Sınıflandırma Görüşleri</button><button data-view="focus" onclick="nav('focus')">⚡   Günlük Çalışma</button><button data-view="color" onclick="nav('color')">🎨   Renklerle Tarife</button><button data-view="puzzle" onclick="nav('puzzle')">🧩   Tarife Yapbozu</button><button data-view="games" onclick="nav('games')">🎮   Oyunlar</button><button data-view="stats" onclick="nav('stats')">▥   İstatistikler</button><button data-view="review" onclick="nav('review')">↻   Akıllı Tekrar</button><button data-view="guide" onclick="nav('guide')">📘 Kullanım Kılavuzu</button><button class="cc-admin-only-hidden" data-view="adminhub" onclick="nav('adminhub')">⚙   Yönetim Paneli</button></div><div class="sidefoot"><b>Rasim Doğan</b><br/><span style="opacity:.75">Customs Community</span></div></aside>
 <main class="main"><header class="top"><div class="topsearch"><span>⌕</span><input id="globalSearch" placeholder="Ürün adı, GTİP, anahtar kelime veya fasıl ara…"/></div><button onclick="toggleTheme()">☼ / ☾</button><button onclick="showShortcuts()">⌨ Kısayollar</button><button onclick="openResetMenu(event)">Sıfırla</button></header><div class="content">
 <section class="view" id="view-home">
@@ -5641,7 +5641,7 @@ body.dark #ccxOverlay .ccx-header-inner .ccx-brand-title{color:#e5f2f8!important
  <div class="ccx-app">
   <header class="ccx-topbar">
    <div class="ccx-header-inner">
-   <button class="ccx-brand ccx-brand-link" type="button" onclick="CCCommunity.setFeed('all')" title="Ana Akışa dön" aria-label="Gümrük Meslek Topluluğu - Ana Akış"><span class="ccx-brand-mark">CC</span><span class="ccx-brand-title">Gümrük Meslek Topluluğu</span></button>
+   <button class="ccx-brand ccx-brand-link" type="button" onclick="CC_ACCOUNT_UI.communityHome()" title="Topluluk ana sayfası" aria-label="Gümrük Meslek Topluluğu - Ana Akış"><span class="ccx-brand-mark">CC</span><span class="ccx-brand-title">Gümrük Meslek Topluluğu</span></button>
    <nav class="ccx-nav-groups ccx-nav-compact" aria-label="Topluluk bölümleri">
     <div class="ccx-nav-cluster ccx-nav-social">
      <span class="ccx-nav-label">TOPLULUK &amp; BİLGİ MERKEZİ</span>
@@ -5669,6 +5669,7 @@ body.dark #ccxOverlay .ccx-header-inner .ccx-brand-title{color:#e5f2f8!important
     </div>
    </nav>
    <div class="ccx-top-actions">
+    <button type="button" class="cc-safe-settings-trigger" onclick="CC_ACCOUNT_UI.open('general')" title="Ayarlar">⚙ Ayarlar</button>
     <button class="ccx-mobile-profile" onclick="CCCommunity.openProfile()">👤 Profilim</button>
     <button id="ccxNotifBtn" class="ccx-notif-btn" onclick="CCCommunity.openNotifications()" aria-label="Bildirimler" title="Bildirimler">🔔<span id="ccxNotifDot" class="ccx-notif-dot"></span></button>
     <button class="ccx-refresh" onclick="CCCommunity.refresh()">↻ Yenile</button>
@@ -5683,6 +5684,7 @@ body.dark #ccxOverlay .ccx-header-inner .ccx-brand-title{color:#e5f2f8!important
      <div id="ccxMyMini" class="ccx-me" role="button" tabindex="0" aria-label="Profilimi görüntüle" onclick="CCCommunity.openMe()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();CCCommunity.openMe()}"><div class="ccx-avatar">CC</div><div><b>Profil</b><small>Yükleniyor…</small></div></div>
      <div id="ccxMyStats" class="ccx-stats"><button onclick="CCCommunity.openMe()" title="Profilimi gör"><strong>–</strong><small>Gönderi</small></button><button onclick="CCCommunity.openConnections(null,'followers')" title="Takipçilerimi göster"><strong>–</strong><small>Takipçi</small></button><button onclick="CCCommunity.openConnections(null,'following')" title="Takip ettiklerimi göster"><strong>–</strong><small>Takip</small></button></div>
      <button class="ccx-lite ccx-profile-open" onclick="CCCommunity.openProfile()">Profili Düzenle</button>
+     <button type="button" class="cc93-sidebar-membership" onclick="CC_ACCOUNT_UI.open('general')" title="Hesap ayarları"><span class="cc93-membership-icon" aria-hidden="true">⚙</span><span>Ayarlar ve Hesabım</span><span aria-hidden="true">→</span></button>
      <button type="button" class="cc93-sidebar-membership" onclick="CC_MEMBERSHIP.showPlans()" title="Üyelik paketleri, indirimler ve rozetler"><span class="cc93-membership-icon" aria-hidden="true">◇</span><span>Üyelik ve Ödemeler</span><span aria-hidden="true">→</span></button>
     </section>
    </aside>
@@ -5780,7 +5782,10 @@ body.dark #ccxOverlay .ccx-header-inner .ccx-brand-title{color:#e5f2f8!important
    <div id="ccxProfileStatsLine" class="ccx-profile-note"></div>
    <button id="ccxProfileSave" class="ccx-primary ccx-profile-save" onclick="CCCommunity.saveProfile()">Profili Kaydet</button>
    <div class="cc93-profile-shortcut"><div><span aria-hidden="true">◇</span><b>Üyelik ve Ödemeler</b></div><button type="button" onclick="CCCommunity.closeProfile();CC_MEMBERSHIP.showPlans()">Planlarımı Gör →</button></div>
-   <details class="ccx-password">
+   <details class="ccx-password cc-safe-section" id="ccSafeGeneral"><summary>⚙ Hesap Ayarları</summary><div class="cc-safe-content"><p>Profil bilgilerini, hesabını ve üyelik tercihlerini yönet.</p><button type="button" onclick="CC_ACCOUNT_UI.open('password')">Şifre ve güvenlik</button></div></details>
+   <details class="ccx-password cc-safe-section" id="ccSafePayments"><summary>▣ Ödemelerim</summary><div class="cc-safe-content"><b>Henüz ödeme kaydı yok.</b><p>Ödeme altyapısı henüz aktif değil. İşlem geçmişi bağlantı kurulduğunda burada gösterilecek.</p><button type="button" onclick="CCCommunity.closeProfile();CC_MEMBERSHIP.showPlans()">Üyelik paketlerini incele</button></div></details>
+   <details class="ccx-password cc-safe-section" id="ccSafeInvoices"><summary>▤ Faturalarım</summary><div class="cc-safe-content"><b>Henüz fatura bulunmuyor.</b><p>Faturalandırma sistemi aktif olduğunda gerçek faturalar ve indirilebilir belgeler bu alanda listelenecek.</p></div></details>
+   <details class="ccx-password" id="ccSafePassword">
     <summary>Şifre değiştir</summary>
     <div class="ccx-fields">
      <div class="ccx-field"><label>Yeni şifre</label><input id="ccxPass1" type="password" minlength="8" maxlength="128"></div>
@@ -6249,7 +6254,7 @@ window.CCCommunity=(()=>{
 
  function renderMy(){
   if(!my)return;
-  let mini=$('ccxMyMini');if(mini)mini.innerHTML=avatar(my.avatar_url,my.display_name,my.username)+`<div><b>${esc(my.display_name||my.username)}</b><small>@${esc(my.username||'kullanici')}</small></div>`;
+  let mini=$('ccxMyMini');if(mini){const admin=window.CC_AUTH?.getProfile?.()?.role==='admin';mini.innerHTML=avatar(my.avatar_url,my.display_name,my.username)+`<div><b>${esc(my.display_name||my.username)}</b><small>@${esc(my.username||'kullanici')}</small>${admin?'<span class="cc-safe-admin-tag">Yönetici</span>':''}</div>`;}
   let av=$('ccxComposerAvatar');if(av)av.outerHTML=avatar(my.avatar_url,my.display_name,my.username,'ccx-avatar').replace('class="ccx-avatar"','id="ccxComposerAvatar" class="ccx-avatar"');
   window.CC_MEMBERSHIP?.decorateOwn?.();
   let boxes=$('ccxMyStats')?.querySelectorAll('strong');if(boxes?.length===3){boxes[0].textContent=stats.posts||0;boxes[1].textContent=stats.followers||0;boxes[2].textContent=stats.following||0}
@@ -7551,7 +7556,7 @@ function svgForTier(t){
 }
 function badgeHtml(tier,{small=false}={}){let t=typeof tier==='number'?TIERS[clamp(tier)]:tier||TIERS[0];return `<span class="cc92-badge cc92-${t.className}${small?' cc92-badge-small':''}" title="${t.name}">${svgForTier(t)}<span>${t.name}</span></span>`}
 function stamp(parent,tier,id){if(!parent)return;let node=id?$(id):parent.querySelector('.cc92-avatar-stamp');if(!node){node=document.createElement('div');node.className='cc92-avatar-stamp';if(id)node.id=id;parent.appendChild(node)}node.innerHTML=badgeHtml(tier,{small:true})}
-function decorateOwn(){const t=tierFrom(details);const mini=$('ccxMyMini');if(mini&&mini.querySelector('.ccx-avatar')){let node=mini.querySelector('.cc92-avatar-stamp');if(!node){node=document.createElement('div');node.className='cc92-avatar-stamp cc92-mini-stamp';mini.appendChild(node)}node.innerHTML=badgeHtml(t,{small:true})}const avatar=$('ccxProfileAvatar');if(avatar){const host=avatar.closest('.ccx-avatar-edit');if(host){let n=$('cc92ProfileAvatarBadge');if(!n){n=document.createElement('div');n.id='cc92ProfileAvatarBadge';n.className='cc92-drawer-stamp';(host.querySelector('.cc93-avatar-copy')||host.querySelector('.ccx-avatar-edit-copy')||host.children[1]||host).appendChild(n)}n.innerHTML=badgeHtml(t,{small:true})}}}
+function decorateOwn(){if(window.CC_AUTH?.getProfile?.()?.role==='admin'){document.querySelector('#ccxMyMini .cc92-avatar-stamp')?.remove();document.getElementById('cc92ProfileAvatarBadge')?.remove();return}const t=tierFrom(details);const mini=$('ccxMyMini');if(mini&&mini.querySelector('.ccx-avatar')){let node=mini.querySelector('.cc92-avatar-stamp');if(!node){node=document.createElement('div');node.className='cc92-avatar-stamp cc92-mini-stamp';mini.appendChild(node)}node.innerHTML=badgeHtml(t,{small:true})}const avatar=$('ccxProfileAvatar');if(avatar){const host=avatar.closest('.ccx-avatar-edit');if(host){let n=$('cc92ProfileAvatarBadge');if(!n){n=document.createElement('div');n.id='cc92ProfileAvatarBadge';n.className='cc92-drawer-stamp';(host.querySelector('.cc93-avatar-copy')||host.querySelector('.ccx-avatar-edit-copy')||host.children[1]||host).appendChild(n)}n.innerHTML=badgeHtml(t,{small:true})}}}
 async function renderPublicBadge(target){const id='cc92PublicBadge';const el=$(id);if(!el)return;el.innerHTML=badgeHtml(TIERS[0],{small:true});try{const client=await window.CC_AUTH?.getClient?.();if(!client)return;const {data,error}=await client.rpc('cc_public_badge',{p_target:target});if(error)throw error;if(!$(id)||window.CCCommunity?.__badgeTarget!==target)return;el.innerHTML=badgeHtml(tierFrom(data),{small:true})}catch(e){if($(id)&&window.CCCommunity?.__badgeTarget===target)el.innerHTML=badgeHtml(TIERS[0],{small:true})}}
 async function oauthClient(){if(oauth)return oauth;const mod=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');oauth=mod.createClient(PROJECT,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:'cc_google_oauth_v10292'}});return oauth}
 async function googleLogin(){const btn=$('ccGoogleLoginBtn'),el=$('ccAuthMsg');if(btn?.disabled)return;try{if(btn)btn.disabled=true;if(el)el.textContent='Google girişine bağlanılıyor…';if(!/^https?:$/.test(location.protocol))throw Error('Google girişi için customscommunity.com adresini aç.');const response=await fetch(PROJECT+'/auth/v1/settings',{headers:{apikey:KEY}});if(!response.ok)throw Error('Giriş servisine ulaşılamadı. Tekrar dene.');const settings=await response.json();if(!settings.external?.google)throw Error('Google girişi henüz etkinleştirilmedi. Yönetici Google bağlantı ayarlarını tamamlamalı.');const target=new URL(PROJECT+'/auth/v1/authorize');target.searchParams.set('provider','google');target.searchParams.set('redirect_to','https://customscommunity.com/');target.searchParams.set('prompt','select_account');location.assign(target.href)}catch(e){if(el){el.textContent=e.message||String(e);el.className='cc-auth-msg bad'}if(btn)btn.disabled=false}}
@@ -7669,7 +7674,7 @@ window.addEventListener('cc-authenticated',()=>{setTimeout(()=>refresh(),900)});
   })});
   setTimeout(()=>{if(!document.getElementById('ccAccountDialog')){const el=document.getElementById('ccAuthMsg');if(el)el.textContent='Şifre yenileme bağlantısı geçersiz veya süresi dolmuş. Şifremi Unuttum ile yeni bağlantı iste.'}},5000);
  }
- window.addEventListener('cc-authenticated',()=>{const target=document.getElementById('ccxMyMini');if(target&&!document.getElementById('ccFreeMembershipLabel')){const span=document.createElement('span');span.id='ccFreeMembershipLabel';span.textContent='Ücretsiz üyelik';span.style.cssText='font-size:12px;display:block;color:#24714d';target.appendChild(span)}});
+ // Membership status is rendered by profile/badge components.
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initRecovery,{once:true});else initRecovery();
  return{forgot,setup};
 })();
@@ -8648,4 +8653,30 @@ window.CCClassDemo={
 };
 })();
 </script>
-</body></html>
+<style id="cc-safe-profile-v10392">
+.side .brand[role="button"]{cursor:pointer}
+.side .brand[role="button"]:focus-visible{outline:2px solid #2c84b4;outline-offset:4px;border-radius:9px}
+.cc-safe-admin-tag{display:block;width:max-content;margin:5px auto 0;border-radius:13px;padding:4px 9px;background:#deedf8;color:#185781;font-size:11px;font-weight:850}
+.cc-safe-section{margin-top:10px}
+.cc-safe-content{padding:12px 6px;color:#506e82;font-size:12px;line-height:1.6}
+.cc-safe-content p{margin:6px 0 11px}
+.cc-safe-content button{border:1px solid #b9d1e5;border-radius:9px;background:#edf6fc;color:#165d8b;padding:9px 12px;cursor:pointer;font-weight:800}
+</style>
+<script id="cc-safe-profile-js-v10392">
+window.CC_ACCOUNT_UI={
+ communityHome:function(){
+  try{window.CCCommunity?.closePublicProfile?.()}catch(e){}
+  try{window.CCHub?.close?.()}catch(e){}
+  try{window.CCCards?.closeTransient?.();window.CCCards?.closeLibraryView?.()}catch(e){}
+  try{window.CCCommunity?.setFeed?.('all')}catch(e){}
+  const area=document.getElementById('ccxSocialLayout');if(area)area.scrollTop=0;
+ },
+ open:async function(section='general'){
+  try{await window.CCCommunity?.openProfile?.();
+   const ids={general:'ccSafeGeneral',payments:'ccSafePayments',invoices:'ccSafeInvoices',password:'ccSafePassword'};
+   const el=document.getElementById(ids[section]||ids.general);
+   if(el){el.open=true;el.scrollIntoView({block:'nearest',behavior:'auto'})}
+  }catch(e){console.warn('Profil ayarları:',e)}
+ }
+};
+</script></body></html>
