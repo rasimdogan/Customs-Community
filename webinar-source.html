@@ -1,0 +1,1163 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Customs Community — Webinar Kaynak Kodları (İnceleme Kopyası)</title>
+<!--
+KAYNAK: rasimdogan/Customs-Community / main / index.html
+SHA: 3e044e688f8c9d49001fdff77a17f33c236cceb0
+AMAÇ: Webinar modülünü başka bir geliştirici veya uygulamada inceleme/düzeltme için taşımak.
+DİKKAT: Bu bir üretimden çıkarılmış kaynak kod paketidir. BAĞIMSIZ ÇALIŞAN DEMO DEĞİLDİR.
+Webinar görünümü CCHub.renderWebinarView() ile dinamik oluşur.
+CCHub ortak Makale/Haber/Webinar modülüdür. JS'nin tamamı değişiklikleri izleyebilmeniz için aynen korunmuştur.
+Başlıca dış bağımlılıklar: Supabase istemcisi ve RPC fonksiyonları (cc_webinar_list, cc_webinar_create, cc_webinar_attend, vb.), CC_AUTH, CCCommunity, ccToast, media storage, Jitsi iframe.
+Orijinal dosyanın başka alanlarındaki global CSS, modal yardımcıları ve auth başlangıcı burada eksiktir. 
+Değişiklikleri yapıp bu dosyayı geri gönderin; üretim index.html ile güvenli şekilde birleştirilebilir.
+-->
+<style id="v10265-community-publishing">
+/* Üst menü yeni bölümlere hazır */
+.ccx-tabs{overflow-x:auto;scrollbar-width:none;min-width:0}
+.ccx-tabs::-webkit-scrollbar{display:none}
+.ccx-tabs button{white-space:nowrap;flex:0 0 auto;padding-left:13px!important;padding-right:13px!important}
+
+/* Makale / Haber / Webinar ana paneli */
+.cchub-panel{flex:1;min-height:0;overflow:auto;background:#f4f6f8}
+.cchub-shell{width:min(1160px,calc(100% - 34px));margin:0 auto;padding:20px 0 34px}
+.cchub-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:15px;padding:0 2px}
+.cchub-head small{display:block;font-size:8px;font-weight:950;letter-spacing:1.2px;color:#5483a0}
+.cchub-head h2{margin:3px 0 4px;font-size:25px;line-height:1.1;color:#1e3d50}
+.cchub-head p{margin:0;color:#6d818e;font-size:11px;line-height:1.5;max-width:670px}
+.cchub-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.cchub-content{min-height:300px}
+.cchub-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+.cchub-main,.cchub-side{display:grid;gap:12px}
+.cchub-side{position:sticky;top:14px}
+.cchub-card{background:#fff;border:1px solid #dfe5e8;border-radius:12px;box-shadow:0 1px 2px rgba(16,35,49,.035)}
+.cchub-section{padding:14px}
+.cchub-section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.cchub-section-title small{font-size:7.5px;letter-spacing:1px;font-weight:950;color:#80919c}
+.cchub-section-title h3{margin:2px 0 0;color:#284b60;font-size:15px}
+.cchub-empty{padding:28px 18px;text-align:center;color:#7b8d98;font-size:10.5px;border:1px dashed #d6e0e5;border-radius:10px;background:#fafcfd}
+
+/* Articles */
+.cchub-article{padding:16px;cursor:pointer;transition:box-shadow .15s ease,transform .15s ease}
+.cchub-article:hover{box-shadow:0 7px 24px rgba(26,56,74,.08);transform:translateY(-1px)}
+.cchub-badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 7px;background:#edf5f9;color:#34759a;font-size:7.5px;font-weight:950;letter-spacing:.04em}
+.cchub-article h3{margin:8px 0 5px;color:#203f52;font-size:18px;line-height:1.25}
+.cchub-article p{margin:0;color:#617987;font-size:11px;line-height:1.6}
+.cchub-author-row{display:flex;align-items:center;gap:8px;margin-top:12px;color:#6f838f}
+.cchub-author-row .ccx-avatar{width:30px;height:30px;font-size:8px}
+.cchub-author-row button{border:0;background:transparent;padding:0;text-align:left;cursor:pointer;color:#355e76}
+.cchub-author-row b{display:block;font-size:9.5px}
+.cchub-author-row small{display:block;font-size:8px;color:#8a9aa3;margin-top:1px}
+.cchub-author-list{display:grid;gap:5px}
+.cchub-author-item{display:grid;grid-template-columns:38px minmax(0,1fr);gap:9px;align-items:center;border:0;background:transparent;text-align:left;padding:7px;border-radius:9px;cursor:pointer}
+.cchub-author-item:hover{background:#f2f7f9}
+.cchub-author-item .ccx-avatar{width:38px;height:38px;font-size:9px}
+.cchub-author-item b{display:block;color:#294d61;font-size:10px}
+.cchub-author-item small{display:block;color:#82949f;font-size:8.5px;margin-top:2px}
+.cchub-more{width:100%;border:1px solid #d8e3e8;background:#fff;color:#3e718d;border-radius:10px;padding:10px;font-size:9.5px;font-weight:900;cursor:pointer}
+.cchub-more:hover{background:#f2f8fa}
+
+/* News & sponsored */
+.cchub-news{padding:15px}
+.cchub-news+.cchub-news{border-top:1px solid #edf0f2}
+.cchub-news-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cchub-news h3{margin:7px 0 5px;font-size:15px;line-height:1.3;color:#26485c}
+.cchub-news p{margin:0;color:#667c89;font-size:10.5px;line-height:1.55}
+.cchub-news time{font-size:8px;color:#91a0a8}
+.cchub-badge.update{background:#edf1ff;color:#526cc8}
+.cchub-badge.ad{background:#fff4db;color:#9a6a00}
+.cchub-ad{padding:14px;background:linear-gradient(145deg,#fffdf7,#fff7df);border-color:#ead9a8}
+.cchub-ad .cchub-sponsored{font-size:7px;font-weight:950;letter-spacing:1px;color:#9f7a22}
+.cchub-ad h4{margin:5px 0 5px;color:#4d4634;font-size:13px}
+.cchub-ad p{margin:0;color:#796d50;font-size:9.5px;line-height:1.5}
+.cchub-ad a{display:inline-block;margin-top:9px;color:#84630e;font-size:9px;font-weight:900;text-decoration:none}
+.cchub-ad-placeholder{padding:16px;text-align:center;border:1px dashed #e2d5b2;border-radius:10px;color:#9a8961;background:#fffdf7;font-size:9px}
+
+/* Webinar calendar */
+.cchub-live-entry-note{display:flex;flex-direction:column;gap:5px;padding:12px 13px;border:1px solid #b9d9e8;border-radius:10px;background:linear-gradient(135deg,#edf7fb,#f7fbfd);color:#31566d;font-size:10px;line-height:1.55}.cchub-live-entry-note b{font-size:11px;color:#185879}.cchub-live-entry-note span{color:#567386}
+
+.cchub-webinar{display:grid;grid-template-columns:72px minmax(0,1fr);gap:13px;padding:14px}
+.cchub-webinar-date{border-radius:10px;background:#ecf4f8;text-align:center;padding:9px 5px;align-self:start}
+.cchub-webinar-date strong{display:block;color:#235f80;font-size:24px;line-height:1}
+.cchub-webinar-date span{display:block;color:#5e7b8c;font-size:8px;font-weight:950;letter-spacing:.07em;margin-top:4px}
+.cchub-webinar-body h3{margin:3px 0 4px;font-size:15px;color:#24495d}
+.cchub-webinar-body p{margin:0;color:#687e8b;font-size:10px;line-height:1.5}
+.cchub-webinar-meta{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px;color:#728791;font-size:8.5px}
+.cchub-webinar-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.cchub-webinar-event:before{content:'SITE İÇİ CANLI OTURUM';display:inline-flex;align-items:center;margin:0 0 9px;padding:5px 9px;border-radius:7px;background:#e6f5ed;color:#176c48;font-size:9px;font-weight:950;letter-spacing:.04em}
+.cchub-attend.active{background:#e8f5ee!important;border-color:#b8dfca!important;color:#237849!important}
+.cchub-cancelled{opacity:.58}
+.cchub-cancelled h3{text-decoration:line-through}
+
+/* Editors / detail */
+.cchub-backdrop{z-index:2050!important}
+.cchub-editor{width:min(720px,calc(100% - 24px));max-height:90vh;overflow:auto;background:#fff;border-radius:14px;border:1px solid #dce4e8;box-shadow:0 24px 80px rgba(18,38,51,.23)}
+.cchub-form{display:grid;gap:10px;padding:15px}
+.cchub-two-col{grid-template-columns:1fr 1fr}
+.cchub-span2{grid-column:1/-1}
+.cchub-form label>span{display:block;font-size:8px;font-weight:900;color:#6e828f;margin-bottom:4px}
+.cchub-form input,.cchub-form textarea,.cchub-form select{width:100%;border:1px solid #d7e1e6;border-radius:9px;padding:9px 10px;background:#fff;color:#294657;outline:0;font-size:11px}
+.cchub-form textarea{min-height:92px;resize:vertical;line-height:1.5}
+.cchub-form .cchub-long-text{min-height:310px}
+.cchub-editor-actions{display:flex;justify-content:flex-end;gap:7px;padding:12px 15px;border-top:1px solid #edf0f2}
+.cchub-detail{width:min(760px,calc(100% - 24px));max-height:90vh;overflow:auto;background:#fff;border-radius:14px;border:1px solid #dce4e8;box-shadow:0 24px 80px rgba(18,38,51,.23)}
+.cchub-detail-head{padding:18px 20px 12px;border-bottom:1px solid #edf0f2}
+.cchub-detail-head>div:first-child{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.cchub-detail h2{margin:9px 0 6px;color:#203f52;font-size:24px;line-height:1.25}
+.cchub-detail-summary{color:#607986;font-size:11.5px;line-height:1.6;margin:0}
+.cchub-detail-body{padding:18px 20px;color:#334f60;font-size:12px;line-height:1.78;white-space:pre-wrap;overflow-wrap:anywhere}
+.cchub-detail-footer{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 20px;border-top:1px solid #edf0f2}
+.cchub-detail-footer>div{display:flex;gap:7px;flex-wrap:wrap}
+.cchub-link{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:9px;background:#236f98;color:#fff;text-decoration:none;padding:9px 12px;font-size:9.5px;font-weight:900}
+
+/* dark mode */
+body.dark .cchub-panel{background:#0c1723}
+body.dark .cchub-card,body.dark .cchub-editor,body.dark .cchub-detail{background:#112236;border-color:#294158}
+body.dark .cchub-head h2,body.dark .cchub-article h3,body.dark .cchub-news h3,body.dark .cchub-webinar-body h3,body.dark .cchub-detail h2,body.dark .cchub-author-item b{color:#e2edf4}
+body.dark .cchub-head p,body.dark .cchub-article p,body.dark .cchub-news p,body.dark .cchub-webinar-body p,body.dark .cchub-detail-body,body.dark .cchub-detail-summary{color:#b9cad4}
+body.dark .cchub-author-item:hover{background:#182d40}
+body.dark .cchub-form input,body.dark .cchub-form textarea,body.dark .cchub-form select{background:#0f1f31;border-color:#30485d;color:#e4edf3}
+body.dark .cchub-ad{background:#2b281d;border-color:#5b5135}
+
+@media(max-width:900px){
+ .cchub-grid{grid-template-columns:1fr}
+ .cchub-side{position:static}
+}
+@media(max-width:760px){
+ .ccx-tabs{position:absolute;left:8px;right:8px;bottom:0;height:34px}
+ .ccx-tabs button{padding:0 10px!important;font-size:10px!important}
+ .cchub-shell{width:calc(100% - 12px);padding:10px 0 24px}
+ .cchub-head{align-items:flex-start;flex-direction:column;padding:0 4px}
+ .cchub-head h2{font-size:21px}
+ .cchub-actions{width:100%;justify-content:flex-start}
+ .cchub-webinar{grid-template-columns:58px minmax(0,1fr);gap:10px;padding:11px}
+ .cchub-webinar-date strong{font-size:20px}
+ .cchub-two-col{grid-template-columns:1fr}
+ .cchub-span2{grid-column:auto}
+ .cchub-editor,.cchub-detail{width:100%;height:100%;max-height:100%;border-radius:0}
+ .cchub-form .cchub-long-text{min-height:42vh}
+}
+</style>
+
+<style id="v10266-community-structure">
+/* Üç ayrı yapı: Akış / Kart Kütüphanesi / Bilgi Merkezi */
+.ccx-topbar{
+ height:88px!important;flex:0 0 88px!important;
+ grid-template-columns:240px minmax(0,1fr) 230px!important;
+ gap:18px!important;padding:0 18px!important
+}
+.ccx-nav-groups{display:grid;grid-template-columns:minmax(250px,.9fr) minmax(225px,.72fr) minmax(330px,1.15fr);gap:10px;align-items:center;min-width:0}
+.ccx-nav-cluster{min-width:0;padding:8px 10px 7px;border:1px solid #e4e9ec;border-radius:12px;background:#fafcfd}
+.ccx-nav-label{display:block;margin:0 2px 5px;font-size:6.8px;line-height:1;font-weight:950;letter-spacing:1px;color:#8b9aa3}
+.ccx-nav-buttons{display:flex;align-items:center;gap:4px}
+.ccx-nav-buttons button{
+ border:0;background:transparent;border-radius:8px;padding:7px 9px;color:#627987;
+ font-size:9.5px;font-weight:850;cursor:pointer;white-space:nowrap
+}
+.ccx-nav-buttons button:hover{background:#edf4f7;color:#2b6e91}
+.ccx-nav-buttons button.active{background:#e7f1f7;color:#1f6b95;box-shadow:inset 0 0 0 1px #d1e3ed}
+.ccx-card-library-entry{
+ border:1px solid #1f6f9a!important;background:linear-gradient(135deg,#184f72,#237da7)!important;
+ color:#fff!important;border-radius:13px!important;padding:10px 13px!important;display:flex;align-items:center;gap:10px;
+ cursor:pointer;box-shadow:0 8px 20px rgba(31,111,154,.16);min-width:0;text-align:left
+}
+.ccx-card-library-entry:hover{transform:translateY(-1px);box-shadow:0 11px 24px rgba(31,111,154,.22)}
+.ccx-card-library-entry.active{box-shadow:0 0 0 3px rgba(57,145,190,.18),0 10px 24px rgba(31,111,154,.22)}
+.ccx-card-library-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,.14);font-size:18px;flex:0 0 34px}
+.ccx-card-library-entry b{display:block;font-size:11px}
+.ccx-card-library-entry small{display:block;margin-top:2px;font-size:7.5px;color:#d8edf7;font-weight:700;white-space:nowrap}
+
+/* Daha geniş çalışma alanı */
+.ccx-layout{width:min(1320px,calc(100% - 28px))!important;grid-template-columns:minmax(0,1fr) 320px!important}
+.cckl-panel{width:min(1360px,calc(100% - 24px))!important}
+.cckl-shell{grid-template-columns:220px minmax(0,1fr)!important}
+.cckl-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+.cckl-head{
+ background:linear-gradient(120deg,#eef7fb,#fff 55%,#f4f9fc)!important;
+ border-color:#cfe3ee!important;padding:20px 22px!important
+}
+.cckl-head h2{font-size:25px!important}
+
+.cchub-shell{width:min(1320px,calc(100% - 28px))!important}
+
+/* Makale: dergi / yazı kimliği */
+.cchub-article-editor{width:min(820px,calc(100% - 24px))!important;background:#fbfaf7!important}
+.cchub-editor-hero{display:flex;justify-content:space-between;gap:18px;padding:19px 20px 14px;background:linear-gradient(135deg,#f4efe4,#fffdf8);border-bottom:1px solid #e9e1d2}
+.cchub-editor-hero small{font-size:7px;letter-spacing:1.2px;font-weight:950;color:#9a774d}
+.cchub-editor-hero h3{margin:3px 0 4px;font:800 23px Georgia,serif;color:#413a31}
+.cchub-editor-hero p{margin:0;max-width:580px;color:#776d60;font-size:10px;line-height:1.45}
+.cchub-article-cover-pick{padding:15px 16px 0}
+.cchub-cover-preview{background-size:cover;background-position:center;display:grid;place-items:center;overflow:hidden}
+.cchub-cover-preview-article{height:190px;border:1px dashed #d9c9ae;border-radius:12px;background-color:#f5efe4}
+.cchub-cover-preview-article span{font:700 14px Georgia,serif;color:#9b886b}
+.cchub-cover-preview.has-image span{display:none}
+.cchub-cover-actions{display:flex;gap:6px;margin-top:7px}
+.cchub-article-form{grid-template-columns:1fr 240px!important}
+.cchub-writing-hint{align-self:end;padding:9px 10px;border-radius:9px;background:#f3eee4;color:#6f6252}
+.cchub-writing-hint b{display:block;font-size:8px}
+.cchub-writing-hint small{display:block;margin-top:2px;font-size:7.5px;line-height:1.4}
+.cchub-article-magazine{display:grid!important;grid-template-columns:220px minmax(0,1fr);padding:0!important;overflow:hidden}
+.cchub-article-cover{min-height:190px;background:#e9ecee;overflow:hidden}
+.cchub-article-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.cchub-article-cover-empty{display:grid;place-items:center;background:linear-gradient(135deg,#e8e1d6,#f5f0e8)}
+.cchub-article-cover-empty span{font:900 38px Georgia,serif;color:#b19e81}
+.cchub-article-copy{padding:16px}
+.cchub-article-flags{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#8c979d;font-size:8px}
+.cchub-article-reading{font-family:Georgia,"Times New Roman",serif!important;font-size:14px!important;line-height:1.9!important;color:#394650!important;max-width:720px;margin:0 auto}
+.cchub-detail-cover{height:280px;overflow:hidden;background:#e9eef1}
+.cchub-detail-cover img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* Webinar: etkinlik / afiş kimliği */
+.cchub-webinar-editor{width:min(840px,calc(100% - 24px))!important}
+.cchub-webinar-editor-head{display:grid;grid-template-columns:58px minmax(0,1fr) auto;gap:13px;align-items:center;padding:17px 18px;background:linear-gradient(135deg,#133a5b,#1e7096);color:#fff}
+.cchub-webinar-editor-mark{width:58px;height:58px;border-radius:13px;background:#e84444;display:grid;place-items:center;font-size:12px;font-weight:950;letter-spacing:1px;box-shadow:0 7px 18px rgba(232,68,68,.25)}
+.cchub-webinar-editor-head small{font-size:7px;font-weight:950;letter-spacing:1px;color:#acd5e9}
+.cchub-webinar-editor-head h3{margin:3px 0;font-size:21px}
+.cchub-webinar-editor-head p{margin:0;color:#d8edf7;font-size:9.5px}
+.cchub-webinar-editor-head .ccx-icon-btn{background:rgba(255,255,255,.12)!important;color:#fff!important;border-color:rgba(255,255,255,.2)!important}
+.cchub-cover-preview-webinar{height:210px;margin:14px 15px 0;border-radius:12px;background:linear-gradient(135deg,#dcecf5,#edf6fa);border:1px dashed #b9d2df}
+.cchub-cover-preview-webinar span{font-size:11px;font-weight:900;color:#5f879b}
+.cchub-webinar-cover-actions{padding:0 15px}
+.cchub-webinar-form{background:#f8fbfc}
+.cchub-webinar-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+.cchub-webinar-event{padding:0!important;overflow:hidden}
+.cchub-webinar-cover{height:230px;background:#dce8ee;overflow:hidden}
+.cchub-webinar-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.cchub-webinar-cover-empty{display:grid;place-items:center;background:linear-gradient(135deg,#183f60,#2b7ca1)}
+.cchub-webinar-cover-empty span{color:#fff;font-size:20px;font-weight:950;letter-spacing:2px}
+.cchub-webinar-event-grid{display:grid;grid-template-columns:76px minmax(0,1fr);gap:13px;padding:14px}
+.cchub-webinar-kicker{display:flex;align-items:center;gap:7px;flex-wrap:wrap;color:#68808d;font-size:8.5px}
+.cchub-calendar-side{position:sticky;top:14px}
+.cchub-mini-event{display:block;width:100%;border:0;border-top:1px solid #edf0f2;background:transparent;text-align:left;padding:10px 4px;cursor:pointer}
+.cchub-mini-event:first-of-type{border-top:0}
+.cchub-mini-event span{display:block;color:#2c7aa1;font-size:8px;font-weight:900}
+.cchub-mini-event b{display:block;margin-top:3px;color:#29495b;font-size:10px;line-height:1.35}
+.cchub-mini-event small{display:block;margin-top:3px;color:#84959e;font-size:8px}
+.cchub-detail-cover-webinar{height:300px}
+
+/* Haber: ayrı yayın masası */
+.cchub-news-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
+.cchub-update-card{display:block;width:100%;border:0;border-top:1px solid #edf0f2;background:transparent;text-align:left;padding:10px 2px;cursor:pointer}
+.cchub-update-card:first-of-type{border-top:0}
+.cchub-update-card span{font-size:7.5px;color:#6f80b0;font-weight:900}
+.cchub-update-card b{display:block;margin-top:3px;color:#34495f;font-size:10.5px}
+.cchub-update-card small{display:block;margin-top:3px;color:#87959d;font-size:8px;line-height:1.35}
+
+@media(max-width:1180px){
+ .ccx-topbar{height:auto!important;min-height:102px;grid-template-columns:200px minmax(0,1fr) 180px!important;padding:8px 12px!important}
+ .ccx-nav-groups{grid-template-columns:1fr 190px 1.2fr}
+ .ccx-card-library-entry small{display:none}
+ .cckl-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media(max-width:900px){
+ .ccx-topbar{grid-template-columns:1fr auto!important;min-height:78px}
+ .ccx-brand{grid-column:1}
+ .ccx-nav-groups{grid-column:1/-1;grid-row:2;grid-template-columns:1fr;gap:6px;padding-bottom:4px}
+ .ccx-nav-cluster{padding:6px 7px}
+ .ccx-card-library-entry{order:-1;justify-content:center}
+ .ccx-nav-buttons{overflow-x:auto}
+ .ccx-layout{width:calc(100% - 12px)!important}
+ .cckl-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .cchub-webinar-layout,.cchub-news-layout{grid-template-columns:1fr}
+ .cchub-calendar-side{position:static}
+ .cchub-article-magazine{grid-template-columns:160px minmax(0,1fr)}
+}
+@media(max-width:600px){
+ .ccx-topbar{min-height:0!important;padding:7px 8px!important}
+ .ccx-nav-label{display:none}
+ .ccx-nav-groups{display:flex;overflow-x:auto;align-items:stretch}
+ .ccx-nav-cluster{flex:0 0 auto}
+ .ccx-card-library-entry{flex:0 0 auto;order:0}
+ .ccx-card-library-entry small{display:block}
+ .cckl-panel{width:calc(100% - 8px)!important}
+ .cckl-shell{grid-template-columns:1fr!important}
+ .cckl-nav{position:static!important;display:flex!important;overflow-x:auto!important}
+ .cckl-grid{grid-template-columns:1fr!important}
+ .cchub-article-magazine{grid-template-columns:1fr}
+ .cchub-article-cover{height:180px}
+ .cchub-article-form{grid-template-columns:1fr!important}
+ .cchub-writing-hint{display:none}
+ .cchub-webinar-event-grid{grid-template-columns:58px minmax(0,1fr)}
+}
+</style>
+
+<style id="v10267-official-gazette">
+.cchub-news-page{display:grid;gap:16px}
+.cchub-rg-section{overflow:hidden;border-color:#d6dee3}
+.cchub-rg-head{
+ display:flex;align-items:center;justify-content:space-between;gap:12px;
+ padding:14px 16px;background:linear-gradient(135deg,#f3f7f9,#fff);border-bottom:1px solid #e4eaed
+}
+.cchub-rg-head>div{display:flex;align-items:center;gap:10px}
+.cchub-rg-seal{
+ width:38px;height:38px;border-radius:50%;display:grid;place-items:center;
+ background:#8b1d24;color:#fff;font-size:11px;font-weight:950;letter-spacing:.6px;box-shadow:0 4px 12px rgba(139,29,36,.17)
+}
+.cchub-rg-head b{display:block;color:#233f50;font-size:13px}
+.cchub-rg-head small{display:block;margin-top:2px;color:#758892;font-size:8.5px}
+.cchub-rg-auto{font-size:8px;font-weight:900;color:#647985;background:#eef3f5;border-radius:999px;padding:6px 8px;white-space:nowrap}
+.cchub-rg-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+.cchub-rg-item{
+ padding:14px 15px;border-right:1px solid #edf0f2;border-bottom:1px solid #edf0f2;
+ cursor:pointer;min-height:190px;display:flex;flex-direction:column;background:#fff
+}
+.cchub-rg-item:nth-child(3n){border-right:0}
+.cchub-rg-item:hover{background:#fafcfd}
+.cchub-rg-item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.cchub-rg-item-top>div{display:flex;gap:4px;flex-wrap:wrap}
+.cchub-rg-item-top>span{font-size:7.5px;color:#84949d;text-align:right}
+.cchub-badge.rg{background:#f4e9ea;color:#8b1d24}
+.cchub-badge.ai{background:#e9f2ff;color:#2d67a2}
+.cchub-rg-item h3{margin:9px 0 6px;color:#243f50;font-size:13px;line-height:1.4}
+.cchub-rg-item p{margin:0;color:#657b87;font-size:9.5px;line-height:1.5;flex:1}
+.cchub-rg-item-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px}
+.cchub-rg-item-bottom small{font-size:7.5px;color:#95a2a9}
+.cchub-news-badges{display:flex;gap:5px;flex-wrap:wrap}
+.cchub-rg-detail-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.cchub-rg-detail-meta span{font-size:8px;color:#607986;background:#f0f5f7;border-radius:999px;padding:5px 7px}
+body.dark .cchub-rg-head{background:linear-gradient(135deg,#172a3b,#112236);border-color:#294158}
+body.dark .cchub-rg-head b,body.dark .cchub-rg-item h3{color:#e2edf4}
+body.dark .cchub-rg-item{background:#112236;border-color:#294158}
+body.dark .cchub-rg-item:hover{background:#162b3d}
+body.dark .cchub-rg-detail-meta span{background:#193149;color:#b9cbd5}
+@media(max-width:1000px){.cchub-rg-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cchub-rg-item:nth-child(3n){border-right:1px solid #edf0f2}.cchub-rg-item:nth-child(2n){border-right:0}}
+@media(max-width:620px){.cchub-rg-head{align-items:flex-start;flex-direction:column}.cchub-rg-grid{grid-template-columns:1fr}.cchub-rg-item,.cchub-rg-item:nth-child(n){border-right:0}.cchub-rg-item{min-height:0}}
+</style>
+
+<style id="v10268-community-home-and-news">
+/* Ana Topluluk ekranı: eski, dengeli üç kolon düzenine geri dön */
+#ccxSocialLayout.ccx-layout{
+ width:min(1220px,calc(100% - 28px))!important;
+ grid-template-columns:225px minmax(500px,650px) 270px!important;
+ justify-content:center!important;
+ gap:16px!important;
+ padding:18px 0 34px!important;
+ align-items:start!important;
+}
+#ccxSocialLayout .ccx-left,
+#ccxSocialLayout .ccx-side{position:sticky!important;top:18px!important;align-self:start!important}
+#ccxSocialLayout .ccx-main{min-width:0!important}
+
+/* Üst banner: daha okunur ve daha düzenli */
+.ccx-topbar{
+ min-height:96px!important;height:auto!important;flex:0 0 auto!important;
+ grid-template-columns:260px minmax(0,1fr) 220px!important;
+ gap:18px!important;padding:10px 22px!important
+}
+.ccx-brand-mark{width:46px!important;height:46px!important;font-size:20px!important}
+.ccx-brand small{font-size:9px!important;letter-spacing:1.35px!important}
+.ccx-brand b{font-size:20px!important;line-height:1.15!important}
+.ccx-nav-groups{
+ grid-template-columns:minmax(245px,.9fr) minmax(250px,.88fr) minmax(350px,1.18fr)!important;
+ gap:12px!important;align-items:stretch!important
+}
+.ccx-nav-cluster{
+ padding:10px 12px 9px!important;border-radius:13px!important;
+ display:flex!important;flex-direction:column!important;justify-content:center!important
+}
+.ccx-nav-label{
+ font-size:8px!important;line-height:1!important;letter-spacing:1.15px!important;
+ margin:0 2px 7px!important;color:#788b98!important
+}
+.ccx-nav-buttons{gap:5px!important}
+.ccx-nav-buttons button{
+ font-size:11px!important;padding:8px 11px!important;line-height:1.2!important
+}
+.ccx-card-library-entry{
+ min-height:68px!important;padding:11px 14px!important;border-radius:14px!important
+}
+.ccx-card-library-icon{width:40px!important;height:40px!important;flex-basis:40px!important;font-size:20px!important}
+.ccx-card-library-entry b{font-size:13px!important;line-height:1.2!important}
+.ccx-card-library-entry small{font-size:9px!important;margin-top:4px!important}
+
+/* Haber alanı: iki sütun, altı kart, daha büyük yazı */
+.cchub-news-page{display:grid;gap:15px!important}
+.cchub-news-layout{display:block!important}
+.cchub-news-layout>.cchub-main{display:block!important}
+.cchub-news-layout>.cchub-side{margin-top:15px!important;position:static!important}
+.cchub-news-layout>.cchub-main>.cchub-card{padding:15px!important}
+.cchub-news-grid{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px
+}
+.cchub-news-card{
+ display:flex;flex-direction:column;min-height:285px;padding:18px!important;
+ border:1px solid #dfe5e9;border-radius:14px;background:#fff;
+ box-shadow:0 2px 8px rgba(22,47,63,.035);
+ transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;
+ cursor:pointer
+}
+.cchub-news-card:hover{
+ transform:translateY(-3px);
+ box-shadow:0 10px 25px rgba(29,58,75,.09);
+ border-color:#cbd9e1
+}
+.cchub-news-card-top{
+ display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:11px
+}
+.cchub-news-card-badges{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.cchub-news-card time{font-size:9px!important;color:#8b9ba4;white-space:nowrap;padding-top:3px}
+.cchub-news-card h3{
+ margin:0 0 9px!important;color:#223f51!important;
+ font-size:16px!important;line-height:1.38!important;font-weight:850!important
+}
+.cchub-news-card p{
+ margin:0!important;color:#5f7481!important;
+ font-size:11.5px!important;line-height:1.62!important;
+ display:-webkit-box;-webkit-line-clamp:7;-webkit-box-orient:vertical;overflow:hidden;
+ flex:1
+}
+.cchub-news-card-footer{
+ display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px;padding-top:11px;
+ border-top:1px solid #edf0f2
+}
+.cchub-news-card-footer small{font-size:8.5px;color:#8a9aa3}
+.cchub-news-card .ccx-lite{font-size:9.5px!important;padding:7px 9px!important}
+
+/* Otomatik konu etiketi */
+.cchub-topic-tag{
+ display:inline-flex;align-items:center;border-radius:999px;padding:5px 8px;
+ font-size:8px;font-weight:950;letter-spacing:.03em;border:1px solid transparent
+}
+.cchub-topic-tag[data-tag="İthalat"]{background:#eef6ff;color:#2b67a1;border-color:#d8e8f8}
+.cchub-topic-tag[data-tag="İhracat"]{background:#edf8f2;color:#2e7c55;border-color:#d7ebdf}
+.cchub-topic-tag[data-tag="Gümrük"]{background:#f2eefb;color:#654ca0;border-color:#e1d9f3}
+.cchub-topic-tag[data-tag="Dış Ticaret"]{background:#fff5e8;color:#986622;border-color:#f0dfc4}
+.cchub-topic-tag[data-tag="Diğer"]{background:#f1f4f5;color:#657984;border-color:#dfe5e8}
+.cchub-news-source{
+ font-size:8.5px;font-weight:850;color:#6f838e;white-space:nowrap
+}
+.cchub-news-list-head{
+ display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:12px
+}
+.cchub-news-list-head small{display:block;font-size:8px;font-weight:950;letter-spacing:1px;color:#80919b}
+.cchub-news-list-head h3{margin:3px 0 0;font-size:17px;color:#29495c}
+.cchub-news-list-head p{margin:0;max-width:520px;text-align:right;font-size:9.5px;color:#81919a;line-height:1.45}
+
+/* Resmî Gazete özet kutusu daha sade */
+.cchub-rg-head{padding:13px 15px!important}
+.cchub-rg-head b{font-size:14px!important}
+.cchub-rg-head small{font-size:9px!important}
+.cchub-rg-grid{display:none!important}
+.cchub-rg-section{border-style:dashed!important;background:#fcfdfd}
+
+/* Platform güncellemeleri kartları */
+.cchub-update-card b{font-size:11.5px!important}
+.cchub-update-card small{font-size:9px!important;line-height:1.5!important}
+
+/* Haber detayları da okunur olsun */
+.cchub-detail h2{font-size:26px!important;line-height:1.25!important}
+.cchub-detail-summary{font-size:13px!important;line-height:1.65!important}
+.cchub-detail-body{font-size:13px!important;line-height:1.8!important}
+
+/* dark */
+body.dark .cchub-news-card{background:#112236;border-color:#294158}
+body.dark .cchub-news-card:hover{border-color:#3b5870;box-shadow:0 10px 25px rgba(0,0,0,.2)}
+body.dark .cchub-news-card h3{color:#e3edf4!important}
+body.dark .cchub-news-card p{color:#b8cad4!important}
+body.dark .cchub-news-card-footer{border-color:#294158}
+body.dark .cchub-rg-section{background:#0f1d2c}
+
+/* responsive */
+@media(max-width:1180px){
+ #ccxSocialLayout.ccx-layout{
+  grid-template-columns:210px minmax(460px,1fr) 250px!important;
+  width:min(1160px,calc(100% - 20px))!important
+ }
+ .ccx-topbar{grid-template-columns:230px minmax(0,1fr) 190px!important}
+ .ccx-nav-groups{grid-template-columns:minmax(220px,.9fr) minmax(210px,.82fr) minmax(310px,1.15fr)!important}
+}
+@media(max-width:980px){
+ #ccxSocialLayout.ccx-layout{
+  grid-template-columns:minmax(0,1fr) 285px!important;
+ }
+ #ccxSocialLayout .ccx-left{display:none!important}
+ .ccx-topbar{grid-template-columns:1fr auto!important}
+ .ccx-nav-groups{grid-column:1/-1!important;grid-row:2!important;display:flex!important;overflow-x:auto!important}
+ .ccx-nav-cluster,.ccx-card-library-entry{flex:0 0 auto!important}
+}
+@media(max-width:760px){
+ #ccxSocialLayout.ccx-layout{display:block!important;width:calc(100% - 12px)!important}
+ #ccxSocialLayout .ccx-side{position:static!important;margin-top:12px}
+ .cchub-news-grid{grid-template-columns:1fr}
+ .cchub-news-card{min-height:0}
+ .ccx-topbar{min-height:0!important;padding:8px!important}
+ .ccx-brand b{font-size:17px!important}
+ .ccx-brand small{font-size:8px!important}
+ .ccx-card-library-entry b{font-size:11px!important}
+ .ccx-card-library-entry small{font-size:8px!important}
+}
+</style>
+
+<style id="v10278-community-header-news">
+/* =========================================================
+   TOPLULUK ÜST BANT — tek parça, sakin, profesyonel
+   ========================================================= */
+.ccx-topbar{
+ min-height:92px!important;
+ padding:12px 24px!important;
+ grid-template-columns:270px minmax(690px,1fr) 210px!important;
+ gap:22px!important;
+ background:linear-gradient(180deg,#ffffff 0%,#fbfcfd 100%)!important;
+ border-bottom:1px solid #e5eaee!important;
+ box-shadow:0 5px 18px rgba(28,52,67,.045)!important;
+ align-items:center!important;
+}
+.ccx-brand{
+ align-items:center!important;
+ gap:13px!important;
+ padding:2px 0!important;
+}
+.ccx-brand-mark{
+ width:48px!important;height:48px!important;flex:0 0 48px!important;
+ border-radius:13px!important;
+ background:linear-gradient(145deg,#1f5f8f,#357ec3)!important;
+ box-shadow:0 8px 18px rgba(38,103,157,.16)!important;
+ font-size:20px!important;
+}
+.ccx-brand small{
+ font-size:8.5px!important;
+ letter-spacing:1.45px!important;
+ color:#778792!important;
+ font-weight:950!important;
+}
+.ccx-brand b{
+ margin-top:2px!important;
+ font-size:22px!important;
+ line-height:1.08!important;
+ letter-spacing:-.25px!important;
+ color:#223e50!important;
+}
+
+/* Tek bir navigasyon yüzeyi — kutu içinde kutu görünümü kaldırıldı */
+.ccx-nav-groups{
+ display:grid!important;
+ grid-template-columns:minmax(245px,.8fr) minmax(255px,.82fr) minmax(365px,1.12fr)!important;
+ gap:6px!important;
+ padding:6px!important;
+ min-height:66px!important;
+ border:1px solid #e2e8ec!important;
+ border-radius:18px!important;
+ background:#f5f8fa!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 3px 10px rgba(30,54,68,.035)!important;
+ align-items:stretch!important;
+}
+.ccx-nav-cluster{
+ position:relative!important;
+ border:0!important;
+ background:transparent!important;
+ border-radius:13px!important;
+ padding:7px 12px 6px!important;
+ display:flex!important;
+ flex-direction:column!important;
+ justify-content:center!important;
+}
+.ccx-nav-social:after{
+ content:"";
+ position:absolute;right:-3px;top:12px;bottom:12px;width:1px;
+ background:#dde5e9;
+}
+.ccx-nav-knowledge:before{
+ content:"";
+ position:absolute;left:-3px;top:12px;bottom:12px;width:1px;
+ background:#dde5e9;
+}
+.ccx-nav-label{
+ margin:0 4px 6px!important;
+ font-size:7.5px!important;
+ letter-spacing:1.25px!important;
+ color:#8797a1!important;
+ font-weight:950!important;
+}
+.ccx-nav-buttons{
+ display:flex!important;
+ gap:3px!important;
+ align-items:center!important;
+}
+.ccx-nav-buttons button{
+ border:0!important;
+ background:transparent!important;
+ color:#596f7d!important;
+ border-radius:10px!important;
+ padding:8px 11px!important;
+ font-size:11.5px!important;
+ font-weight:850!important;
+ line-height:1.1!important;
+ transition:background .15s ease,color .15s ease,box-shadow .15s ease!important;
+}
+.ccx-nav-buttons button:hover{
+ background:#fff!important;
+ color:#245f82!important;
+ box-shadow:0 2px 7px rgba(30,61,78,.06)!important;
+}
+.ccx-nav-buttons button.active{
+ background:#fff!important;
+ color:#1d6690!important;
+ box-shadow:0 3px 10px rgba(28,72,98,.09),inset 0 0 0 1px #d7e5ec!important;
+}
+
+/* Kart Kütüphanesi ana merkez */
+.ccx-card-library-entry{
+ min-height:54px!important;
+ margin:0!important;
+ padding:8px 13px!important;
+ border:0!important;
+ border-radius:13px!important;
+ background:linear-gradient(135deg,#19587e 0%,#287fa6 100%)!important;
+ color:#fff!important;
+ box-shadow:0 8px 20px rgba(29,104,143,.18)!important;
+ transform:none!important;
+ transition:transform .15s ease,box-shadow .15s ease,filter .15s ease!important;
+ align-self:center!important;
+}
+.ccx-card-library-entry:hover{
+ transform:translateY(-1px)!important;
+ box-shadow:0 11px 24px rgba(29,104,143,.23)!important;
+ filter:saturate(1.04)!important;
+}
+.ccx-card-library-entry.active{
+ box-shadow:0 0 0 3px rgba(53,139,181,.14),0 10px 24px rgba(29,104,143,.22)!important;
+}
+.ccx-card-library-icon{
+ width:38px!important;height:38px!important;flex:0 0 38px!important;
+ border-radius:10px!important;
+ background:rgba(255,255,255,.14)!important;
+ font-size:18px!important;
+}
+.ccx-card-library-entry b{
+ font-size:13.5px!important;
+ line-height:1.1!important;
+ letter-spacing:-.1px!important;
+}
+.ccx-card-library-entry small{
+ margin-top:4px!important;
+ font-size:8.8px!important;
+ color:#d9edf7!important;
+}
+
+/* Sağ aksiyonlar: ikon ağırlıklı, bannerı bölmesin */
+.ccx-top-actions{gap:8px!important}
+.ccx-top-actions button{
+ min-height:40px!important;
+ border-radius:11px!important;
+ font-size:11px!important;
+ font-weight:900!important;
+}
+.ccx-notif-btn{
+ width:40px!important;min-width:40px!important;padding:0!important;
+ background:#f6f8f9!important;border:1px solid #e3e8eb!important;
+ font-size:16px!important
+}
+.ccx-top-actions .ccx-refresh{
+ min-width:92px!important;
+ background:#eef6fa!important;
+ border:1px solid #ccdee8!important;
+ color:#285d79!important;
+}
+.ccx-top-actions .ccx-close{
+ width:40px!important;min-width:40px!important;
+ background:#fff5f4!important;border:1px solid #eccfcb!important;
+ color:#a44840!important;
+}
+.ccx-top-actions button:hover{transform:translateY(-1px)}
+
+/* =========================================================
+   HABERLER — yalnızca mesleki alan, 2x3 kart
+   ========================================================= */
+.cchub-news-card{
+ min-height:300px!important;
+ padding:20px!important;
+ border-radius:16px!important;
+}
+.cchub-news-card:hover{
+ transform:translateY(-4px)!important;
+ box-shadow:0 13px 30px rgba(30,61,79,.10)!important;
+}
+.cchub-news-card h3{
+ font-size:17px!important;
+ line-height:1.38!important;
+ letter-spacing:-.1px!important;
+ margin-bottom:10px!important;
+}
+.cchub-news-card p{
+ font-size:12px!important;
+ line-height:1.68!important;
+ -webkit-line-clamp:8!important;
+}
+.cchub-news-card time{font-size:9px!important}
+.cchub-topic-tag{
+ padding:5px 9px!important;
+ font-size:8px!important;
+}
+.cchub-topic-tag[data-tag="Mevzuat"]{
+ background:#f7f1e9;color:#855f2f;border-color:#e8d9c6
+}
+.cchub-topic-tag[data-tag="Platform"]{
+ background:#eef1ff;color:#566ab0;border-color:#dce2f5
+}
+.cchub-news-list-head h3{font-size:18px!important}
+.cchub-news-list-head p{font-size:10px!important}
+
+/* 'Diğer' etiketi artık haber akışında kullanılmıyor */
+.cchub-topic-tag[data-tag="Diğer"]{display:none!important}
+
+/* Daha yumuşak küçük ekran geçişleri */
+@media(max-width:1260px){
+ .ccx-topbar{
+  grid-template-columns:235px minmax(620px,1fr) 185px!important;
+  gap:14px!important;padding:10px 14px!important;
+ }
+ .ccx-nav-groups{
+  grid-template-columns:minmax(220px,.8fr) minmax(220px,.82fr) minmax(330px,1.1fr)!important;
+ }
+ .ccx-brand b{font-size:19px!important}
+ .ccx-brand small{font-size:7.8px!important}
+}
+@media(max-width:1040px){
+ .ccx-topbar{
+  grid-template-columns:1fr auto!important;
+  gap:8px!important;
+ }
+ .ccx-brand{grid-column:1!important}
+ .ccx-top-actions{grid-column:2!important}
+ .ccx-nav-groups{
+  grid-column:1/-1!important;grid-row:2!important;
+  display:flex!important;overflow-x:auto!important;
+  min-height:58px!important;border-radius:14px!important;
+ }
+ .ccx-nav-cluster,.ccx-card-library-entry{flex:0 0 auto!important}
+ .ccx-nav-social:after,.ccx-nav-knowledge:before{display:none!important}
+ .ccx-nav-label{display:none!important}
+}
+@media(max-width:700px){
+ .ccx-topbar{padding:8px!important}
+ .ccx-brand-mark{width:40px!important;height:40px!important;flex-basis:40px!important}
+ .ccx-brand b{font-size:17px!important}
+ .ccx-brand small{font-size:7px!important}
+ .ccx-nav-groups{padding:5px!important}
+ .ccx-nav-buttons button{font-size:10px!important;padding:7px 9px!important}
+ .ccx-card-library-entry b{font-size:11.5px!important}
+ .ccx-card-library-entry small{display:none!important}
+ .ccx-top-actions .ccx-refresh{display:none!important}
+ .cchub-news-card{min-height:0!important;padding:16px!important}
+ .cchub-news-card h3{font-size:16px!important}
+ .cchub-news-card p{font-size:11.5px!important}
+}
+</style>
+
+<style id="v10278-webinar-recurrence-and-news">
+#cchubRepeatDays[hidden],#cchubRepeatUntilWrap[hidden]{display:none!important}
+.cc-webinar-repeat-days{border:1px solid #dbe5ee;border-radius:12px;padding:12px;background:#fff}
+.cc-webinar-repeat-days>span{display:block;font-size:11px;font-weight:800;color:#48677b;margin-bottom:9px}
+.cc-webinar-day-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cc-webinar-day-grid label{display:flex!important;align-items:center;justify-content:center;gap:4px;padding:8px 4px;background:#f0f5fa;border:1px solid #dce7ee;border-radius:8px;font-size:11px;color:#284c64;cursor:pointer;white-space:nowrap}
+.cc-webinar-day-grid input{width:14px!important;height:14px!important;margin:0!important;accent-color:#176fb0}
+.cc-webinar-repeat-hint{margin:0!important;color:#5c7a90!important;font-size:11px!important;line-height:1.5}
+#ccxHubPanel:has(.cchub-webinar-layout) .cchub-shell{width:min(1330px,calc(100% - 36px))!important}
+#ccxHubPanel .cchub-webinar-layout{grid-template-columns:minmax(0,1fr) minmax(295px,330px)!important;gap:19px!important}
+#ccxHubPanel .cchub-webinar-layout>.cchub-side{display:grid!important;align-content:start!important;gap:13px!important;position:sticky;top:16px;min-width:0}
+#ccxHubPanel .cchub-webinar-layout .cchub-section-title h3{font-size:17px!important}
+body.dark .cc-webinar-repeat-days{background:#162536;border-color:#30475b}
+body.dark .cc-webinar-day-grid label{background:#142638;color:#d1e2ee;border-color:#345166}
+@media(max-width:1000px){#ccxHubPanel .cchub-webinar-layout{grid-template-columns:minmax(0,1fr)!important}#ccxHubPanel .cchub-webinar-layout>.cchub-side{position:static!important}}
+@media(max-width:650px){.cc-webinar-day-grid{grid-template-columns:repeat(4,minmax(0,1fr))}#ccxHubPanel:has(.cchub-webinar-layout) .cchub-shell{width:calc(100% - 18px)!important}}
+</style>
+
+<style id="v10278-home-news-location">
+/* The latest news belong in the main community feed's right rail, not the webinar page. */
+#ccxSocialLayout .ccx-home-news-card{padding:15px 14px 12px!important;min-width:0;overflow:hidden}
+#ccxSocialLayout .ccx-home-news-head{margin-bottom:9px;gap:6px}
+#ccxSocialLayout .ccx-home-news-head>div{min-width:0}
+#ccxSocialLayout .ccx-home-news-head small{display:block;color:#6e8a9d;font-size:8px;font-weight:900;letter-spacing:.5px;margin-bottom:4px}
+#ccxSocialLayout .ccx-home-news-head b{display:block;color:#264b62;font-size:15px;line-height:1.25}
+#ccxSocialLayout .ccx-home-news-all{border:1px solid #d9e9f2;background:#eff7fc;color:#226a98;border-radius:9px;padding:7px 8px;font-size:10px;font-weight:850;white-space:nowrap;cursor:pointer;flex-shrink:0}
+#ccxSocialLayout .ccx-home-news-all:hover{background:#e4f1f9}
+#ccxSocialLayout .ccx-home-news-list{max-height:395px;overflow-y:auto;scrollbar-width:thin}
+#ccxSocialLayout .ccx-home-news-item{display:block;width:100%;border:0;border-top:1px solid #e7edf1;text-align:left;background:transparent;padding:12px 2px;cursor:pointer;color:inherit}
+#ccxSocialLayout .ccx-home-news-item:hover{background:#f5f9fc}
+#ccxSocialLayout .ccx-home-news-meta{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px;min-width:0}
+#ccxSocialLayout .ccx-home-news-meta .cchub-topic-tag{font-size:9px!important;padding:3px 7px!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65%}
+#ccxSocialLayout .ccx-home-news-meta time{color:#8b99a5;font-size:9px;white-space:nowrap}
+#ccxSocialLayout .ccx-home-news-item b{display:block;margin-bottom:5px;font-size:12px;line-height:1.45;color:#24465f;overflow-wrap:anywhere}
+#ccxSocialLayout .ccx-home-news-item small{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:10.5px;line-height:1.45;color:#708697}
+#ccxSocialLayout .ccx-home-news-empty{padding:12px 2px;font-size:11px;line-height:1.5;color:#7c909f}
+body.dark #ccxSocialLayout .ccx-home-news-head b,body.dark #ccxSocialLayout .ccx-home-news-item b{color:#e1eef8}
+body.dark #ccxSocialLayout .ccx-home-news-item small{color:#b5c5d2}
+body.dark #ccxSocialLayout .ccx-home-news-item{border-color:#2b4254}
+body.dark #ccxSocialLayout .ccx-home-news-item:hover{background:#182f40}
+@media(max-width:900px){#ccxSocialLayout .ccx-side .ccx-home-news-card{display:block!important}}
+@media(max-width:760px){#ccxSocialLayout .ccx-home-news-card{margin-top:10px}#ccxSocialLayout .ccx-home-news-list{max-height:300px}}
+</style>
+
+<style id="cc-mobile-news-isolation-v10301">
+/* Hidden panels must remain hidden despite earlier display!important mobile rules. */
+#ccxOverlay #ccxSocialLayout[hidden],#ccxOverlay #ccxHubPanel[hidden],#ccxOverlay #ccxCardLibraryPanel[hidden],#ccxOverlay #ccxUserProfilePage[hidden]{display:none!important}
+@media(max-width:760px){
+ #ccxOverlay #ccxHubPanel:not([hidden]){display:block!important;width:100%!important;min-width:0!important}
+ #ccxOverlay #ccxHubPanel .cchub-shell,#ccxOverlay #ccxHubPanel .cchub-content{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box}
+ #ccxOverlay #ccxHubPanel .cchub-news-page{min-width:0!important}
+ #ccxOverlay #ccxHubPanel .cchub-news-grid{grid-template-columns:minmax(0,1fr)!important}
+ #ccxOverlay #ccxHubPanel .cchub-news-card{min-width:0!important}
+}
+</style>
+
+<style id="cc-webinar-jitsi-v10387">.cchub-jitsi-entry{border:1px solid #a9cbe4!important;background:#eaf4fb!important;color:#175c89!important;font-weight:750!important}.cchub-jitsi-panel{margin:15px 18px 20px;border:1px solid #d6e3ee;border-radius:15px;overflow:hidden;background:#f7fafd}.cchub-jitsi-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 15px;background:#eaf2fa;color:#245276;font-size:13px}.cchub-jitsi-panel #cchubJitsiStatus{padding:8px 15px;color:#55718a;font-size:12px}.cchub-jitsi-panel #cchubJitsiMount{min-height:440px;background:#162639}.cchub-jitsi-panel #cchubJitsiMount iframe{display:block;width:100%;border:0}@media(max-width:700px){.cchub-jitsi-panel{margin:10px 6px}.cchub-jitsi-panel #cchubJitsiMount{min-height:340px}}</style>
+
+<style id="cc-top-controls-webinar-fixes-v10394">
+/* Sağ üst butonlar navigasyonun mavi / yumuşak hatlı tasarımını izler. */
+#ccxOverlay .ccx-header-inner .ccx-top-actions{gap:7px!important;justify-content:flex-end!important;align-items:center!important}
+#ccxOverlay .ccx-header-inner .ccx-top-actions button{height:36px!important;min-height:36px!important;padding:0 11px!important;border-radius:10px!important;font-size:12px!important;font-weight:750!important;line-height:1!important;box-shadow:none!important;white-space:nowrap}
+#ccxOverlay .ccx-header-inner .ccx-top-actions .cc-safe-settings-trigger{color:#245c81!important;border:1px solid #bbd4e7!important;background:#edf5fa!important;padding:0 13px!important;letter-spacing:0!important}
+#ccxOverlay .ccx-header-inner .ccx-top-actions .cc-safe-settings-trigger:hover{background:#dceef9!important}
+#ccxOverlay .ccx-header-inner .ccx-top-actions #ccxNotifBtn,#ccxOverlay .ccx-header-inner .ccx-top-actions .ccx-refresh{background:#edf5fa!important;color:#245c81!important;border:1px solid #bbd4e7!important}
+#ccxOverlay .ccx-header-inner .ccx-top-actions .ccx-close{background:#fdf4f3!important;color:#8b5550!important;border:1px solid #edd9d5!important;font-size:21px!important;min-width:36px!important;padding:0 9px!important}
+#ccxOverlay .ccx-header-inner .ccx-top-actions .ccx-refresh{font-size:0!important;min-width:38px!important;padding:0 10px!important}
+#ccxOverlay .ccx-header-inner .ccx-top-actions .ccx-refresh::before{content:'↻';font-size:23px;line-height:1}
+#ccxOverlay .ccx-header-inner .ccx-top-actions #ccxNotifBtn{min-width:36px!important;width:36px!important;padding:0!important;font-size:18px!important}
+#ccxOverlay .ccx-header-inner{grid-template-columns:196px minmax(0,1fr) 220px!important}
+#ccxOverlay .ccx-header-inner .ccx-top-actions{min-width:0!important}
+#ccxProfileBackdrop .cc-safe-admin-tag{display:inline-block!important;margin:8px 0 0!important}
+#ccxOverlay .cchub-webinar-actions .cchub-jitsi-entry{background:#e8f3fb!important;border:1px solid #a4cbe5!important;color:#165f8d!important;font-weight:800!important}
+#ccxOverlay .cchub-jitsi-panel{display:block!important;min-height:300px}
+#ccxOverlay .cchub-jitsi-panel #cchubJitsiMount{min-height:460px}
+@media(max-width:1150px){#ccxOverlay .ccx-header-inner{grid-template-columns:minmax(150px,190px) minmax(0,1fr) auto!important}}
+@media(max-width:730px){#ccxOverlay .ccx-header-inner .ccx-top-actions button{height:33px!important;min-height:33px!important;padding:0 7px!important;font-size:11px!important}#ccxOverlay .ccx-header-inner .ccx-top-actions .cc-safe-settings-trigger{padding:0 9px!important}#ccxOverlay .cchub-jitsi-panel #cchubJitsiMount{min-height:340px}}
+</style>
+
+<style id="cc-webinar-profile-layout-v10395">
+/* Kompakt, hiyerarşik hesap ayarları */
+#ccxProfileBackdrop .cc-safe-section{margin:0!important;padding:0!important;border-top:1px solid #dfe8ef!important}
+#ccxProfileBackdrop .cc-safe-section summary,#ccxProfileBackdrop #ccSafePassword summary{font-size:13px!important;font-weight:750!important;line-height:1.5!important;letter-spacing:0!important;color:#264c6a!important;padding:13px 6px!important}
+#ccxProfileBackdrop .cc-safe-content{padding:0 6px 13px!important;font-size:12px!important;color:#627c8c!important;line-height:1.55!important}
+#ccxProfileBackdrop .cc-safe-content p,#ccxProfileBackdrop .cc-safe-content b{font-size:12px!important;line-height:1.55!important}
+#ccxProfileBackdrop .cc-safe-content button{font-size:12px!important;font-weight:700!important;padding:8px 12px!important;border-radius:8px!important}
+#ccxProfileBackdrop .cc93-profile-shortcut{margin-bottom:14px}
+#ccxOverlay .ccx-header-inner{grid-template-columns:190px minmax(0,1fr) auto!important;align-items:center!important}
+#ccxOverlay .ccx-header-inner .ccx-top-actions{gap:8px!important;justify-self:end!important;align-self:center!important;padding:0!important;margin:0!important}
+#ccxOverlay .ccx-header-inner .ccx-top-actions button{height:43px!important;min-height:43px!important;border-radius:12px!important;font-size:13px!important;border:1px solid #a5c6dc!important;background:#e9f3f9!important;color:#225779!important;box-shadow:none!important}
+#ccxOverlay .ccx-header-inner .ccx-top-actions .cc-safe-settings-trigger{min-width:100px!important;padding:0 19px!important;background:#285e83!important;color:white!important;border-color:#285e83!important;font-weight:850!important;font-size:14px!important}
+#ccxOverlay .ccx-header-inner .ccx-top-actions .ccx-refresh{width:43px!important;min-width:43px!important}
+#ccxOverlay .ccx-header-inner .ccx-top-actions #ccxNotifBtn{width:43px!important;min-width:43px!important}
+#ccxOverlay .ccx-header-inner .ccx-top-actions .ccx-close{width:43px!important;min-width:43px!important;background:#f5eeed!important;border-color:#e5d5d3!important;color:#8d5752!important}
+#ccxOverlay .cchub-webinar-actions .cchub-jitsi-entry{font-size:11px!important;border:1px solid #bdd3e4!important;border-radius:9px!important}
+@media(max-width:1150px){#ccxOverlay .ccx-header-inner{grid-template-columns:minmax(150px,190px) minmax(0,1fr) auto!important}}
+@media(max-width:700px){#ccxOverlay .ccx-header-inner .ccx-top-actions button{height:36px!important;min-height:36px!important;font-size:11px!important}#ccxOverlay .ccx-header-inner .ccx-top-actions .cc-safe-settings-trigger{min-width:0!important;padding:0 9px!important;font-size:12px!important}}
+</style>
+</head>
+<body>
+<!-- 1. Webinar takviminin içerisine basıldığı gerçek ortak panel -->
+<div id="ccxOverlay" class="open">
+<section id="ccxHubPanel" class="cchub-panel" hidden>
+   <div class="cchub-shell">
+    <header class="cchub-head">
+     <div><small id="cchubKicker">TOPLULUK</small><h2 id="cchubTitle">İçerik</h2><p id="cchubDesc"></p></div>
+     <div id="cchubActions" class="cchub-actions"></div>
+    </header>
+    <div id="cchubContent" class="cchub-content"><div class="ccx-loading">Hazırlanıyor…</div></div>
+   </div>
+  </section>
+
+  
+</div>
+
+<!-- 2. Webinar detay / Jitsi oturum penceresi (makaleler ve haberlerle ortak) -->
+<div id="cchubDetailBackdrop" class="ccx-modal-backdrop cchub-backdrop" onclick="if(event.target===this)CCHub.closeDetail()">
+  <section id="cchubDetail" class="cchub-detail" role="dialog" aria-modal="true"><div class="ccx-loading">Hazırlanıyor…</div></section>
+ </div>
+
+ 
+
+<!-- 3. Webinar oluştur / takvime ekle formu -->
+<div id="cchubWebinarEditor" class="ccx-modal-backdrop cchub-backdrop" onclick="if(event.target===this)CCHub.closeWebinarEditor()">
+  <section class="cchub-editor cchub-webinar-editor" role="dialog" aria-modal="true">
+   <div class="cchub-webinar-editor-head">
+    <div class="cchub-webinar-editor-mark">LIVE</div>
+    <div><small>ETKİNLİK OLUŞTURUCU</small><h3>Webinar Planla</h3><p>Tarih, konuşmacı ve görsel bilgilerini ekle; katılımcılar canlı oturuma Customs Community içinden katılsın.</p></div>
+    <button class="ccx-icon-btn" onclick="CCHub.closeWebinarEditor()">×</button>
+   </div>
+   <div id="cchubWebinarCoverPreview" class="cchub-cover-preview cchub-cover-preview-webinar"><span>Webinar afişi / kapak görseli</span></div>
+   <div class="cchub-cover-actions cchub-webinar-cover-actions">
+    <label class="ccx-lite">🖼 Webinar Görseli<input id="cchubWebinarCover" type="file" accept="image/jpeg,image/png,image/webp" hidden onchange="CCHub.pickWebinarCover(this)"></label>
+    <button id="cchubWebinarCoverRemove" class="ccx-lite" type="button" onclick="CCHub.removeWebinarCover()" hidden>Görseli Kaldır</button>
+   </div>
+   <div class="cchub-form cchub-two-col cchub-webinar-form">
+    <label class="cchub-span2"><span>Webinar başlığı</span><input id="cchubWebinarTitle" maxlength="180" placeholder="Örn. Gümrük Kıymetinde Güncel Uygulamalar"></label>
+    <label><span>Başlangıç</span><input id="cchubWebinarStart" type="datetime-local" onchange="CCHub.changeWebinarRepeat()"></label>
+    <label><span>Bitiş</span><input id="cchubWebinarEnd" type="datetime-local"></label>
+    <label><span>Konuşmacı / Sunucu</span><input id="cchubWebinarSpeaker" maxlength="180" placeholder="Ad Soyad veya kurum"></label>
+    <label><span>Kategori</span><select id="cchubWebinarCategory"><option>Etüd</option><option>Sürekli Eğitim</option><option>Tarife</option><option>Mevzuat</option><option>Genel Bilgilendirme</option></select></label>
+    <label><span>Tekrarlama</span><select id="cchubWebinarRepeat" onchange="CCHub.changeWebinarRepeat()"><option value="once">Tek seferlik</option><option value="weekly">Her hafta</option><option value="biweekly">İki haftada bir</option><option value="monthly">Her ay</option></select></label>
+    <label id="cchubRepeatUntilWrap" hidden><span>Son tekrar tarihi</span><input id="cchubRepeatUntil" type="date" aria-label="Son tekrar tarihi"></label>
+    <div class="cchub-span2 cc-webinar-repeat-days" id="cchubRepeatDays" hidden><span>Tekrarlanacak günler</span><div class="cc-webinar-day-grid">
+     <label><input type="checkbox" class="cchub-repeat-day" value="1"> Pzt</label><label><input type="checkbox" class="cchub-repeat-day" value="2"> Sal</label><label><input type="checkbox" class="cchub-repeat-day" value="3"> Çar</label><label><input type="checkbox" class="cchub-repeat-day" value="4"> Per</label><label><input type="checkbox" class="cchub-repeat-day" value="5"> Cum</label><label><input type="checkbox" class="cchub-repeat-day" value="6"> Cmt</label><label><input type="checkbox" class="cchub-repeat-day" value="7"> Paz</label>
+     </div></div>
+    <p id="cchubRepeatHint" class="cc-webinar-repeat-hint cchub-span2">Tek seferlik webinar.</p>
+    <div class="cchub-span2 cchub-live-entry-note"><b>▣ Site içi canlı oturum</b><span>Katılımcılar harici Zoom / Teams bağlantısı kullanmadan, etkinliğin kendi sayfasından oturuma katılacak.</span></div>
+    <label class="cchub-span2"><span>Program ve açıklama</span><textarea id="cchubWebinarDesc" maxlength="5000" placeholder="Konuşulacak başlıklar, hedef kitle, konuşmacılar ve diğer detaylar…"></textarea></label>
+   </div>
+   <div class="cchub-editor-actions"><button class="ccx-lite" onclick="CCHub.closeWebinarEditor()">Vazgeç</button><button id="cchubWebinarSave" class="ccx-primary" onclick="CCHub.saveWebinar()">Takvime Ekle</button></div>
+  </section>
+ </div>
+
+ 
+
+<!-- 4. Gerçek CCHub uygulama betiği: Makale/Haber/Webinar ortak kod, webinar fonksiyonları içerir -->
+<script id="cc-community-hub-v10265">
+window.CCHub=(()=>{
+ const $=id=>document.getElementById(id);
+ const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+ const toast=(m,t='info')=>window.ccToast?ccToast(m,t):alert(m);
+ let sb=null,current=null,articles=[],articleCursor=null,articleHasMore=true,articleLoading=false,news=[],webinars=[],mediaCache=new Map(),articleCoverFile=null,articleCoverUrl='',webinarCoverFile=null,webinarCoverUrl='';
+ function isAdmin(){return window.CC_AUTH?.getProfile?.()?.role==='admin'}
+ function uid(){let x=window.CC_AUTH?.getSession?.();return x?.user?.id||x?.user_id||window.CC_AUTH?.getProfile?.()?.user_id||''}
+ async function ensure(){if(!window.CC_AUTH?.getSession?.()?.access_token){toast('Önce giriş yapmalısın.','err');return false}if(!sb)sb=await window.CC_AUTH.getClient();return !!sb}
+ function readImage(file,cb){if(!file)return;let r=new FileReader();r.onload=()=>cb(String(r.result||''));r.readAsDataURL(file)}
+ function validateImage(file){if(!file)return false;if(!['image/jpeg','image/png','image/webp'].includes(file.type)){toast('JPG, PNG veya WEBP görsel seç.','err');return false}if(file.size>6*1024*1024){toast('Görsel en fazla 6 MB olabilir.','err');return false}return true}
+ async function uploadCover(file,prefix){
+  if(!file)return null;let ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';
+  let path='posts/'+uid()+'/'+prefix+'-'+(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2))+'.'+ext;
+  let up=await sb.storage.from('community-media').upload(path,file,{contentType:file.type,upsert:false});if(up.error)throw up.error;return path
+ }
+ function avatar(url,name,user){let ini=String(name||user||'CC').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase();return `<div class="ccx-avatar">${url?`<img src="${esc(url)}" alt="">`:esc(ini||'CC')}</div>`}
+ async function sign(path){if(!path)return '';if(mediaCache.has(path))return mediaCache.get(path);let p=(async()=>{try{let r=await sb.storage.from('community-media').createSignedUrl(path,3600);return r.data?.signedUrl||''}catch{return ''}})();mediaCache.set(path,p);let u=await p;mediaCache.set(path,Promise.resolve(u));return u}
+ function trDate(v,opts={}){try{return new Date(v).toLocaleString('tr-TR',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',...opts})}catch{return ''}}
+ function shortDate(v){try{return new Date(v).toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'})}catch{return ''}}
+ function dateParts(v){let d=new Date(v);return{day:String(d.getDate()).padStart(2,'0'),mon:d.toLocaleDateString('tr-TR',{month:'short'}).replace('.','').toUpperCase()}}
+ function bodyHTML(v){return esc(v).replace(/\n{2,}/g,'</p><p>').replace(/\n/g,'<br>').replace(/^/,'<p>').replace(/$/,'</p>')}
+ function openExternal(url){if(/^https?:\/\//i.test(String(url||'')))window.open(url,'_blank','noopener,noreferrer')}
+ function setTabs(view){
+  ['All','Following','Cards','Articles','News','Webinars'].forEach(x=>$('ccxTab'+x)?.classList.remove('active'));
+  let id={articles:'ccxTabArticles',news:'ccxTabNews',webinars:'ccxTabWebinars'}[view];$(id)?.classList.add('active')
+ }
+ function showPanel(){
+  window.CCCommunity?.closePublicProfile?.();window.CCCards?.closeLibraryView?.();
+  let social=$('ccxSocialLayout'),cards=$('ccxCardLibraryPanel'),hub=$('ccxHubPanel');
+  if(social){social.style.setProperty('display','none','important');social.hidden=true}if(cards)cards.hidden=true;if(hub)hub.hidden=false
+ }
+ function close(){
+  current=null;let hub=$('ccxHubPanel');if(hub)hub.hidden=true;
+  let social=$('ccxSocialLayout');if(social){social.hidden=false;social.style.removeProperty('display')}
+  ['ccxTabArticles','ccxTabNews','ccxTabWebinars'].forEach(id=>$(id)?.classList.remove('active'))
+ }
+ function isOpen(){return !!current && !$('ccxHubPanel')?.hidden}
+ function goTop(){$('ccxHubPanel')?.scrollTo({top:0,behavior:'smooth'})}
+ async function open(view){
+  if(!['articles','news','webinars'].includes(view)||!await ensure())return;
+  current=view;showPanel();setTabs(view);
+  if(view==='articles')await renderArticlesView(true);
+  if(view==='news')await renderNewsView();
+  if(view==='webinars')await renderWebinarView()
+ }
+ async function refresh(){if(!current)return;if(current==='articles')await renderArticlesView(true);if(current==='news')await renderNewsView();if(current==='webinars')await renderWebinarView()}
+ function setHeader(kicker,title,desc,actions=''){
+  $('cchubKicker').textContent=kicker;$('cchubTitle').textContent=title;$('cchubDesc').textContent=desc;$('cchubActions').innerHTML=actions
+ }
+
+ async function renderArticlesView(reset=false){
+  setHeader('UZUN OKUMA','Makaleler','Gümrük ve dış ticaret alanındaki deneyimleri, yorumları ve uzmanlık bilgisini uzun formatta paylaşın.','<button class="ccx-primary" onclick="CCHub.openArticleEditor()">✎ Makale Yaz</button>');
+  $('cchubContent').innerHTML=`<div class="cchub-grid"><main id="cchubArticleList" class="cchub-main"><div class="ccx-loading">Makaleler yükleniyor…</div></main><aside class="cchub-side"><section class="cchub-card cchub-section"><div class="cchub-section-title"><div><small>TOPLULUK</small><h3>Yazarlar</h3></div></div><div id="cchubAuthors"><div class="ccx-loading" style="padding:16px">Yazarlar yükleniyor…</div></div></section></aside></div>`;
+  articles=[];articleCursor=null;articleHasMore=true;await Promise.all([loadArticles(true),loadAuthors()])
+ }
+ async function loadArticles(reset=false){
+  if(articleLoading||(!reset&&!articleHasMore)||!await ensure())return;
+  articleLoading=true;if(reset){articles=[];articleCursor=null;articleHasMore=true}
+  let {data,error}=await sb.rpc('cc_article_list',{p_before_id:reset?null:articleCursor,p_limit:10});
+  if(error){$('cchubArticleList').innerHTML='<div class="cchub-empty">Makaleler yüklenemedi.</div>';articleLoading=false;return}
+  let page=await Promise.all((data||[]).map(async a=>({...a,avatar_url:await sign(a.avatar_path),cover_url:await sign(a.cover_path)})));
+  articles.push(...page);if(data?.length)articleCursor=Number(data[data.length-1].id);articleHasMore=(data||[]).length===10;
+  let box=$('cchubArticleList');
+  if(!articles.length)box.innerHTML='<div class="cchub-empty">Henüz yayınlanmış makale yok. İlk makaleyi sen yazabilirsin.</div>';
+  else box.innerHTML=articles.map(a=>{let mins=Math.max(1,Math.ceil(String(a.body||'').trim().split(/\s+/).filter(Boolean).length/220));return `<article class="cchub-card cchub-article cchub-article-magazine" onclick="CCHub.openArticle(${a.id})">${a.cover_url?`<div class="cchub-article-cover"><img src="${esc(a.cover_url)}" loading="lazy" decoding="async" alt=""></div>`:'<div class="cchub-article-cover cchub-article-cover-empty"><span>CC</span></div>'}<div class="cchub-article-copy"><div class="cchub-article-flags"><span class="cchub-badge">${esc(a.category)}</span><span>${mins} dk okuma</span></div><h3>${esc(a.title)}</h3><p>${esc(a.summary||a.body.slice(0,220))}</p><div class="cchub-author-row"><button onclick="event.stopPropagation();CCCommunity.openUser('${a.author_id}')">${avatar(a.avatar_url,a.display_name,a.username)}</button><button onclick="event.stopPropagation();CCCommunity.openUser('${a.author_id}')"><b>${esc(a.display_name||a.username)}</b><small>@${esc(a.username)} · ${esc(shortDate(a.created_at))}</small></button></div></div></article>`}).join('')+(articleHasMore?'<button class="cchub-more" onclick="CCHub.loadMoreArticles()">Daha fazla makale göster</button>':'');
+  articleLoading=false
+ }
+ async function loadMoreArticles(){await loadArticles(false)}
+ async function loadAuthors(){
+  let {data,error}=await sb.rpc('cc_article_authors',{p_limit:8}),box=$('cchubAuthors');if(!box)return;
+  if(error){box.innerHTML='<div class="cchub-empty">Yazarlar yüklenemedi.</div>';return}
+  let rows=await Promise.all((data||[]).map(async a=>({...a,avatar_url:await sign(a.avatar_path)})));
+  box.innerHTML=rows.length?`<div class="cchub-author-list">${rows.map(a=>`<button class="cchub-author-item" onclick="CCCommunity.openUser('${a.user_id}')">${avatar(a.avatar_url,a.display_name,a.username)}<span><b>${esc(a.display_name||a.username)}</b><small>${Number(a.article_count||0)} makale · @${esc(a.username)}</small></span></button>`).join('')}</div>`:'<div class="cchub-empty">İlk yazarlar burada görünecek.</div>'
+ }
+ function openArticleEditor(){
+  ['cchubArticleTitle','cchubArticleSummary','cchubArticleBody'].forEach(id=>$(id).value='');$('cchubArticleCategory').value='Genel';removeArticleCover();$('cchubArticleEditor').classList.add('open')
+ }
+ function closeArticleEditor(){$('cchubArticleEditor')?.classList.remove('open')}
+ function pickArticleCover(input){let f=input.files?.[0];if(!validateImage(f)){input.value='';return}articleCoverFile=f;readImage(f,u=>{articleCoverUrl=u;let p=$('cchubArticleCoverPreview');p.style.backgroundImage=`url("${u}")`;p.classList.add('has-image');p.innerHTML='';$('cchubArticleCoverRemove').hidden=false})}
+ function removeArticleCover(){articleCoverFile=null;articleCoverUrl='';let p=$('cchubArticleCoverPreview');if(p){p.style.backgroundImage='';p.classList.remove('has-image');p.innerHTML='<span>Kapak görseli makalenizi öne çıkarır</span>'}let i=$('cchubArticleCover');if(i)i.value='';let b=$('cchubArticleCoverRemove');if(b)b.hidden=true}
+ async function saveArticle(){
+  if(!await ensure())return;let btn=$('cchubArticleSave');btn.disabled=true;let path=null;
+  try{
+   path=await uploadCover(articleCoverFile,'article');
+   let args={p_title:$('cchubArticleTitle').value.trim(),p_summary:$('cchubArticleSummary').value.trim(),p_body:$('cchubArticleBody').value.trim(),p_category:$('cchubArticleCategory').value,p_cover_path:path};
+   let {data,error}=await sb.rpc('cc_article_create',args);if(error)throw error;
+   closeArticleEditor();removeArticleCover();toast('Makalen yayınlandı.','ok');await renderArticlesView(true);if(data)openArticle(Number(data))
+  }catch(e){if(path)try{await sb.storage.from('community-media').remove([path])}catch{}toast(e.message||e,'err')}finally{btn.disabled=false}
+ }
+ async function openArticle(id){
+  if(!await ensure())return;$('cchubDetailBackdrop').classList.add('open');$('cchubDetail').innerHTML='<div class="ccx-loading">Makale hazırlanıyor…</div>';
+  let {data,error}=await sb.rpc('cc_article_get',{p_id:id});if(error){$('cchubDetail').innerHTML='<div class="cchub-empty">Makale açılamadı.</div>';return}
+  let a=Array.isArray(data)?data[0]:data;if(!a)return;let [av,cover]=await Promise.all([sign(a.avatar_path),sign(a.cover_path)]);
+  $('cchubDetail').innerHTML=`${cover?`<div class="cchub-detail-cover"><img src="${esc(cover)}" alt=""></div>`:''}<div class="cchub-detail-head"><div><span class="cchub-badge">${esc(a.category)}</span><button class="ccx-icon-btn" onclick="CCHub.closeDetail()">×</button></div><h2>${esc(a.title)}</h2>${a.summary?`<p class="cchub-detail-summary">${esc(a.summary)}</p>`:''}<div class="cchub-author-row"><button onclick="CCHub.closeDetail();CCCommunity.openUser('${a.author_id}')">${avatar(av,a.display_name,a.username)}</button><button onclick="CCHub.closeDetail();CCCommunity.openUser('${a.author_id}')"><b>${esc(a.display_name||a.username)}</b><small>@${esc(a.username)} · ${esc(trDate(a.created_at))}</small></button></div></div><div class="cchub-detail-body cchub-article-reading">${bodyHTML(a.body)}</div><div class="cchub-detail-footer"><span></span><div>${a.can_delete?`<button class="ccx-lite" onclick="CCHub.deleteArticle(${a.id})">Makaleyi Sil</button>`:''}<button class="ccx-primary" onclick="CCHub.closeDetail()">Kapat</button></div></div>`
+ }
+ async function deleteArticle(id){if(!confirm('Bu makale silinsin mi?'))return;let {error}=await sb.rpc('cc_article_delete',{p_id:id});if(error){toast(error.message,'err');return}closeDetail();toast('Makale silindi.','ok');await renderArticlesView(true)}
+
+ async function loadNews(){
+  let {data,error}=await sb.rpc('cc_news_list',{p_limit:60});if(error){toast(error.message,'err');return []}news=data||[];return news
+ }
+ function newsBadge(n){
+  if(n.source_type==='resmi_gazete')return '<span class="cchub-badge rg">RESMÎ GAZETE</span><span class="cchub-badge ai">AI ÖZET</span>';
+  return n.kind==='update'?'<span class="cchub-badge update">GÜNCELLEME</span>':'<span class="cchub-badge">HABER</span>'
+}
+ function newsTopic(n){return n.auto_tag||(n.kind==='update'?'Platform':'Mevzuat')}
+ function newsExcerpt(n){
+  let a=String(n.summary||'').trim(),b=String(n.body||'').replace(/\n+/g,' ').replace(/AI özeti;[\s\S]*$/i,'').trim();
+  let text=a;
+  if(b&&b.toLocaleLowerCase('tr-TR')!==a.toLocaleLowerCase('tr-TR'))text=(a?`${a} ${b}`:b);
+  return text.length>520?text.slice(0,517).trim()+'…':text
+ }
+ async function refreshHomeNews(){
+  let box=$('ccxHomeNews');if(!box||!await ensure())return;
+  box.innerHTML='<div class="ccx-side-note">Son haberler yükleniyor…</div>';
+  let {data,error}=await sb.rpc('cc_news_list',{p_limit:25});
+  if(error){box.innerHTML='<div class="ccx-home-news-empty">Haberler şu anda yüklenemiyor. Haberler bölümünden tekrar deneyebilirsin.</div>';return}
+  news=data||[];
+  let latest=news.filter(n=>n.kind==='news').slice(0,4);
+  box.innerHTML=latest.length?latest.map(n=>`<button class="ccx-home-news-item" type="button" onclick="CCHub.openNews(${Number(n.id)})" title="${esc(n.title)}">
+   <span class="ccx-home-news-meta"><span class="cchub-topic-tag" data-tag="${esc(newsTopic(n))}">${esc(newsTopic(n))}</span><time>${esc(shortDate(n.source_date||n.created_at))}</time></span>
+   <b>${esc(n.title)}</b><small>${esc((n.summary||newsExcerpt(n)||'Haberi okumak için tıkla').slice(0,150))}</small>
+  </button>`).join(''):'<div class="ccx-home-news-empty">Şu anda yeni bir gümrük veya dış ticaret haberi bulunmuyor.</div>';
+ }
+ async function renderNewsView(){
+  setHeader('GÜNCEL BİLGİ','Haberler','Resmî Gazete AI özetleri, yönetici haberleri ve Customs Community güncellemeleri. Az ama okunabilir içerik; detaylar mümkün olduğunca sayfa içinde kalır.',isAdmin()?'<button class="ccx-primary" onclick="CCHub.openNewsEditor()">＋ Yönetici Haberi Ekle</button>':'');
+  $('cchubContent').innerHTML='<div class="ccx-loading">Haberler hazırlanıyor…</div>';
+  let rows=await loadNews(),updates=rows.filter(x=>x.kind==='update'),allNews=rows.filter(x=>x.kind==='news').slice(0,6),rg=allNews.filter(x=>x.source_type==='resmi_gazete');
+  let issue=rg[0]?.source_issue||'',sourceDate=rg[0]?.source_date||'';
+  let rgHead=rg.length?`<section class="cchub-card cchub-rg-section"><div class="cchub-rg-head"><div><span class="cchub-rg-seal">RG</span><span><b>Resmî Gazete günlük özeti hazır</b><small>${sourceDate?esc(new Date(sourceDate+'T00:00:00').toLocaleDateString('tr-TR',{day:'2-digit',month:'long',year:'numeric'})):''}${issue?' · Sayı '+esc(issue):''} · aşağıdaki haberlerde AI özetiyle sunuluyor</small></span></div><span class="cchub-rg-auto">Her sabah güncellenir</span></div></section>`:'';
+  let cards=allNews.length?allNews.map(n=>`<article class="cchub-news-card" onclick="CCHub.openNews(${n.id})">
+    <div class="cchub-news-card-top"><div class="cchub-news-card-badges">${newsBadge(n)}<span class="cchub-topic-tag" data-tag="${esc(newsTopic(n))}">${esc(newsTopic(n))}</span></div><time>${esc(shortDate(n.source_date||n.created_at))}</time></div>
+    <h3>${esc(n.title)}</h3>
+    <p>${esc(newsExcerpt(n))}</p>
+    <div class="cchub-news-card-footer"><small class="cchub-news-source">${n.source_type==='resmi_gazete'?'Resmî Gazete'+(n.source_issue?' · '+esc(n.source_issue):''):'Customs Community'}</small><button class="ccx-lite" onclick="event.stopPropagation();CCHub.openNews(${n.id})">Haberi Oku</button></div>
+   </article>`).join(''):'<div class="cchub-empty">Bugün Gümrük, Dış Ticaret, İthalat, İhracat veya ilgili Mevzuat kapsamında yeni haber bulunmuyor.</div>';
+  $('cchubContent').innerHTML=`<div class="cchub-news-page">
+    ${rgHead}
+    <section class="cchub-card cchub-section">
+     <div class="cchub-news-list-head"><div><small>SON HABERLER</small><h3>Güncel Haber Akışı</h3></div><p>Yalnızca gümrük ve dış ticaret alanındaki son 6 haber gösterilir. Konu etiketi otomatik belirlenir.</p></div>
+     <div class="cchub-news-grid">${cards}</div>
+    </section>
+    <div class="cchub-news-layout">
+     <main class="cchub-main"></main>
+     <aside class="cchub-side"><section class="cchub-card cchub-section"><div class="cchub-section-title"><div><small>PLATFORM</small><h3>Customs Community Güncellemeleri</h3></div></div>${updates.length?updates.slice(0,5).map(n=>`<button class="cchub-update-card" onclick="CCHub.openNews(${n.id})"><span>${esc(shortDate(n.created_at))}</span><b>${esc(n.title)}</b><small>${esc(n.summary||'Detayları gör')}</small></button>`).join(''):'<div class="cchub-empty">Yeni platform güncellemesi bulunmuyor.</div>'}</section></aside>
+    </div>
+   </div>`
+ }
+ function openNews(id){
+  let n=news.find(x=>Number(x.id)===Number(id));if(!n)return;$('cchubDetailBackdrop').classList.add('open');
+  let official=n.source_type==='resmi_gazete';
+  let meta=official?`<div class="cchub-rg-detail-meta"><span>Resmî Gazete</span><span class="cchub-topic-tag" data-tag="${esc(newsTopic(n))}">${esc(newsTopic(n))}</span>${n.source_date?`<span>${esc(new Date(n.source_date+'T00:00:00').toLocaleDateString('tr-TR',{day:'2-digit',month:'long',year:'numeric'}))}</span>`:''}${n.source_issue?`<span>Sayı ${esc(n.source_issue)}</span>`:''}${n.source_section?`<span>${esc(n.source_section)}</span>`:''}</div>`:`<div class="cchub-rg-detail-meta"><span class="cchub-topic-tag" data-tag="${esc(newsTopic(n))}">${esc(newsTopic(n))}</span><span>Customs Community</span><span>${esc(trDate(n.created_at))}</span></div>`;
+  let link=n.source_url||n.link_url;
+  $('cchubDetail').innerHTML=`<div class="cchub-detail-head"><div><div class="cchub-news-badges">${newsBadge(n)}</div><button class="ccx-icon-btn" onclick="CCHub.closeDetail()">×</button></div><h2>${esc(n.title)}</h2>${n.summary?`<p class="cchub-detail-summary">${esc(n.summary)}</p>`:''}${meta}</div><div class="cchub-detail-body">${bodyHTML(n.body||n.summary||'')}</div><div class="cchub-detail-footer"><span>${official?'AI özeti · Resmî metin esas alınır.':''}</span><div>${link?`<a class="cchub-link" href="${esc(link)}" target="_blank" rel="noopener noreferrer">${official?'Resmî Gazete’de Tam Metin ↗':esc(n.link_label||'Bağlantıyı Aç')}</a>`:''}<button class="ccx-primary" onclick="CCHub.closeDetail()">Kapat</button></div></div>`
+ }
+ function openNewsEditor(){
+  ['cchubNewsTitle','cchubNewsSummary','cchubNewsBody','cchubNewsUrl','cchubNewsLinkLabel','cchubNewsStart','cchubNewsEnd'].forEach(id=>$(id).value='');$('cchubNewsKind').value='news';$('cchubNewsEditor').classList.add('open')
+ }
+ function closeNewsEditor(){$('cchubNewsEditor')?.classList.remove('open')}
+ function isoOrNull(v){if(!v)return null;let d=new Date(v);return Number.isNaN(d.getTime())?null:d.toISOString()}
+ async function saveNews(){
+  if(!await ensure())return;let btn=$('cchubNewsSave');btn.disabled=true;
+  let args={p_kind:$('cchubNewsKind').value,p_title:$('cchubNewsTitle').value.trim(),p_summary:$('cchubNewsSummary').value.trim(),p_body:$('cchubNewsBody').value.trim(),p_link_url:$('cchubNewsUrl').value.trim()||null,p_link_label:$('cchubNewsLinkLabel').value.trim()||null,p_sponsor_name:null,p_starts_at:isoOrNull($('cchubNewsStart').value),p_ends_at:isoOrNull($('cchubNewsEnd').value)};
+  let {error}=await sb.rpc('cc_news_create',args);btn.disabled=false;if(error){toast(error.message,'err');return}closeNewsEditor();toast('Yayın oluşturuldu.','ok');await renderNewsView()
+ }
+ async function deleteNews(id){if(!confirm('Bu yayın silinsin mi?'))return;let {error}=await sb.rpc('cc_news_delete',{p_id:id});if(error){toast(error.message,'err');return}toast('Yayın silindi.','ok');await renderNewsView()}
+
+ async function renderWebinarView(){
+  setHeader('ETKİNLİK','Webinar Takvimi','Yaklaşan canlı eğitimleri inceleyin, katılımınızı bildirin ve oturumlara Customs Community içinden katılın.','<button class="ccx-primary" onclick="CCHub.openWebinarEditor()">＋ Webinar Oluştur</button>');
+  $('cchubContent').innerHTML='<div class="ccx-loading">Webinar takvimi hazırlanıyor…</div>';
+  let wr=await sb.rpc('cc_webinar_list',{p_from:new Date(Date.now()-12*3600*1000).toISOString(),p_limit:50});
+  if(wr.error){$('cchubContent').innerHTML='<div class="cchub-empty">Webinar takvimi yüklenemedi.</div>';return}
+  const stateResult=await sb.rpc('cc_webinar_live_list');
+  if(stateResult.error)console.warn('Webinar yayın durumu yüklenemedi',stateResult.error);
+  const states=new Map((stateResult.data||[]).map(x=>[String(x.webinar_id),!!x.is_live]));
+  webinars=await Promise.all((wr.data||[]).map(async w=>({...w,is_live:states.get(String(w.id))===true,avatar_url:await sign(w.avatar_path),cover_url:await sign(w.cover_path)})));
+  $('cchubContent').innerHTML=`<div class="cchub-webinar-layout"><main class="cchub-main">${webinars.length?webinars.map(w=>{let d=dateParts(w.start_at),name=w.display_name||w.username;return `<article class="cchub-card cchub-webinar cchub-webinar-event ${w.cancelled?'cchub-cancelled':''}">${w.cover_url?`<div class="cchub-webinar-cover"><img src="${esc(w.cover_url)}" loading="lazy" decoding="async" alt=""></div>`:`<div class="cchub-webinar-cover cchub-webinar-cover-empty"><span>WEBINAR</span></div>`}<div class="cchub-webinar-event-grid"><div class="cchub-webinar-date"><strong>${d.day}</strong><span>${esc(d.mon)}</span></div><div class="cchub-webinar-body"><div class="cchub-webinar-kicker"><span class="cchub-badge">${esc(w.category||'Genel')}</span>${w.speaker_name?`<span>🎙 ${esc(w.speaker_name)}</span>`:''}</div><h3>${esc(w.title)}</h3><p>${esc((w.description||'').slice(0,260))}</p><div class="cchub-webinar-meta"><span>🕒 ${esc(trDate(w.start_at))}</span><span>👤 ${esc(name)}</span><span>👥 ${Number(w.attendee_count||0)} katılacak</span></div><div class="cchub-webinar-actions"><button class="ccx-lite cchub-attend ${w.attending?'active':''}" onclick="CCHub.toggleAttendance('${w.id}')">${w.attending?'✓ Katılacağım':'Katılacağım'}</button><button class="ccx-primary" onclick="CCHub.openWebinar('${w.id}')">Oturum Detayları</button><button class="ccx-lite cchub-jitsi-entry" onclick="CCHub.openWebinarAndJoin('${w.id}')">${w.is_live?'Canlı Yayına Katıl': 'Yayın Kapalı'}</button>${w.can_manage?`<button class="ccx-lite" onclick="CCHub.deleteWebinar('${w.id}')">Sil</button>`:''}</div></div></div></article>`}).join(''):'<div class="cchub-empty">Planlanmış webinar yok. İlk webinarı oluşturabilirsin.</div>'}</main><aside class="cchub-side"><section class="cchub-card cchub-section cchub-calendar-side"><div class="cchub-section-title"><div><small>TAKVİM</small><h3>Yaklaşan Webinarlar</h3></div></div>${webinars.length?webinars.slice(0,6).map(w=>`<button class="cchub-mini-event" onclick="CCHub.openWebinar('${w.id}')"><span>${esc(shortDate(w.start_at))}</span><b>${esc(w.title)}</b><small>${Number(w.attendee_count||0)} kişi katılacak</small></button>`).join(''):'<div class="cchub-empty">Takvim boş.</div>'}</section>
+  </aside></div>`
+ }
+ function openWebinarEditor(){
+  ['cchubWebinarTitle','cchubWebinarStart','cchubWebinarEnd','cchubWebinarDesc','cchubWebinarSpeaker'].forEach(id=>$(id).value='');
+  $('cchubWebinarCategory').value='Etüd';$('cchubWebinarRepeat').value='once';$('cchubRepeatUntil').value='';
+  document.querySelectorAll('.cchub-repeat-day').forEach(x=>x.checked=false);
+  removeWebinarCover();changeWebinarRepeat();$('cchubWebinarEditor').classList.add('open')
+ }
+ function closeWebinarEditor(){$('cchubWebinarEditor')?.classList.remove('open')}
+ function changeWebinarRepeat(){
+  let mode=$('cchubWebinarRepeat')?.value||'once';
+  $('cchubRepeatUntilWrap').hidden=mode==='once';
+  $('cchubRepeatDays').hidden=!['weekly','biweekly'].includes(mode);
+  const hints={once:'Bu webinar yalnızca seçilen tarihte düzenlenir.',weekly:'Seçtiğin günlerde her hafta tekrarlanır.',biweekly:'Seçtiğin günlerde iki haftada bir tekrarlanır.',monthly:'Her ay, seçilen başlangıç gününde tekrarlanır.'};
+  $('cchubRepeatHint').textContent=hints[mode]||hints.once;
+  if(mode!=='once'){
+   let start=$('cchubWebinarStart').value,until=$('cchubRepeatUntil');
+   if(start){until.min=start.slice(0,10);let d=new Date(start);d.setMonth(d.getMonth()+3);until.value=until.value||[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')}
+  }
+ }
+ function pickWebinarCover(input){let f=input.files?.[0];if(!validateImage(f)){input.value='';return}webinarCoverFile=f;readImage(f,u=>{webinarCoverUrl=u;let p=$('cchubWebinarCoverPreview');p.style.backgroundImage=`url("${u}")`;p.classList.add('has-image');p.innerHTML='';$('cchubWebinarCoverRemove').hidden=false})}
+ function removeWebinarCover(){webinarCoverFile=null;webinarCoverUrl='';let p=$('cchubWebinarCoverPreview');if(p){p.style.backgroundImage='';p.classList.remove('has-image');p.innerHTML='<span>Webinar afişi / kapak görseli</span>'}let i=$('cchubWebinarCover');if(i)i.value='';let b=$('cchubWebinarCoverRemove');if(b)b.hidden=true}
+ async function saveWebinar(){
+  if(!await ensure())return;let st=$('cchubWebinarStart').value;if(!st){toast('Webinar başlangıç tarihini seçmelisin.','err');return}
+  let btn=$('cchubWebinarSave');btn.disabled=true;let path=null;let completed=false;
+  try{
+   const repeatMode=$('cchubWebinarRepeat').value,untilDate=$('cchubRepeatUntil').value;
+   const selectedDays=[...document.querySelectorAll('.cchub-repeat-day:checked')];
+   if(repeatMode!=='once'&&!untilDate)throw Error('Tekrarlanan webinar için son tarihi seçmelisin.');
+   if(['weekly','biweekly'].includes(repeatMode)&&!selectedDays.length)throw Error('En az bir tekrar günü seçmelisin.');
+   if(repeatMode!=='once'&&untilDate<st.slice(0,10))throw Error('Son tekrar tarihi başlangıçtan önce olamaz.');
+   path=await uploadCover(webinarCoverFile,'webinar');
+   let args={p_title:$('cchubWebinarTitle').value.trim(),p_description:$('cchubWebinarDesc').value.trim(),p_start_at:new Date(st).toISOString(),p_end_at:isoOrNull($('cchubWebinarEnd').value),p_webinar_url:null,p_category:$('cchubWebinarCategory').value,p_cover_path:path,p_speaker_name:$('cchubWebinarSpeaker').value.trim()||null};
+   const mode=$('cchubWebinarRepeat').value;
+   const until=$('cchubRepeatUntil').value;
+   const days=[...document.querySelectorAll('.cchub-repeat-day:checked')].map(el=>Number(el.value));
+   const timezone=Intl.DateTimeFormat().resolvedOptions().timeZone||'Europe/Istanbul';
+   let {data,error}=await sb.rpc('cc_webinar_create_series',{...args,p_repeat:mode,p_until_date:mode==='once'?null:until,p_days:days,p_timezone:timezone});
+   if(error)throw error;
+   completed=true;closeWebinarEditor();removeWebinarCover();toast((Number(data)||1)+' webinar oturumu takvime eklendi.','ok');await renderWebinarView()
+  }catch(e){if(path&&!completed)try{await sb.storage.from('community-media').remove([path])}catch{}toast(e.message||e,'err')}finally{btn.disabled=false}
+ }
+ async function toggleAttendance(id){
+  let {data,error}=await sb.rpc('cc_webinar_toggle_attendance',{p_webinar_id:id});if(error){toast(error.message,'err');return}let row=Array.isArray(data)?data[0]:data,w=webinars.find(x=>x.id===id);if(w&&row){w.attending=!!row.attending;w.attendee_count=Number(row.attendee_count||0)}await renderWebinarView()
+ }
+ function openWebinar(id){
+  leaveWebinarRoom();let w=webinars.find(x=>String(x.id)===String(id));if(!w)return;$('cchubDetailBackdrop').classList.add('open');
+  $('cchubDetail').innerHTML=`${w.cover_url?`<div class="cchub-detail-cover cchub-detail-cover-webinar"><img src="${esc(w.cover_url)}" loading="lazy" decoding="async" alt=""></div>`:''}<div class="cchub-detail-head"><div><span class="cchub-badge">${esc(w.category||'Genel')}</span><button class="ccx-icon-btn" onclick="CCHub.closeDetail()">×</button></div><h2>${esc(w.title)}</h2><p class="cchub-detail-summary">${esc(trDate(w.start_at))}${w.end_at?' – '+esc(trDate(w.end_at)):''}${w.speaker_name?` · 🎙 ${esc(w.speaker_name)}`:''}</p><div class="cchub-author-row"><button onclick="CCHub.closeDetail();CCCommunity.openUser('${w.organizer_id}')">${avatar(w.avatar_url,w.display_name,w.username)}</button><button onclick="CCHub.closeDetail();CCCommunity.openUser('${w.organizer_id}')"><b>${esc(w.display_name||w.username)}</b><small>Organizatör · @${esc(w.username)}</small></button></div></div><div class="cchub-detail-body">${bodyHTML(w.description||'Webinar açıklaması eklenmemiş.')}<div class="cchub-live-entry-note" style="margin-top:14px"><b>▣ Customs Community canlı odası</b><span>Bu etkinliğin katılım noktası site içindedir. Harici toplantı bağlantısı kullanılmaz.</span></div></div><div class="cchub-detail-footer"><span>${Number(w.attendee_count||0)} kişi katılacağını işaretledi. · ${w.is_live?'Yayın şu anda açık':'Yönetici yayını başlatmadı'}</span><div><button class="ccx-lite cchub-attend ${w.attending?'active':''}" onclick="CCHub.toggleAttendance('${w.id}');CCHub.closeDetail()">${w.attending?'✓ Katılacağım':'Katılacağım'}</button>${window.CC_AUTH?.getProfile?.()?.role==='admin'?`<button class="ccx-primary" type="button" onclick="CCHub.setWebinarLive('${w.id}',${w.is_live?'false':'true'})">${w.is_live?'Yayını Bitir':'Yayını Başlat'}</button>`:''}${w.is_live?`<button class="ccx-primary" type="button" onclick="CCHub.joinWebinarRoom('${w.id}')">Canlı Yayına Katıl</button>`:''}</div></div>`
+ }
+ let webinarJitsi=null,webinarSdkPromise=null;
+async function setWebinarLive(id,enabled){
+ if(window.CC_AUTH?.getProfile?.()?.role!=='admin'){toast('Yayını yalnızca yönetici başlatabilir.','err');return}
+ const w=webinars.find(x=>String(x.id)===String(id));if(!w)return;
+ const {error}=await sb.rpc('cc_webinar_set_live',{p_webinar_id:id,p_live:!!enabled});
+ if(error){toast('Yayın durumu değiştirilemedi: '+error.message,'err');return}
+ w.is_live=!!enabled;
+ if(!enabled)leaveWebinarRoom();
+ openWebinar(id);
+ toast(enabled?'Webinar yayını açıldı. Katılımcılar şimdi girebilir.':'Webinar yayını kapatıldı.','ok');
+}
+
+ async function openWebinarAndJoin(id){openWebinar(id);if(!$('cchubDetailBackdrop')?.classList.contains('open'))return;await joinWebinarRoom(id)}
+function webinarSdk(){if(window.JitsiMeetExternalAPI)return Promise.resolve();if(webinarSdkPromise)return webinarSdkPromise;webinarSdkPromise=new Promise((resolve,reject)=>{const el=document.createElement('script');el.src='https://meet.jit.si/external_api.js';el.onload=()=>window.JitsiMeetExternalAPI?resolve():reject(Error('Jitsi başlatılamadı'));el.onerror=()=>reject(Error('Jitsi yüklenemedi'));document.head.appendChild(el)}).catch(e=>{webinarSdkPromise=null;throw e});return webinarSdkPromise}
+function leaveWebinarRoom(){try{webinarJitsi?.dispose()}catch(e){}webinarJitsi=null;$('cchubWebinarJitsi')?.remove()}
+async function joinWebinarRoom(id){const w=webinars.find(x=>String(x.id)===String(id));if(!w)return;
+ if(!window.CC_AUTH?.getSession?.()?.access_token){toast('Webinara katılmak için giriş yapmalısın.','err');return}
+ const check=await sb.rpc('cc_webinar_live_list');
+ if(check.error){toast('Webinar durumu kontrol edilemedi.','err');return}
+ const state=(check.data||[]).find(x=>String(x.webinar_id)===String(id));
+ if(!state?.is_live){w.is_live=false;toast('Yönetici henüz yayını başlatmadı.','info');openWebinar(id);return}
+ w.is_live=true;
+ leaveWebinarRoom();const detail=$('cchubDetail');if(!detail)return;const panel=document.createElement('section');panel.id='cchubWebinarJitsi';panel.className='cchub-jitsi-panel';panel.innerHTML='<div class="cchub-jitsi-head"><strong>● Canlı Webinar</strong><button type="button" class="ccx-lite" onclick="CCHub.leaveWebinarRoom()">Yayından Ayrıl</button></div><div id="cchubJitsiStatus">Görüntülü görüşme hazırlanıyor…</div><div id="cchubJitsiMount"></div>';detail.appendChild(panel);panel.scrollIntoView({behavior:'smooth',block:'nearest'});try{await webinarSdk();if(!$('cchubJitsiMount'))return;const room='CustomsCommunityWebinar'+String(w.id).replace(/[^a-zA-Z0-9]/g,'');webinarJitsi=new window.JitsiMeetExternalAPI('meet.jit.si',{roomName:room,parentNode:$('cchubJitsiMount'),width:'100%',height:520,configOverwrite:{prejoinPageEnabled:true,startWithAudioMuted:true,startWithVideoMuted:true},userInfo:{displayName:window.CC_AUTH?.getProfile?.()?.full_name||window.CC_AUTH?.getProfile?.()?.display_name||'Katılımcı'}});webinarJitsi.addListener('videoConferenceJoined',()=>{if($('cchubJitsiStatus'))$('cchubJitsiStatus').textContent='Canlı odaya bağlandınız.'});webinarJitsi.addListener('videoConferenceLeft',leaveWebinarRoom)}catch(e){if($('cchubJitsiStatus'))$('cchubJitsiStatus').textContent='Bağlantı kurulamadı: '+(e.message||e)}}
+ async function deleteWebinar(id){if(!confirm('Bu webinar takvimden silinsin mi?'))return;let {error}=await sb.rpc('cc_webinar_delete',{p_webinar_id:id});if(error){toast(error.message,'err');return}toast('Webinar silindi.','ok');await renderWebinarView()}
+ function closeDetail(){leaveWebinarRoom();$('cchubDetailBackdrop')?.classList.remove('open')}
+
+ document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if($('cchubDetailBackdrop')?.classList.contains('open'))closeDetail();else if($('cchubArticleEditor')?.classList.contains('open'))closeArticleEditor();else if($('cchubWebinarEditor')?.classList.contains('open'))closeWebinarEditor();else if($('cchubNewsEditor')?.classList.contains('open'))closeNewsEditor()});
+ return{open,close,isOpen,goTop,refresh,refreshHomeNews,changeWebinarRepeat,loadMoreArticles,openArticleEditor,closeArticleEditor,pickArticleCover,removeArticleCover,saveArticle,openArticle,deleteArticle,renderArticlesView,openNews,openNewsEditor,closeNewsEditor,saveNews,deleteNews,renderNewsView,openWebinarEditor,closeWebinarEditor,pickWebinarCover,removeWebinarCover,saveWebinar,toggleAttendance,openWebinar,openWebinarAndJoin,setWebinarLive,joinWebinarRoom,leaveWebinarRoom,deleteWebinar,renderWebinarView,closeDetail};
+})();
+</script>
+</body>
+</html>
