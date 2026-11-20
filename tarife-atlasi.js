@@ -45,9 +45,14 @@ function mount(){
  if(eduTools&&!$('caEduLaunch')){
    let btn=document.createElement('button');btn.type='button';btn.id='caEduLaunch';btn.textContent='🧭 Tarife Atlası';btn.addEventListener('click',open);eduTools.prepend(btn);
  }
- const homeHeader=document.querySelector('#view-home .home-center .panelhead');
- if(homeHeader&&!$('caHomeLaunch')){
-   let btn=document.createElement('button');btn.type='button';btn.id='caHomeLaunch';btn.textContent='🧭 Tarife Atlası';btn.addEventListener('click',open);homeHeader.appendChild(btn);
+ const homeAtlasSlot=$('homeChapterAtlasSlot')||document.querySelector('#view-home .home-center .panelhead');
+ if(homeAtlasSlot&&!$('caHomeLaunch')){
+   const btn=document.createElement('button');
+   btn.type='button';btn.id='caHomeLaunch';btn.className='cc-fcm-atlas';
+   btn.setAttribute('aria-label','Tarife Atlası: 21 bölüm ve fasıl rehberini aç');
+   btn.innerHTML='<span class="cc-fcm-atlas-icon" aria-hidden="true">🧭</span><span class="cc-fcm-atlas-copy"><strong>Tarife Atlası</strong><small>21 bölüm · Fasıl rehberi</small></span><span class="cc-fcm-atlas-arrow" aria-hidden="true">↗</span>';
+   btn.addEventListener('click',open);
+   homeAtlasSlot.appendChild(btn);
  }
  root.addEventListener('click',click);
  root.addEventListener('input',ev=>{if(ev.target.id==='caSearch'){search=ev.target.value;renderSections()}});
