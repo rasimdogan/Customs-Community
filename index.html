@@ -3424,10 +3424,43 @@ html.cc-auth-pending body{overflow:hidden}.cc-auth-gate{position:fixed;inset:0;z
 <button class="home-work-card sand" onclick="nav('puzzle')"><span>🧩</span><b>Tarife Yapbozu</b><small>Büyük resmi tamamla</small></button>
 <button class="home-work-card teal" onclick="GTA_CHALLENGE.open()"><span>🏆</span><b>Meydan Okuması</b><small>Görselini tamamla</small></button>
 </div>
-<div class="home-center panel">
-<div class="panelhead"><div><h3>🎯 Fasıl Çalışma Merkezi</h3><div class="muted">Bir fasıl seç; doğrudan kartlarına geç veya o fasıldan 10 soruluk test başlat.</div></div><span class="pill" id="homeChapterCount">—</span></div>
-<div class="home-chapter-launch"><select id="homeChapterSelect" onchange="GTA_HOME.chapterInfo()"></select><select aria-label="Test soru sayısı" id="homeTestCount"><option value="5">5 Soru</option><option selected="" value="10">10 Soru</option><option value="20">20 Soru</option><option value="all">Kart sayısına göre</option></select><button class="primary" onclick="GTA_HOME.openChapter()">Kartları Aç</button><button onclick="GTA_HOME.testChapter()">Teste Başla</button><button onclick="GTA_HOME.resume()">Son Karta Dön</button></div>
-<div class="home-chapter-info" id="homeChapterInfo"></div>
+<div class="home-center panel cc-fcm" aria-label="Fasıl Çalışma Merkezi">
+  <div class="cc-fcm-heading">
+    <div class="cc-fcm-heading-copy">
+      <div class="cc-fcm-kicker">EĞİTİM ALANI · HIZLI ÇALIŞMA</div>
+      <h3>🎯 Fasıl Çalışma Merkezi</h3>
+      <p>Faslını seç; kartlarla öğren veya kısa bir testle bilgini pekiştir.</p>
+    </div>
+    <div class="cc-fcm-atlas-slot" id="homeChapterAtlasSlot" aria-label="Tarife Atlası kısayolu"></div>
+  </div>
+  <div class="cc-fcm-workflow">
+    <div class="cc-fcm-field cc-fcm-chapter-field">
+      <label for="homeChapterSelect">01 <span>ÇALIŞACAĞIN FASLI SEÇ</span></label>
+      <select id="homeChapterSelect" onchange="GTA_HOME.chapterInfo()" aria-label="Çalışılacak fasıl"></select>
+    </div>
+    <div class="cc-fcm-field cc-fcm-method-field">
+      <div class="cc-fcm-field-label">02 <span>NASIL ÇALIŞMAK İSTERSİN?</span></div>
+      <div class="cc-fcm-action-row">
+        <button class="cc-fcm-study" type="button" onclick="GTA_HOME.openChapter()">📖 <span>Kartlarla Çalış</span></button>
+        <div class="cc-fcm-test-control" aria-label="Fasıl testi">
+          <select id="homeTestCount" aria-label="Test soru sayısı">
+            <option value="5">5 Soru</option>
+            <option selected value="10">10 Soru</option>
+            <option value="20">20 Soru</option>
+            <option value="all">Tüm kartlar</option>
+          </select>
+          <button class="cc-fcm-test-start" type="button" onclick="GTA_HOME.testChapter()">✓ <span>Teste Başla</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cc-fcm-footer">
+    <div class="cc-fcm-summary">
+      <span class="cc-fcm-count" id="homeChapterCount" aria-label="Seçili faslın kart sayısı">—</span>
+      <div class="home-chapter-info" id="homeChapterInfo" aria-live="polite"></div>
+    </div>
+    <button class="cc-fcm-resume" type="button" onclick="GTA_HOME.resume()">↻ <span>Kaldığım Karttan Devam Et</span></button>
+  </div>
 </div>
 <div class="panel home-favorites"><div class="panelhead"><div><h3>⭐ Favori Kartlardan Rastgele</h3><div class="muted">Favorilerinden rastgele 4 kart. Karıştır dedikçe yeni kartlar gelir.</div></div><button onclick="GTA_HOME.renderFavorites()">↻ Karıştır</button></div><div class="home-favorite-grid" id="homeFavoriteGrid"></div></div>
 <div class="cc-contact-banner" aria-label="Customs Community iletişim alanı">
@@ -9286,4 +9319,77 @@ body.ccw-live-open{overflow:hidden!important}
  #ccxHubPanel .ccw-cover:not(.ccw-cover-empty){width:100%!important;height:160px!important}
  #ccxOverlay .cchub-detail-cover-webinar{height:220px!important}
 }
-</style><script src="tarife-atlasi.js?v=20261120-3"></script></body></html>
+</style><script src="tarife-atlasi.js?v=20261120-4"></script><style id="cc-fcm-unified-v1">
+/* Customs Community · Fazıl Çalışma Merkezi birleşik masaüstü/mobil düzen · 20.11.2026 */
+#view-home .cc-fcm{padding:20px 22px 17px!important;box-sizing:border-box;min-width:0;overflow:hidden}
+#view-home .cc-fcm *{box-sizing:border-box}
+#view-home .cc-fcm button{font-family:inherit;cursor:pointer}
+#view-home .cc-fcm select,#view-home .cc-fcm button{transition:background .15s ease,border-color .15s ease,box-shadow .15s ease}
+#view-home .cc-fcm button:focus-visible,#view-home .cc-fcm select:focus-visible{outline:3px solid #53a7ba!important;outline-offset:2px}
+#view-home .cc-fcm-heading{display:grid;grid-template-columns:minmax(0,1fr) minmax(210px,268px);align-items:center;gap:18px;padding-bottom:16px;border-bottom:1px solid #e4edf2}
+#view-home .cc-fcm-heading-copy{min-width:0}
+#view-home .cc-fcm-kicker{color:#167c91;font-size:10px;font-weight:850;letter-spacing:1.2px;line-height:1.5;margin-bottom:4px}
+#view-home .cc-fcm-heading h3{font-size:21px;line-height:1.3;font-weight:850;color:#183b55;margin:0 0 4px}
+#view-home .cc-fcm-heading p{font-size:12.5px;line-height:1.55;color:#72849a;margin:0}
+#view-home .cc-fcm-atlas-slot{min-width:0;width:100%}
+#view-home .cc-fcm-atlas{width:100%;min-height:64px;padding:11px 13px;display:grid;grid-template-columns:34px minmax(0,1fr) 18px;align-items:center;text-align:left;gap:10px;border:1px solid #bfdde4;background:linear-gradient(130deg,#f0fafb,#e8f3f6);border-radius:12px;color:#15536b}
+#view-home .cc-fcm-atlas:hover{background:#e2f3f6;border-color:#86bfcc;box-shadow:0 3px 10px #16475b15}
+#view-home .cc-fcm-atlas-icon{display:grid;place-items:center;font-size:23px}
+#view-home .cc-fcm-atlas-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+#view-home .cc-fcm-atlas-copy strong{font-size:14px;line-height:1.15;color:#184a60;font-weight:850}
+#view-home .cc-fcm-atlas-copy small{font-size:10.5px;line-height:1.4;color:#648394}
+#view-home .cc-fcm-atlas-arrow{font-size:18px;align-self:center;color:#29738a}
+#view-home .cc-fcm-workflow{display:grid;grid-template-columns:minmax(260px,1.1fr) minmax(450px,1fr);gap:17px;align-items:end;margin-top:16px}
+#view-home .cc-fcm-field{min-width:0}
+#view-home .cc-fcm-field label,#view-home .cc-fcm-field-label{font-size:11px;font-weight:900;letter-spacing:.25px;line-height:1.5;color:#136d80;display:flex;align-items:center;gap:7px;margin-bottom:8px}
+#view-home .cc-fcm-field label span,#view-home .cc-fcm-field-label span{color:#577589;letter-spacing:.7px}
+#view-home .cc-fcm-chapter-field #homeChapterSelect{display:block;width:100%;min-width:0;height:52px;padding:10px 13px;border:1px solid #cddde5;background:#fff;color:#163d54;border-radius:10px;font-size:14px;font-weight:700;white-space:nowrap;text-overflow:ellipsis}
+#view-home .cc-fcm-action-row{display:grid;grid-template-columns:minmax(145px,.85fr) minmax(273px,1.45fr);align-items:stretch;gap:9px}
+#view-home .cc-fcm-study{display:flex;align-items:center;justify-content:center;gap:8px;min-width:0;min-height:52px;padding:10px 14px;border:1px solid #156a7d;border-radius:10px;background:#176c80;color:#fff;font-size:13.5px;font-weight:850;white-space:nowrap}
+#view-home .cc-fcm-study:hover{background:#0e5469}
+#view-home .cc-fcm-test-control{display:grid;grid-template-columns:minmax(94px,.8fr) minmax(126px,1fr);align-items:stretch;gap:9px;min-width:0}
+#view-home .cc-fcm-test-control select{min-width:0;width:100%;height:52px;padding:10px 9px;border:1px solid #cddde5;border-radius:10px;background:#fff;color:#264d63;font-size:13px;font-weight:650;white-space:nowrap;text-overflow:ellipsis}
+#view-home .cc-fcm-test-start{min-width:0;display:flex;align-items:center;justify-content:center;gap:7px;height:52px;padding:10px 12px;border:1px solid #b9d6e0;border-radius:10px;color:#175c75;background:#edf7fa;font-size:13.5px;font-weight:850;white-space:nowrap}
+#view-home .cc-fcm-test-start:hover{background:#dbeef5;border-color:#84b9c8}
+#view-home .cc-fcm-footer{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-top:15px;padding:12px 0 0;border-top:1px solid #e8eff3;min-width:0}
+#view-home .cc-fcm-summary{display:flex;align-items:center;gap:10px;flex:1 1 auto;min-width:0;flex-wrap:wrap}
+#view-home .cc-fcm-count{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;min-width:57px;min-height:29px;padding:4px 10px;background:#eaf4f7;color:#1d647c;border:1px solid #d6e8ed;border-radius:20px;font-size:11.5px;font-weight:800}
+#view-home .cc-fcm-footer .home-chapter-info{margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;color:#63798c;font-size:11.5px;line-height:1.5;min-width:0}
+#view-home .cc-fcm-footer .home-chapter-info b{font-size:12px;color:#2d526a}
+#view-home .cc-fcm-resume{display:inline-flex;align-items:center;justify-content:center;gap:6px;flex:0 0 auto;padding:8px 10px;border:1px solid transparent;background:transparent;border-radius:8px;color:#466f82;font-size:11.5px;font-weight:750}
+#view-home .cc-fcm-resume:hover{background:#edf7fa;border-color:#d1e5eb}
+body.dark #view-home .cc-fcm-heading{border-color:#2b475c}
+body.dark #view-home .cc-fcm-heading h3{color:#e4f1fa}
+body.dark #view-home .cc-fcm-kicker,body.dark #view-home .cc-fcm-field label{color:#77cedf}
+body.dark #view-home .cc-fcm-heading p,body.dark #view-home .cc-fcm-field-label span,body.dark #view-home .cc-fcm-field label span{color:#a2b7c7}
+body.dark #view-home .cc-fcm-atlas{background:#17384a;border-color:#315e6f}
+body.dark #view-home .cc-fcm-atlas-copy strong{color:#c5effa}
+body.dark #view-home .cc-fcm-atlas-copy small{color:#a2c8d3}
+body.dark #view-home .cc-fcm-atlas-arrow{color:#85d4e4}
+body.dark #view-home .cc-fcm-chapter-field #homeChapterSelect,body.dark #view-home .cc-fcm-test-control select{background:#162c3e;border-color:#3b5969;color:#e5eff7}
+body.dark #view-home .cc-fcm-test-start{background:#244e63;border-color:#326c83;color:#e0f4ff}
+body.dark #view-home .cc-fcm-footer{border-color:#2c4658}
+body.dark #view-home .cc-fcm-count{background:#1e4659;color:#bcecf9;border-color:#32637a}
+body.dark #view-home .cc-fcm-footer .home-chapter-info{color:#bad0db}
+body.dark #view-home .cc-fcm-footer .home-chapter-info b{color:#e2f1f8}
+body.dark #view-home .cc-fcm-resume{color:#b6d6e5}
+@media(max-width:1190px){
+ #view-home .cc-fcm-workflow{grid-template-columns:1fr;gap:12px}
+ #view-home .cc-fcm-action-row{grid-template-columns:minmax(150px,.65fr) minmax(280px,1.35fr)}
+}
+@media(max-width:700px){
+ #view-home .cc-fcm{padding:16px 14px!important}
+ #view-home .cc-fcm-heading{grid-template-columns:1fr;gap:12px;padding-bottom:13px}
+ #view-home .cc-fcm-heading h3{font-size:19px}
+ #view-home .cc-fcm-atlas{min-height:58px}
+ #view-home .cc-fcm-action-row{grid-template-columns:1fr}
+ #view-home .cc-fcm-test-control{grid-template-columns:minmax(110px,.7fr) minmax(150px,1.3fr)}
+ #view-home .cc-fcm-footer{align-items:flex-start;flex-direction:column;gap:5px}
+ #view-home .cc-fcm-resume{margin-left:-8px}
+}
+@media(max-width:390px){
+ #view-home .cc-fcm-test-control{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:6px}
+ #view-home .cc-fcm-test-start{padding:8px 5px;font-size:12px}
+ #view-home .cc-fcm-test-control select{font-size:12px;padding:8px 4px}
+}
+</style></body></html>
