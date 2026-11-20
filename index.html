@@ -5688,7 +5688,7 @@ body.dark #ccxOverlay .ccx-header-inner .ccx-brand-title{color:#e5f2f8!important
   <div class="cc94-nav-shortcuts gmt-actions">
    <button id="ccxNotifBtn" class="ccx-notif-btn gmt-bell" type="button" onclick="CCCommunity.openNotifications()" aria-label="Bildirimler" title="Bildirimler"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg><span id="ccxNotifDot" class="ccx-notif-dot"></span></button>
    <div class="ccx-library-frame"><button id="ccxTabCards" class="ccx-card-library-entry gmt-btn gmt-btn--primary" type="button" onclick="CCCards.openLibrary()">Kart Kütüphanesi</button></div>
-   <div class="ccx-library-frame cc94-education-frame"><button id="cc94TabEducation" class="ccx-card-library-entry gmt-btn gmt-btn--ghost" type="button" onclick="CCCommunity.close();nav('home');window.scrollTo({top:0,behavior:'auto'})">Eğitim Alanı</button></div>
+   <div class="ccx-library-frame cc94-education-frame"><button id="cc94TabEducation" class="ccx-card-library-entry gmt-btn gmt-btn--ghost" type="button" onclick="CC_OPEN_EDUCATION_HOME(event)">Eğitim Alanı</button></div>
   </div>
  </div>
 </header>
@@ -9392,4 +9392,46 @@ body.dark #view-home .cc-fcm-resume{color:#b6d6e5}
  #view-home .cc-fcm-test-start{padding:8px 5px;font-size:12px}
  #view-home .cc-fcm-test-control select{font-size:12px;padding:8px 4px}
 }
-</style></body></html>
+</style><script id="cc-community-to-education-home-v2">
+/* Return to the Educational HOME dashboard from Community and its shared Classes header. */
+(function(){
+ 'use strict';
+ function openEducationHome(ev){
+   if(ev){ev.preventDefault();ev.stopImmediatePropagation();}
+   /* Cleanup failures must not prevent navigation. */
+   const classPanel=document.getElementById('ccClassDemo');
+   if(classPanel && classPanel.style.display!=='none' && getComputedStyle(classPanel).display!=='none'){
+     try{window.CCClassDemo?.close?.();}catch(err){console.warn('Sınıf görünümünden çıkış',err);}
+     classPanel.style.display='none';
+   }
+   try{window.CCCommunity?.close?.();}catch(err){console.warn('Topluluk görünümünden çıkış',err);}
+   const overlay=document.getElementById('ccxOverlay');
+   if(overlay){overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');}
+   document.body.classList.remove('ccx-community-open');
+   document.body.style.removeProperty('overflow');
+   const validSession=!!window.CC_AUTH?.getSession?.()?.access_token;
+   try{if(typeof window.nav==='function')window.nav('home');}catch(err){console.warn('Eğitim ana sayfası geçişi',err);}
+   const target=document.getElementById('view-home');
+   if(validSession && target?.classList.contains('hidden')){
+     /* Keep the existing login guard: fallback only for authenticated visitors. */
+     document.querySelectorAll('.view').forEach(view=>view.classList.add('hidden'));
+     target.classList.remove('hidden');
+     document.body.classList.add('home-view');
+     document.body.classList.remove('admin-view');
+     document.querySelectorAll('.nav button[data-view]').forEach(btn=>btn.classList.toggle('active',btn.dataset.view==='home'));
+     try{window.renderHome?.();}catch(err){console.warn('Eğitim özet yenileme',err);}
+   }
+   if(validSession && target && !target.classList.contains('hidden')){
+     try{window.scrollTo({top:0,left:0,behavior:'instant'});}catch(_){window.scrollTo(0,0);}
+   } else if(!validSession){
+     try{window.ccToast?.('Eğitim Alanı için giriş yapmalısın.','err');}catch(_){}
+   }
+ }
+ window.CC_OPEN_EDUCATION_HOME=openEducationHome;
+ /* Also catch the shortcut in the cloned Classes header. */
+ document.addEventListener('click',function(ev){
+   const button=ev.target?.closest?.('#cc94TabEducation, #ccClassDemo [data-gmt-source-id="cc94TabEducation"]');
+   if(button)openEducationHome(ev);
+ },true);
+})();
+</script></body></html>
