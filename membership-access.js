@@ -127,21 +127,7 @@ async function savePlan(userId,next,select){
 }
 
 function protectEducationNavigation(){
- const base=window.nav;
- if(typeof base!=='function'||base.__ccAccessWrapped)return;
- const blocked=new Set(['games','detective','spy','scene','fasil-savas','mpconquest','mpduel','puzzle']);
- const wrapped=function(view,...args){
-  if(logged()&&!hasTariff()&&blocked.has(view)){upgrade('tariff');return}
-  return base.call(this,view,...args)
- };
- wrapped.__ccAccessWrapped=true;
- window.nav=wrapped;
- const challenge=window.GTA_CHALLENGE;
- if(challenge&&typeof challenge.open==='function'&&!challenge.__ccAccessWrapped){
-  const original=challenge.open;
-  challenge.open=function(...args){if(logged()&&!hasTariff()){upgrade('tariff');return}return original.apply(this,args)};
-  challenge.__ccAccessWrapped=true;
- }
+ /* Eğitim oyunları bütün aktif üyelere açık; soru havuzu ve sahneler paket gereği sınırlandırılır. */
 }
 
 function guardClassOpen(){
@@ -157,10 +143,7 @@ function installClickGuards(){
   if(webinar&&!canHost()){
    e.preventDefault();e.stopImmediatePropagation();upgrade('host');return;
   }
-  const unlicensedGame=e.target?.closest?.('.nav button[data-view="games"], .nav button[data-view="puzzle"], .nav button[data-view="scene"]');
-  if(unlicensedGame&&!hasTariff()){
-   e.preventDefault();e.stopImmediatePropagation();upgrade('tariff');
-  }
+  /* Oyunlar ücretsiz ve Kart Plus için de açıktır. */
  },true);
 }
 function updateBookNotice(){
