@@ -5098,7 +5098,7 @@ window.CC_AUTH={login,logout,bootstrapAdmin,createUser,listUsers,setUserActive,d
 document.documentElement.classList.add('cc-auth-pending');
 document.addEventListener('DOMContentLoaded',()=>{let f=$id('ccLoginForm');if(f)f.addEventListener('submit',login);setTimeout(()=>{guardNav();hookSave();restore()},0)});
 })();
-</script><script>window.CC_BUILD="V103.84";</script><script id="cc-cache-version">(function(){const B="10384";try{const u=new URL(location.href);if(u.searchParams.get("v")!==B){u.searchParams.set("v",B);history.replaceState(null,"",u.pathname+"?"+u.searchParams.toString()+u.hash)}}catch(e){}})();</script>
+</script><script>window.CC_BUILD="V103.85";</script><script id="cc-cache-version">(function(){const B="10385";try{const u=new URL(location.href);if(u.searchParams.get("v")!==B){u.searchParams.set("v",B);history.replaceState(null,"",u.pathname+"?"+u.searchParams.toString()+u.hash)}}catch(e){}})();</script>
 <style id="cc-toast-style-v10231">
 #ccToastStack{position:fixed;right:20px;top:20px;z-index:99999;display:flex;flex-direction:column;gap:10px;max-width:min(390px,calc(100vw - 28px));pointer-events:none}
 .cc-toast{background:rgba(20,42,60,.96);color:#fff;border:1px solid rgba(255,255,255,.14);box-shadow:0 14px 38px rgba(0,0,0,.18);border-radius:14px;padding:12px 15px;font:600 13px/1.45 inherit;opacity:0;transform:translateY(-8px);transition:.2s ease;backdrop-filter:blur(12px)}
@@ -8632,7 +8632,7 @@ body.dark #ccxOverlay .ccx-topic{background:#1b3a51!important;color:#a9d8ee!impo
 </aside>
   </div>
  </div>
- <section class="room" id="ccdRoom"><div class="roominner"><div class="roomhead"><div><small style="color:#9ecde3">CUSTOMS COMMUNITY · CANLI SINIF</small><h2 id="ccdRoomTitle" style="margin:4px 0">Canlı ders</h2><small style="color:#9db3c2">Canlı ders odası</small></div><button class="btn" onclick="CCClassDemo.back()">Sınıflara dön</button></div><div id="ccdRoomManage" class="ccd-room-manage"><span id="ccdRoomState">Canlı yayın henüz başlatılmadı.</span><button id="ccdJoinLive" class="btn primary" type="button" onclick="CCClassDemo.joinLive()" hidden>▶ Canlı derse bağlan</button><button id="ccdStartLive" class="btn primary" type="button" onclick="CCClassDemo.startLive()">▶ Canlı yayını başlat</button><button id="ccdStopLive" class="btn" type="button" onclick="CCClassDemo.stopLive()" hidden>■ Yayını kapat</button></div><div class="ccd-teaching-toolbar" id="ccdTeachingToolbar"><button class="btn" type="button" id="ccdBookOpen" onclick="CCClassDemo.openBook()">📖 Kitabı Aç</button><button class="btn" type="button" id="ccdBookClose" onclick="CCClassDemo.closeBook()" hidden>✕ Kitabı Kapat</button><button class="btn primary" type="button" id="ccdQuizOpen" onclick="CCClassDemo.toggleQuizSetup()" hidden>✦ Fasıl Testi</button></div><div id="ccdQuizPanel" class="ccd-quiz-panel" hidden></div><section id="ccdWaitingPanel" class="ccd-waiting-panel" hidden aria-live="polite"><span class="ccd-waiting-icon" aria-hidden="true">🎓</span><div><h3>Dersin başlamasını bekliyorsun</h3><p>Sınıf üyeliğin aktif. Eğitmen canlı yayını başlattığında <strong>Canlı derse bağlan</strong> düğmesi açılacak. Buradan derse katılabileceksin.</p></div></section><div id="ccdJitsiPanel" class="ccd-jitsi-panel" hidden><div class="ccd-jitsi-notice">Canlı sınıf · Görüntülü görüşme yeni sekmede açılır. Test işlemleri yayını kapatmaz.</div><div id="ccdJitsiMount"></div><div class="ccd-jitsi-actions"><button type="button" class="btn" onclick="CCClassDemo.back()">← Sınıflara dön</button><button type="button" class="btn" onclick="CCClassDemo.openJitsiTab()">Yeni sekmede aç</button></div><div id="ccdJitsiError" role="status"></div></div><div id="ccdFakeVideo" class="videogrid"><div><div class="stage"><span class="liveflag">● DEMO OTURUM</span><div><div class="avatar">AY</div><h2>Ahmet Yılmaz</h2><p>Eğitmen · Örnek görüntü alanı</p></div><small style="position:absolute;bottom:14px;color:#c8d8e3">Gerçek video bağlantısı bu prototipte henüz etkin değil.</small></div><div class="controls"><button id="ccdMic" class="control" onclick="CCClassDemo.toggle('mic')">🎙 Mikrofon açık</button><button id="ccdCam" class="control" onclick="CCClassDemo.toggle('cam')">▣ Kamera açık</button><button class="control" onclick="CCClassDemo.notice()">▤ Ekran paylaş</button><button class="control" onclick="CCClassDemo.notice()">✋ Söz iste</button><button class="control leave" onclick="CCClassDemo.back()">Dersten ayrıl</button></div></div><aside class="roomside"><h3>Katılımcılar · 24</h3><div class="person">★ Ahmet Yılmaz · Eğitmen</div><div class="person">● Rasim Doğan · Sen</div><div class="person">● Elif Kaya</div><div class="person">● Mehmet Demir</div><div class="person">+ 20 katılımcı daha</div><h3 style="margin-top:20px">Ders sohbeti</h3><div class="person">Elif: Sunumu paylaşabilir misiniz?</div><div class="person">Eğitmen: Ders sonunda dosyalara ekleyeceğim.</div></aside></div></div></section>
+ <section class="room" id="ccdRoom"><div class="roominner"><div class="roomhead"><div><small style="color:#9ecde3">CUSTOMS COMMUNITY · CANLI SINIF</small><h2 id="ccdRoomTitle" style="margin:4px 0">Canlı ders</h2><small style="color:#9db3c2">Canlı ders odası</small></div><button class="btn" onclick="CCClassDemo.back()">Sınıflara dön</button></div><div id="ccdRoomManage" class="ccd-room-manage"><span id="ccdRoomState">Canlı yayın henüz başlatılmadı.</span><button id="ccdJoinLive" class="btn primary" type="button" onclick="CCClassDemo.joinLive()" hidden>▶ Canlı derse bağlan</button><button id="ccdStartLive" class="btn primary" type="button" onclick="CCClassDemo.startLive()">▶ Canlı yayını başlat</button><button id="ccdStopLive" class="btn" type="button" onclick="CCClassDemo.stopLive()" hidden>■ Yayını kapat</button></div><div class="ccd-teaching-toolbar" id="ccdTeachingToolbar"><button class="btn" type="button" id="ccdBookOpen" onclick="CCClassDemo.openBook()">📖 Kitabı Aç</button><button class="btn" type="button" id="ccdBookClose" onclick="CCClassDemo.closeBook()" hidden>✕ Kitabı Kapat</button><button class="btn primary" type="button" id="ccdQuizOpen" onclick="CCClassDemo.toggleQuizSetup()" hidden>✦ Fasıl Testi</button><button class="btn" type="button" id="ccdZoomConfigure" onclick="CCClassDemo.showZoomSettings()">⚙ Zoom Ayarları</button></div><section class="ccd-zoom-setup" id="ccdZoomSetup" hidden><div class="ccd-zoom-setup-head"><div><small>VİDEO BAĞLANTISI</small><h3>Zoom toplantısı ayarları</h3><p>Zoom hesabınızda oluşturduğunuz toplantı numarası ve parolasını sınıfa tanımlayın. Meeting SDK anahtarları yalnızca Supabase sunucusunda saklanır.</p></div><button type="button" class="btn" onclick="CCClassDemo.hideZoomSettings()">Kapat</button></div><div class="ccd-zoom-form"><label>Zoom toplantı numarası<input id="ccdZoomNumber" inputmode="numeric" autocomplete="off" placeholder="Ör. 123 456 7890" maxlength="16"></label><label>Toplantı parolası<input id="ccdZoomPasscode" type="text" autocomplete="off" placeholder="Zoom toplantı parolası" maxlength="64"></label><button class="btn primary" type="button" onclick="CCClassDemo.saveZoomSettings()">Kaydet</button></div><p id="ccdZoomSetupStatus" role="status"></p></section><div id="ccdQuizPanel" class="ccd-quiz-panel" hidden></div><section id="ccdWaitingPanel" class="ccd-waiting-panel" hidden aria-live="polite"><span class="ccd-waiting-icon" aria-hidden="true">🎓</span><div><h3>Dersin başlamasını bekliyorsun</h3><p>Sınıf üyeliğin aktif. Eğitmen canlı yayını başlattığında <strong>Canlı derse bağlan</strong> düğmesi açılacak. Buradan derse katılabileceksin.</p></div></section><div id="ccdJitsiPanel" class="ccd-jitsi-panel" hidden><div class="ccd-jitsi-notice">ZOOM · Gömülü canlı sınıf · Kamera, mikrofon ve ekran paylaşımı Zoom içerisinde yönetilir</div><div id="ccdJitsiMount"></div><div class="ccd-jitsi-actions"><button type="button" class="btn" onclick="CCClassDemo.back()">← Sınıflara dön</button><button type="button" class="btn" onclick="CCClassDemo.leaveZoom()">Zoom görüntüsünü kapat</button></div><div id="ccdJitsiError" role="status"></div></div><div id="ccdFakeVideo" class="videogrid"><div><div class="stage"><span class="liveflag">● DEMO OTURUM</span><div><div class="avatar">AY</div><h2>Ahmet Yılmaz</h2><p>Eğitmen · Örnek görüntü alanı</p></div><small style="position:absolute;bottom:14px;color:#c8d8e3">Gerçek video bağlantısı bu prototipte henüz etkin değil.</small></div><div class="controls"><button id="ccdMic" class="control" onclick="CCClassDemo.toggle('mic')">🎙 Mikrofon açık</button><button id="ccdCam" class="control" onclick="CCClassDemo.toggle('cam')">▣ Kamera açık</button><button class="control" onclick="CCClassDemo.notice()">▤ Ekran paylaş</button><button class="control" onclick="CCClassDemo.notice()">✋ Söz iste</button><button class="control leave" onclick="CCClassDemo.back()">Dersten ayrıl</button></div></div><aside class="roomside"><h3>Katılımcılar · 24</h3><div class="person">★ Ahmet Yılmaz · Eğitmen</div><div class="person">● Rasim Doğan · Sen</div><div class="person">● Elif Kaya</div><div class="person">● Mehmet Demir</div><div class="person">+ 20 katılımcı daha</div><h3 style="margin-top:20px">Ders sohbeti</h3><div class="person">Elif: Sunumu paylaşabilir misiniz?</div><div class="person">Eğitmen: Ders sonunda dosyalara ekleyeceğim.</div></aside></div></div></section>
 </div>
 <style id="cc-class-modern-v10380">
 /* Classes 2026 modern interface — scoped to classes only */
@@ -8772,10 +8772,10 @@ const auth=()=>{const v=window.CC_AUTH?.getSession?.();return v?.user||null};
 const repeatText=x=>x.repeat_type==='daily'?'Her gün':x.repeat_type==='weekly'?'Her hafta':x.repeat_type==='monthly'?'Her ay':'';
 const nextDate=x=>{if(!x.starts_at)return null;const base=new Date(x.starts_at),now=new Date();if(x.repeat_type==='none'||!x.repeat_type)return base;let d=new Date(base);const days=Array.isArray(x.repeat_days)?x.repeat_days:[];for(let i=0;i<370&&d<now;i++){if(x.repeat_type==='daily')d.setDate(d.getDate()+1);else if(x.repeat_type==='monthly')d.setMonth(d.getMonth()+1);else{d.setDate(d.getDate()+1);while(days.length&&!days.includes(d.getDay()))d.setDate(d.getDate()+1)}}if(x.repeat_until&&d>new Date(x.repeat_until+'T23:59:59'))return null;return d};
 const isLive=x=>!!(x?.live_started_at&&x?.live_heartbeat_at&&(!x.live_ended_at||new Date(x.live_ended_at)<new Date(x.live_started_at))&&(Date.now()-new Date(x.live_heartbeat_at).getTime()<90000));
-let liveTimer=null,refreshTimer=null,quizTimer=null,quizState=null,quizAnswers=[],quizResults=[],quizIndex=0,quizBusy=false,quizWasActiveThisRoom=false,resultsExpanded=false;
+let liveTimer=null,refreshTimer=null,quizTimer=null,quizState=null,quizAnswers=[],quizResults=[],quizIndex=0,quizBusy=false,quizWasActiveThisRoom=false,resultsExpanded=false,quizDismissedId=null,zoomBusy=false,zoomFrame=null;
 function clearSessionQuiz(){
  quizState=null;quizAnswers=[];quizResults=[];quizIndex=0;
- quizWasActiveThisRoom=false;resultsExpanded=false;quizBusy=false;
+ quizWasActiveThisRoom=false;resultsExpanded=false;quizBusy=false;quizDismissedId=null;
  const panel=$('ccdQuizPanel');
  if(panel){panel.hidden=true;panel.replaceChildren()}
  updateWaitingState();
@@ -8836,7 +8836,7 @@ function stopHeartbeat(){if(liveTimer)clearInterval(liveTimer);liveTimer=null}
 function startHeartbeat(){stopHeartbeat();liveTimer=setInterval(async()=>{try{await liveWrite({live_heartbeat_at:new Date().toISOString()})}catch(e){console.warn('Canlı yayın kalp atışı başarısız',e)}},30000)}
 const client=async()=>{if(!window.CC_AUTH?.getClient)throw Error('Giriş altyapısı hazır değil');const db=await window.CC_AUTH.getClient();const session=window.CC_AUTH.getSession?.();const current=await db.auth.getSession();if(!current.data?.session?.access_token&&session?.access_token){const r=await db.auth.setSession({access_token:session.access_token,refresh_token:session.refresh_token});if(r.error)throw r.error}return db};
 function notice(msg){$('ccdLiveStatus').textContent=msg||''}
-function stop(){try{jitsiApi?.dispose()}catch(e){}jitsiApi=null;jitsiRoom='';$('ccdJitsiMount')?.replaceChildren()}
+function stop(){try{jitsiApi?.dispose()}catch(e){}jitsiApi=null;jitsiRoom='';if(zoomFrame){try{zoomFrame.contentWindow?.postMessage({type:'cc-zoom-reset'},location.origin)}catch{}zoomFrame.remove();zoomFrame=null}$('ccdJitsiMount')?.replaceChildren()}
 function sdk(){if(window.JitsiMeetExternalAPI)return Promise.resolve();if(sdkPromise)return sdkPromise;sdkPromise=new Promise((ok,no)=>{const el=document.createElement('script');el.src='https://meet.jit.si/external_api.js';el.onload=()=>window.JitsiMeetExternalAPI?ok():no(Error('Jitsi kullanılamıyor'));el.onerror=()=>no(Error('Jitsi yüklenemedi'));document.head.appendChild(el)}).catch(e=>{sdkPromise=null;throw e});return sdkPromise}
 async function load(){
  if(loading)return;loading=true;notice('Sınıflar yükleniyor…');
@@ -8908,22 +8908,113 @@ async function enter(id){
  const row=rows.find(x=>x.id===id),user=auth();if(!row)return;
  if(!user){alert('Canlı derse katılmak için giriş yapmalısın.');return}
  if(row.owner_id!==user.id&&!members.has(id)){alert('Önce sınıfa katılmalısın.');return}
- stop();active=row;quizState=null;quizAnswers=[];quizResults=[];quizIndex=0;quizBusy=false;quizWasActiveThisRoom=false;resultsExpanded=false;$('ccdBookOpen').hidden=row.owner_id!==user.id;$('ccdTeachingToolbar').hidden=row.owner_id!==user.id;$('ccdBookClose').hidden=true;quizAnswers=[];$('ccdQuizPanel').hidden=true;$('ccdQuizOpen').hidden=row.owner_id!==user.id||!isLive(row);$('ccdRoomTitle').textContent=row.title;$('ccdDashboard').style.display='none';$('ccdRoom').style.display='block';
- $('ccdJitsiPanel').hidden=true;$('ccdFakeVideo').style.display='none';
+ stop();active=row;quizState=null;quizAnswers=[];quizResults=[];quizIndex=0;quizBusy=false;quizWasActiveThisRoom=false;resultsExpanded=false;quizDismissedId=null;$('ccdZoomSetup').hidden=true;$('ccdBookOpen').hidden=row.owner_id!==user.id;$('ccdTeachingToolbar').hidden=row.owner_id!==user.id;$('ccdBookClose').hidden=true;quizAnswers=[];$('ccdQuizPanel').hidden=true;$('ccdQuizOpen').hidden=row.owner_id!==user.id||!isLive(row);$('ccdRoomTitle').textContent=row.title;$('ccdDashboard').style.display='none';$('ccdRoom').style.display='block';
+ $('ccdJitsiPanel').hidden=true;$('ccdFakeVideo').style.display='none';$('ccdZoomConfigure').hidden=row.owner_id!==user.id;
  const owner=row.owner_id===user.id;
  $('ccdStartLive').hidden=!owner||isLive(row);$('ccdStopLive').hidden=!owner||!isLive(row);
  $('ccdRoomState').textContent=isLive(row)?'🔴 CANLI · Ders devam ediyor.':owner?'Hazır olduğunda canlı yayını başlat.':'Eğitmen yayını başlattığında derse katılabilirsin.';if(owner&&isLive(row))connectLive();
  if(!owner&&row.book_open&&window.BOOK?.open){window.BOOK.open();window.BOOK.goToPage(row.book_page||0)}refreshQuiz();if(quizTimer)clearInterval(quizTimer);quizTimer=setInterval(refreshQuiz,5000);if(!owner){$('ccdStartLive').hidden=true;$('ccdJoinLive').hidden=!isLive(row);$('ccdRoomState').textContent=isLive(row)?'🔴 CANLI · Ders devam ediyor.':'Eğitmen yayını başlattığında derse katılabilirsin.'}else $('ccdJoinLive').hidden=true;updateWaitingState();
 }
-function connectLive(){
- if(!active?.room_name)return;
- jitsiRoom=active.room_name;
- const panel=$('ccdJitsiPanel'),mount=$('ccdJitsiMount');
- panel.hidden=false;
- const url='https://meet.jit.si/'+encodeURIComponent(jitsiRoom);
- mount.innerHTML='<div class="ccd-video-bridge"><div class="ccd-video-icon">🎥</div><div class="ccd-video-content"><h3>Canlı ders bağlantısı hazır</h3><p>Ücretsiz Jitsi görüşmesi ayrı bir sekmede açılır. Bu sayfada testler ve sınıf araçları açık kalır.</p><a class="btn primary ccd-meeting-link" href="'+esc(url)+'" rel="noopener noreferrer" target="_blank">↗ Görüntülü görüşmeye katıl</a><small>Jitsi sekmesi ayrı çalışır; buradaki “Yayını kapat” düğmesi yalnızca sınıftaki canlı durumunu kapatır.</small></div></div>';
- $('ccdJitsiError').textContent='';
+async function zoomApi(action,payload={}){
+ const db=await client();
+ const session=(await db.auth.getSession()).data?.session;
+ if(!session?.access_token)throw Error('Oturum süresi dolmuş. Yeniden giriş yapın.');
+ const res=await fetch('https://sdyezaukbjgwxvyvtpts.supabase.co/functions/v1/cc-zoom-meeting',{
+  method:'POST',
+  headers:{'Content-Type':'application/json','apikey':'sb_publishable_ORdDDUINHAz02NQvRjB4hA_HOKGqdFJ','Authorization':'Bearer '+session.access_token},
+  body:JSON.stringify({action,class_id:active.id,...payload})
+ });
+ const body=await res.json().catch(()=>({}));
+ if(!res.ok)throw Error(body.message||body.error||'Zoom isteği başarısız.');
+ return body
 }
+async function showZoomSettings(){
+ if(!active||active.owner_id!==auth()?.id)return;
+ $('ccdZoomSetup').hidden=false;
+ $('ccdZoomSetupStatus').textContent='Zoom ayarları kontrol ediliyor…';
+ try{
+  const r=await zoomApi('status');
+  $('ccdZoomNumber').value=r.meeting_number||'';
+  $('ccdZoomPasscode').value='';
+  $('ccdZoomSetupStatus').textContent=(r.configured?'Toplantı tanımlı. Parola değişecekse yeniden girin. ':'Henüz toplantı tanımlanmadı. ')+(r.credentials_ready?'Zoom SDK sunucu anahtarları hazır.':'Zoom SDK Client ID ve Secret sunucuya henüz eklenmedi; bu bilgiler olmadan görüntülü bağlantı çalışmaz.');
+ }catch(e){$('ccdZoomSetupStatus').textContent='Ayarlar okunamadı: '+(e.message||e)}
+}
+function hideZoomSettings(){$('ccdZoomSetup').hidden=true}
+async function saveZoomSettings(){
+ if(!active||active.owner_id!==auth()?.id)return;
+ const meeting_number=$('ccdZoomNumber').value.trim(),passcode=$('ccdZoomPasscode').value.trim();
+ const n=meeting_number.replace(/[\s-]/g,'');
+ if(!/^\d{9,11}$/.test(n)){alert('Zoom toplantı numarası 9 ila 11 rakamdan oluşmalı.');return}
+ try{
+  const r=await zoomApi('configure',{meeting_number:n,passcode});
+  $('ccdZoomSetupStatus').textContent=r.credentials_ready?'Zoom toplantısı kaydedildi. Gömülü görüşme bağlantısını açabilirsiniz.':'Toplantı kaydedildi. Görüntüyü açmak için Supabase Zoom Meeting SDK Client ID ve Secret bilgileri eklenmeli.';
+  $('ccdZoomPasscode').value='';
+  if(isLive(active))await connectLive();
+ }catch(e){alert('Zoom toplantısı kaydedilemedi: '+(e.message||e))}
+}
+async function connectLive(){
+ if(!active||!isLive(active))return;
+ const currentClassId=active.id,panel=$('ccdJitsiPanel'),mount=$('ccdJitsiMount');
+ panel.hidden=false;
+ if(zoomFrame)return; 
+ mount.innerHTML='<div class="ccd-zoom-placeholder"><div class="ccd-zoom-emblem">🎥</div><div><span class="ccd-zoom-eyebrow">CUSTOMS COMMUNITY · ZOOM</span><h3>Gömülü Canlı Ders</h3><p id="ccdZoomConnectMessage">Zoom toplantısı hazırlanıyor…</p><button class="btn primary" type="button" id="ccdZoomJoinBtn" onclick="CCClassDemo.joinZoomEmbedded()" disabled>▣ Zoom’u burada aç</button><div class="ccd-zoom-connect-note">Zoom hesabının toplantı sahibi, görüşmeyi önce Zoom uygulamasında başlatmalıdır. Katılımcılar bu sınıf ekranından ayrılmadan bağlanabilir.</div></div></div>';
+ $('ccdJitsiError').textContent='';
+ try{
+  const settings=await zoomApi('status');
+  if(active?.id!==currentClassId||!isLive(active))return;
+  const info=$('ccdZoomConnectMessage'),btn=$('ccdZoomJoinBtn');
+  if(!settings.configured){
+   info.textContent='Eğitmen henüz Zoom toplantı numarasını tanımlamadı.';
+  }else if(!settings.credentials_ready){
+   info.textContent='Toplantı tanımlandı. Zoom Meeting SDK Client ID ve Client Secret henüz Supabase ortamına eklenmedi.';
+  }else{
+   info.textContent='Zoom bağlantısı hazır. Kameranı ve mikrofonunu açmak için aşağıdaki düğmeyi kullanabilirsin.';
+   btn.disabled=false;
+  }
+ }catch(e){const info=$('ccdZoomConnectMessage');if(info)info.textContent='Zoom durumuna ulaşılamadı: '+(e.message||e)}
+}
+async function joinZoomEmbedded(){
+ if(!active||!isLive(active)||zoomBusy||zoomFrame)return;
+ zoomBusy=true;
+ const btn=$('ccdZoomJoinBtn');if(btn){btn.disabled=true;btn.textContent='Zoom başlatılıyor…'}
+ const cls=active.id;
+ try{
+  if(window.matchMedia('(max-width: 680px)').matches)console.info('Zoom Component View ağırlıklı olarak masaüstü tarayıcılarında desteklenir.');
+  const meeting=await zoomApi('signature');
+  if(active?.id!==cls||!isLive(active))return;
+  const mount=$('ccdJitsiMount');mount.replaceChildren();
+  const frame=document.createElement('iframe');
+  frame.id='ccdZoomFrame';
+  frame.className='ccd-zoom-frame';
+  frame.title='Zoom Canlı Sınıf Görüntülü Görüşme';
+  frame.allow='camera; microphone; display-capture; fullscreen; autoplay';
+  frame.setAttribute('allowfullscreen','');
+  frame.src='/zoom-meeting.html?v=10385';
+  zoomFrame=frame;
+  frame.onload=()=>{
+   if(zoomFrame!==frame)return;
+   frame.contentWindow?.postMessage({type:'cc-zoom-join',signature:meeting.signature,meetingNumber:meeting.meeting_number,password:meeting.passcode,userName:meeting.user_name},location.origin)
+  };
+  mount.append(frame);
+  $('ccdJitsiError').textContent='Zoom bu sayfaya gömülü olarak yükleniyor…';
+ }catch(e){
+  $('ccdJitsiError').textContent='Zoom bağlantısı kurulamadı: '+(e.message||e);
+  if(btn){btn.disabled=false;btn.textContent='Yeniden dene'}
+ }finally{zoomBusy=false}
+}
+function leaveZoom(){
+ stop();
+ if(active&&isLive(active))connectLive();
+ else $('ccdJitsiPanel').hidden=true
+}
+window.addEventListener('message',e=>{
+ if(e.origin!==location.origin||!zoomFrame||e.source!==zoomFrame.contentWindow)return;
+ if(e.data?.type!=='cc-zoom-status')return;
+ const box=$('ccdJitsiError');
+ if(!box)return;
+ if(e.data.event==='joined')box.textContent='Zoom toplantısına bağlandınız.';
+ else if(e.data.event==='error')box.textContent='Zoom bağlantısı: '+String(e.data.error||'Bilinmeyen hata').slice(0,240)
+});
 async function startLive(){
  if(!active||active.owner_id!==auth()?.id)return;
  try{
@@ -9143,9 +9234,9 @@ window.CCClassDemo={
  create(){form(null)},edit(id){const row=rows.find(x=>x.id===id);if(row?.owner_id===auth()?.id)form(row)},
  save,join,remove,enter,
  cancelForm(){$('ccdClassForm').hidden=true},
- startLive,stopLive,repeatChanged,openBook,closeBook,toggleQuizSetup,openQuizSetup,updateQuizCount,sendQuiz,answerQuiz,finishQuiz,goQuizQuestion,toggleQuizResults,closeQuiz,joinLive(){if(active&&(members.has(active.id)||active.owner_id===auth()?.id)&&isLive(active))connectLive()},
- openJitsiTab(){if(jitsiRoom)window.open('https://meet.jit.si/'+encodeURIComponent(jitsiRoom),'_blank','noopener,noreferrer')},
- toggle(){},notice(){alert('Kamera, mikrofon, sohbet ve ekran paylaşımı için Jitsi toplantısının içindeki düğmeleri kullanın.')}
+ startLive,stopLive,repeatChanged,openBook,closeBook,toggleQuizSetup,openQuizSetup,updateQuizCount,sendQuiz,answerQuiz,finishQuiz,goQuizQuestion,toggleQuizResults,dismissQuizPanel,closeQuiz,showZoomSettings,hideZoomSettings,saveZoomSettings,joinZoomEmbedded,leaveZoom,joinLive(){if(active&&(members.has(active.id)||active.owner_id===auth()?.id)&&isLive(active))connectLive()},
+ openJitsiTab(){alert('Canlı sınıf artık site içindeki Zoom alanını kullanıyor.')},
+ toggle(){},notice(){alert('Kamera, mikrofon ve ekran paylaşımı gömülü Zoom toplantı alanında yönetilir.')}
 };
 })();
 </script>
