@@ -168,8 +168,7 @@ function choose(i){
 }
 function finish(){
  const n=round.questions.length,correct=round.correct,wrong=n-correct,pct=Math.round(correct/n*100);
- el('ccCustomTest').innerHTML='<div class="cct-result"><h3>Test Tamamlandı</h3><div class="cct-stats"><div><span>Toplam</span><strong>'+n+'</strong></div><div><span>Doğru</span><strong class="cct-green">'+correct+'</strong></div><div><span>Yanlış</span><strong class="cct-red">'+wrong+'</strong></div><div><span>Başarı</span><strong>%'+pct+'</strong></div></div><div class="cct-success">Test tamamlandı · Başarı oranı: <strong>%'+pct+'</strong></div><div class="cct-actions"><button type="button" id="ccCustomAgain">Yeni Test Oluştur</button><button type="button" id="ccCustomExit" class="cct-secondary">Test Seçimine Dön</button></div></div>';
- el('ccCustomAgain').onclick=()=>{round=null;loadBank()};
+ el('ccCustomTest').innerHTML='<div class="cct-result"><h3>Test Tamamlandı</h3><div class="cct-stats"><div><span>Toplam</span><strong>'+n+'</strong></div><div><span>Doğru</span><strong class="cct-green">'+correct+'</strong></div><div><span>Yanlış</span><strong class="cct-red">'+wrong+'</strong></div><div><span>Başarı</span><strong>%'+pct+'</strong></div></div><div class="cct-success">Test tamamlandı · Başarı oranı: <strong>%'+pct+'</strong></div><div class="cct-actions"><button type="button" id="ccCustomExit" class="cct-secondary">Test Seçimine Dön</button></div></div>';
  el('ccCustomExit').onclick=()=>{round=null;loadBank()};
 }
 window.CC_TEST_MODES={setup,setMode,products,items};
