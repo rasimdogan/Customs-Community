@@ -39,12 +39,12 @@ async function refresh(){
    const db=await window.CC_AUTH.getClient(),u=window.CC_AUTH.getSession().user.id;
    const [row,count]=await Promise.all([
     db.from('profiles').select('membership_plan,role').eq('user_id',u).single(),
-    db.from('community_cards').select('id',{count:'exact',head:true}).eq('owner_id',u)
+    db.rpc('cc_my_card_quota')
    ]);
    if(row.error)throw row.error;
    const p=profile();if(p){p.membership_plan=row.data.membership_plan;p.role=row.data.role}
    plan=row.data.role==='admin'?'full':(PACKAGES[row.data.membership_plan]?row.data.membership_plan:'free');
-   if(!count.error)cardCount=Number(count.count||0);
+   if(!count.error)cardCount=Number(count.data?.used||0);
    updateIndicators();window.dispatchEvent(new CustomEvent('cc-plan-updated',{detail:{plan,count:cardCount}}));
   }catch(e){console.warn('Üyelik bilgisi güncellenemedi',e)}
   finally{refreshBusy=false;planLoading=null}
@@ -113,6 +113,25 @@ async function savePlan(userId,next,select){
   await loadAdmin();
  }finally{select.disabled=false}
 }
+
+function protectEducationNavigation(){
+ const base=window.nav;
+ if(typeof base!=='function'||base.__ccAccessWrapped)return;
+ const blocked=new Set(['games','detective','spy','scene','fasil-savas','mpconquest','mpduel','puzzle']);
+ const wrapped=function(view,...args){
+  if(logged()&&!hasTariff()&&blocked.has(view)){upgrade('tariff');return}
+  return base.call(this,view,...args)
+ };
+ wrapped.__ccAccessWrapped=true;
+ window.nav=wrapped;
+ const challenge=window.GTA_CHALLENGE;
+ if(challenge&&typeof challenge.open==='function'&&!challenge.__ccAccessWrapped){
+  const original=challenge.open;
+  challenge.open=function(...args){if(logged()&&!hasTariff()){upgrade('tariff');return}return original.apply(this,args)};
+  challenge.__ccAccessWrapped=true;
+ }
+}
+
 function guardClassOpen(){
  const obj=window.CCClassDemo;if(!obj||obj.__ccPlanProtected)return;
  const open=obj.open;if(typeof open!=='function')return;
@@ -155,8 +174,8 @@ function installObserver(){
  }
 }
 function init(){
- createMemberSummary();guardClassOpen();installClickGuards();installBookNotice();installObserver();
- window.addEventListener('cc-authenticated',()=>{createMemberSummary();refresh()});
+ createMemberSummary();guardClassOpen();protectEducationNavigation();installClickGuards();installBookNotice();installObserver();setTimeout(protectEducationNavigation,200);
+ window.addEventListener('cc-authenticated',()=>{createMemberSummary();protectEducationNavigation();refresh()});
  window.addEventListener('cc-plan-updated',()=>{updateBookNotice();try{window.GTA_ATLAS?.render?.()}catch(_){}});
  window.addEventListener('focus',()=>{if(logged())refresh()});
  window.addEventListener('cc-content-ready',createMemberSummary);
