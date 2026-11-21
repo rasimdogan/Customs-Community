@@ -3,7 +3,7 @@
 const el=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const labels={gtip:'Yönetici Soruları',izahname:'İzahname'};
-let mode='position',bank=[],round=null,answered=false,request=0,originalStart=null,originalCancel=null,originalNext=null;
+let mode='position',bank=[],round=null,answered=false,request=0,originalStart=null,originalCancel=null,originalNext=null,originalRender=null,originalAnswer=null;
 const mix=a=>{const b=a.slice();for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b};
 function setup(){
  const host=el('view-test'),focus=host?.querySelector('.test-focus');if(!focus||el('ccTestModes'))return;
@@ -24,6 +24,7 @@ function setMode(value){
  setup();mode=value;request++;
  const focus=el('view-test')?.querySelector('.test-focus'),shell=focus?.querySelector('.test-shell'),custom=el('ccCustomTest'),product=el('ccProductChoice');if(!shell||!custom)return;
  el('ccTestModes').querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.ccmode===value));
+ if(value!=='position'&&el('view-test')?.classList.contains('cc-test-running'))window.cancelPositionTest?.();
  shell.hidden=value!=='position';product.hidden=value!=='position';custom.hidden=value==='position';
  if(value!=='position')el('view-test')?.classList.remove('cc-test-running');
  if(value!=='position')loadBank();
@@ -33,7 +34,13 @@ function products(card){
  const code=String(card.code||'');if(!/^\d{4}$/.test(code))return [];
  const segments=txt.replace(/[\r\n•]+/g,',').split(/[,;]+/);
  const names=segments.map(s=>s.trim().replace(/^\s*[-–:]+\s*/,'').replace(/\s*\([^)]*\)\s*$/,'').replace(/\s+/g,' ').trim()).filter(s=>s.length>=4&&s.length<=57&&!/[:.]|\d{4}/.test(s)&&!(/^(not|hariç|vb|diğer|boş|istisna|pozisyon|örnek|bunlar|bunların)\b/i.test(s)));
- return [...new Set(names)].slice(0,20);
+ // Soru adları için kalıcı editoryal ayrımlar: muğlak "Böcekler" sorulmaz.
+ const rules=window.CC_PRODUCT_QUESTION_RULES||{};
+ const override=rules.byCode?.[code]||{};
+ const exactKey=v=>String(v||'').toLocaleLowerCase('tr-TR').trim();
+ const blocked=new Set([...(rules.ambiguousNames||[]),...(override.replace||[])].map(exactKey));
+ const safe=names.filter(name=>!blocked.has(exactKey(name))&&!/^böcekler ve /i.test(name));
+ return [...new Set([...safe,...(override.add||[])])].slice(0,20);
 }
 function items(pool){
  const candidates=pool.flatMap(card=>products(card).map(name=>({card,name,code:String(card.code)})));
@@ -72,6 +79,35 @@ function wrapPositionControls(){
   window.cancelPositionTest=function(){
    const result=originalCancel.apply(this,arguments);
    el('view-test')?.classList.remove('cc-test-running','cc-product-question');
+   return result;
+  };
+ }
+ if(!originalRender&&typeof window.renderQuestion==='function'){
+  originalRender=window.renderQuestion;
+  window.renderQuestion=function(){
+   const result=originalRender.apply(this,arguments);
+   const host=el('view-test');
+   if(!host?.classList.contains('cc-test-running'))return result;
+   const question=el('testArea')?.querySelector('.question');
+   if(!question||question.querySelector('.cct-position-actions'))return result;
+   const isLast=testState.current===testState.questions.length-1;
+   const actions=document.createElement('div');
+   actions.className='cct-position-actions';
+   actions.innerHTML='<button type="button" class="cct-back">Test Seçimine Dön</button><button type="button" class="cct-forward" disabled>'+(isLast?'Testi Bitir':'Sonraki Soru')+'</button>';
+   question.appendChild(actions);
+   actions.querySelector('.cct-back').onclick=()=>window.cancelPositionTest();
+   actions.querySelector('.cct-forward').onclick=()=>window.nextTest();
+   return result;
+  };
+ }
+ if(!originalAnswer&&typeof window.answerTest==='function'){
+  originalAnswer=window.answerTest;
+  window.answerTest=function(){
+   const result=originalAnswer.apply(this,arguments);
+   if(el('view-test')?.classList.contains('cc-test-running')){
+    const next=el('testArea')?.querySelector('.cct-position-actions .cct-forward');
+    if(next&&testState.answered)next.disabled=false;
+   }
    return result;
   };
  }
