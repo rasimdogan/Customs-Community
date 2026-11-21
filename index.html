@@ -6812,34 +6812,48 @@ body.dark #ccklEditorBackdrop .cckl-paste-help{color:#aac2d1}
 body.dark #ccklEditorBackdrop .cckl-clean-format-btn{background:#1e3b50!important;color:#d5edf9!important;border-color:#3a6278!important}
 </style>
 <style id="cckl-folders-modern-v10386">#ccklFolders{display:flex;flex-direction:column;gap:6px;margin-top:9px}#ccklFolders .cckl-folder{display:flex;align-items:center;gap:9px;width:100%;padding:10px 11px;border:1px solid transparent;border-radius:11px;background:transparent;text-align:left;color:#334c66;font-size:13px;font-weight:650;transition:.15s}#ccklFolders .cckl-folder:hover{background:#f0f5fa;border-color:#e1eaf3}#ccklFolders .cckl-folder.active{background:#eaf2fd;border-color:#cbdff7;color:#1b5b9c}#ccklFolders .cckl-folder-icon{display:grid;place-items:center;flex:0 0 30px;height:30px;border-radius:9px;background:#e8f1fb;color:#3b75ad;font-size:23px}#ccklFolders .cckl-folder-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#ccklFolders .cckl-folder-count{font-size:11px;color:#70869a;background:#edf2f6;border-radius:99px;padding:3px 7px}#ccklFolders .cckl-folder.cckl-drop-target{background:#dcecff;border:1px dashed #3279bb;transform:translateX(3px)}#ccklGrid .cckl-tile[draggable=true]{cursor:grab}#ccklGrid .cckl-tile.cckl-dragging{opacity:.45}</style><style id="cc-webinar-jitsi-v10387">.cchub-jitsi-entry{border:1px solid #a9cbe4!important;background:#eaf4fb!important;color:#175c89!important;font-weight:750!important}.cchub-jitsi-panel{margin:15px 18px 20px;border:1px solid #d6e3ee;border-radius:15px;overflow:hidden;background:#f7fafd}.cchub-jitsi-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 15px;background:#eaf2fa;color:#245276;font-size:13px}.cchub-jitsi-panel #cchubJitsiStatus{padding:8px 15px;color:#55718a;font-size:12px}.cchub-jitsi-panel #cchubJitsiMount{min-height:440px;background:#162639}.cchub-jitsi-panel #cchubJitsiMount iframe{display:block;width:100%;border:0}@media(max-width:700px){.cchub-jitsi-panel{margin:10px 6px}.cchub-jitsi-panel #cchubJitsiMount{min-height:340px}}</style><style id="cc-pricing-comparison-v10390">
-#ccMembershipModal .cc92-compare-section{margin-top:18px;background:#fff;border:1px solid #dce6ed;border-radius:16px;padding:14px 14px 12px;min-width:0}
-#ccMembershipModal .cc92-compare-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 2px 12px;flex-wrap:wrap}
-#ccMembershipModal .cc92-compare-heading h3{margin:0;color:#1a405e;font-size:17px;font-weight:850}
-#ccMembershipModal .cc92-compare-heading p{margin:0;color:#71879a;font-size:11px}
-#ccMembershipModal .cc92-compare-scroller{max-width:100%;overflow-x:auto;border-radius:11px;outline-offset:3px}
-#ccMembershipModal .cc92-compare-table{width:100%;min-width:660px;border-collapse:separate;border-spacing:0;table-layout:fixed;font-size:12px}
-#ccMembershipModal .cc92-compare-table th,#ccMembershipModal .cc92-compare-table td{padding:9px 10px;border-bottom:1px solid #e7edf2;line-height:1.3}
-#ccMembershipModal .cc92-compare-table thead th{background:#e7f0fa;color:#214c70;font-size:12px;font-weight:850;text-align:center}
-#ccMembershipModal .cc92-compare-table thead th:first-child{text-align:left;border-radius:9px 0 0 0;width:36%}
-#ccMembershipModal .cc92-compare-table thead th:last-child{border-radius:0 9px 0 0}
+
+#ccMembershipModal .cc92-compare-section{margin-top:18px;background:#fff;border:1px solid #dce6ed;border-radius:16px;padding:18px 17px 16px;min-width:0}
+#ccMembershipModal .cc92-compare-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 2px 15px;flex-wrap:wrap}
+#ccMembershipModal .cc92-compare-heading h3{margin:0;color:#1b3950;font-size:18px;font-weight:750;line-height:1.4}
+#ccMembershipModal .cc92-compare-heading p{margin:0;color:#71869a;font-size:12px;font-weight:400;line-height:1.5}
+#ccMembershipModal .cc92-compare-scroller{max-width:100%;overflow-x:auto;border-radius:12px;border:1px solid #e3ebf1;outline-offset:3px}
+#ccMembershipModal .cc92-compare-table{width:100%;min-width:680px;border-collapse:collapse;table-layout:fixed;font-family:inherit;font-size:13px;line-height:1.45;color:#344f64}
+#ccMembershipModal .cc92-compare-table th,#ccMembershipModal .cc92-compare-table td{padding:13px 12px;border-bottom:1px solid #e7edf2;font-family:inherit;font-size:13px;line-height:1.4;vertical-align:middle}
+#ccMembershipModal .cc92-compare-table thead th{background:#edf3f8;color:#244560;text-align:center;font-size:13px;font-weight:650}
+#ccMembershipModal .cc92-compare-table thead th:first-child{text-align:left;width:36%}
 #ccMembershipModal .cc92-compare-table thead th:not(:first-child){width:16%}
-#ccMembershipModal .cc92-compare-table tbody th{color:#314e66;font-weight:650;text-align:left}
-#ccMembershipModal .cc92-compare-table tbody tr:nth-child(even){background:#f3f7fa}
-#ccMembershipModal .cc92-compare-table td{text-align:center}
-#ccMembershipModal .cc92-compare-table tr>*+*{border-left:1px solid #e5edf4}
+#ccMembershipModal .cc92-compare-table tbody th{color:#344f64;font-weight:500;text-align:left}
+#ccMembershipModal .cc92-compare-table tbody tr:nth-child(even){background:#f8fafc}
+#ccMembershipModal .cc92-compare-table tbody td{text-align:center;font-weight:400;color:#344f64}
 #ccMembershipModal .cc92-compare-table tbody tr:last-child>*{border-bottom:0}
-#ccMembershipModal .cc92-compare-table .cc92-yes span{color:#15975b;font-size:20px;font-weight:900;line-height:1}
-#ccMembershipModal .cc92-compare-table .cc92-no span{color:#8ea2b3;font-size:18px;font-weight:700;line-height:1}
-#ccMembershipModal .cc92-compare-note{color:#728798;font-size:11px;line-height:1.5;margin:10px 3px 1px}
-#ccMembershipModal .cc92-compare-table [data-compare-plan].cc92-compare-selected{background:rgba(37,114,170,.095)}
-#ccMembershipModal .cc92-compare-table thead .cc92-compare-selected{background:#d7e8f7;color:#125985}
+#ccMembershipModal .cc92-compare-table tr>*+*{border-left:1px solid #edf1f5}
+#ccMembershipModal .cc92-compare-table tbody td span{display:inline-block;font-size:13px;line-height:1.4;color:inherit;font-weight:400}
+#ccMembershipModal .cc92-compare-table .cc92-cell-yes span{color:#248956;font-size:17px;line-height:1;font-weight:600}
+#ccMembershipModal .cc92-compare-table .cc92-cell-no span{color:#97a9b8;font-size:13px;font-weight:400}
+#ccMembershipModal .cc92-compare-table .cc92-cell-demo span{color:#455f76;font-size:13px;font-weight:500}
+#ccMembershipModal .cc92-compare-table .cc92-cell-text span{color:#344f64;font-size:13px;font-weight:450}
+#ccMembershipModal .cc92-compare-table .cc92-compare-price-row th,#ccMembershipModal .cc92-compare-table .cc92-compare-price-row td{font-weight:700;color:#203f57}
+#ccMembershipModal .cc92-compare-table [data-compare-plan].cc92-compare-selected{background:rgba(37,114,170,.055)}
+#ccMembershipModal .cc92-compare-table thead .cc92-compare-selected{background:#dfeef8;color:#184b6b}
+#ccMembershipModal .cc92-compare-legend{display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;margin:13px 2px 7px;color:#6b8194;font-size:11px}
+#ccMembershipModal .cc92-compare-legend span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+#ccMembershipModal .cc92-compare-legend b{font-size:11px;color:#455f76;font-weight:600}
+#ccMembershipModal .cc92-compare-legend .cc92-legend-check{color:#248956;font-size:15px}
+#ccMembershipModal .cc92-compare-legend .cc92-legend-dash{color:#97a9b8;font-size:13px}
+#ccMembershipModal .cc92-compare-note{color:#536c80;font-size:12px;line-height:1.55;margin:10px 2px 3px}
+#ccMembershipModal .cc92-compare-note b{font-weight:650}
+#ccMembershipModal .cc92-compare-admin-note{color:#7a8d9d;font-size:11px;line-height:1.55;margin:9px 2px 0}
 body.dark #ccMembershipModal .cc92-compare-section{background:#1b3045;border-color:#345168}
-body.dark #ccMembershipModal .cc92-compare-heading h3,body.dark #ccMembershipModal .cc92-compare-table tbody th{color:#d8e8f6}
+body.dark #ccMembershipModal .cc92-compare-heading h3,body.dark #ccMembershipModal .cc92-compare-table tbody th,body.dark #ccMembershipModal .cc92-compare-table tbody td,body.dark #ccMembershipModal .cc92-compare-table .cc92-cell-text span{color:#d8e8f6}
 body.dark #ccMembershipModal .cc92-compare-table thead th{background:#29465f;color:#d8e8f6}
 body.dark #ccMembershipModal .cc92-compare-table tbody tr:nth-child(even){background:#233d55}
 body.dark #ccMembershipModal .cc92-compare-table tr>*{border-color:#345168}
-body.dark #ccMembershipModal .cc92-compare-table .cc92-yes span{color:#63d69e}
-@media(max-width:740px){#ccMembershipModal .cc92-compare-section{padding:12px 10px}#ccMembershipModal .cc92-compare-table{min-width:630px}#ccMembershipModal .cc92-compare-table th,#ccMembershipModal .cc92-compare-table td{padding:9px 7px}#ccMembershipModal .cc92-compare-heading h3{font-size:15px}}
+body.dark #ccMembershipModal .cc92-compare-table .cc92-cell-yes span{color:#63d69e}
+body.dark #ccMembershipModal .cc92-compare-table .cc92-cell-demo span{color:#c2d6e4}
+body.dark #ccMembershipModal .cc92-compare-table .cc92-compare-price-row th,body.dark #ccMembershipModal .cc92-compare-table .cc92-compare-price-row td{color:#edf6fc}
+body.dark #ccMembershipModal .cc92-compare-legend,body.dark #ccMembershipModal .cc92-compare-note{color:#b6cada}
+@media(max-width:740px){#ccMembershipModal .cc92-compare-section{padding:14px 11px}#ccMembershipModal .cc92-compare-table{min-width:650px}#ccMembershipModal .cc92-compare-table th,#ccMembershipModal .cc92-compare-table td{padding:11px 8px}#ccMembershipModal .cc92-compare-heading h3{font-size:17px}}
 </style><style id="cc-pricing-v10389">#ccMembershipModal .cc92-plans-four{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}#ccMembershipModal .cc92-layout{display:block}#ccMembershipModal .cc92-main{width:100%;max-width:none}@media(max-width:900px){#ccMembershipModal .cc92-plans-four{grid-template-columns:repeat(2,1fr)}}@media(max-width:550px){#ccMembershipModal .cc92-plans-four{grid-template-columns:1fr}}</style><script id="cc-community-cards-js-v10250">
 window.CCCards=(()=>{
  let sb=null,session=null,section='library',folderId=null,rows=[],folders=[],detailRows=[],detailIndex=-1;
@@ -7680,25 +7694,31 @@ function levelCard(t,i){return `<div class="cc92-level ${t.className==='free'?'c
 function priceTable(){return `<div class="cc92-table-scroller"><table class="cc92-table"><thead><tr><th>90 günlük katkı puanı</th><th>Yıllık Plus</th><th>Yıllık indirim</th><th>Aylık Plus</th></tr></thead><tbody>${STEPS.map((r,i)=>`<tr data-step="${i}"><td><span class="cc92-table-dot cc92-${TIERS[i].className}"></span>${r[0]}</td><td>${r[1]}</td><td>${r[3]}</td><td>${r[2]}</td></tr>`).join('')}</tbody></table></div>`}
 function plansHTML(){
  const packages=[
-  {id:'free',name:'Ücretsiz',price:'0 TL',description:'Topluluğu kullan, 10 kart oluştur; 01–05 fasılları çalış'},
-  {id:'cards',name:'Kart Üyeliği',price:'100 TL',description:'Sınırsız topluluk kartı oluştur ve kütüphaneni yönet'},
-  {id:'tariff',name:'Tarife Modülü',price:'200 TL',description:'Kartlar, tüm GTİP eğitim fasılları ve Kitap Modu'},
-  {id:'full',name:'Tam Erişim',price:'300 TL',description:'Tüm eğitim, sınıf oluşturma, canlı ders ve webinar'}
+  {id:'free',name:'Ücretsiz',price:'0 TL',description:'Topluluk, 10 kart ve temel eğitim demosu'},
+  {id:'cards',name:'Kart Plus',price:'100 TL',description:'Sınırsız kart oluşturma ve kütüphane yönetimi'},
+  {id:'tariff',name:'Tarife Modülü',price:'200 TL',description:'Tüm GTİP eğitim fasılları, Kitap Modu ve testler'},
+  {id:'full',name:'Tam Erişim',price:'300 TL',description:'Tüm özellikler, canlı sınıflar ve webinarlar'}
  ];
  const features=[
-  ['Topluluk, paylaşım, beğeni, yorum',[1,1,1,1]],
-  ['Kendi topluluk kartını oluşturma',['10 kart','Sınırsız','Sınırsız','Sınırsız']],
-  ['Kart düzenleme ve kütüphane yönetimi',[1,1,1,1]],
-  ['GTİP Eğitim Alanı',['Fasıl 01–05','Fasıl 01–05','Tüm fasıllar','Tüm fasıllar']],
-  ['Kitap Modu',['Fasıl 01–05','Fasıl 01–05','Tüm fasıllar','Tüm fasıllar']],
-  ['Tarife testleri ve eğitim oyunları',['İlk 5 fasıl','İlk 5 fasıl','Tüm modüller','Tüm modüller']],
+  ['Topluluk',[1,1,1,1]],
+  ['Kart oluşturma',['10 kart','Sınırsız','Sınırsız','Sınırsız']],
+  ['Kart ve kütüphane yönetimi',[1,1,1,1]],
+  ['Tarife eğitimi',['Demo','Demo',1,1]],
+  ['Kitap modu',['Demo','Demo',1,1]],
+  ['Testler ve oyunlar',['Demo','Demo',1,1]],
   ['Sınıf oluşturma',[0,0,0,1]],
-  ['Canlı ders açma ve katılma',[0,0,0,1]],
-  ['Webinar oluşturma ve katılma',[0,0,0,1]]
+  ['Canlı dersler',[0,0,0,1]],
+  ['Webinarlar',[0,0,0,1]]
  ];
  const planCards=packages.map(p=>'<button type="button" class="cc92-plan" data-plan="'+p.id+'" onclick="CC_MEMBERSHIP.selectPlan(\''+p.id+'\')"><span class="cc92-plan-name">'+p.name+'</span><span class="cc92-plan-price">'+p.price+' <small>/ ay</small></span><span class="cc92-benefits"><span>✓ '+p.description+'</span></span><span class="cc92-plan-pick">Paketi İncele</span></button>').join('');
- const rows=features.map(([name,flags])=>'<tr><th scope="row">'+name+'</th>'+flags.map((v,i)=>'<td class="'+(v?'cc92-yes':'cc92-no')+'" data-compare-plan="'+packages[i].id+'"><span>'+((typeof v==='string')?v:(v?'✓':'–'))+'</span></td>').join('')+'</tr>').join('');
- return '<section class="cc92-main-pane" data-member-page="plans"><div class="cc92-pane-title"><div><small>ÜYELİK PAKETLERİ</small><h3>Paketleri Karşılaştır</h3><p>Ücretsiz üyelikte topluluk serbest, 10 kart ve ilk 5 fasıl açık. Diğer paketler daha geniş yetkiler sunar.</p></div></div><div class="cc92-plans cc92-plans-four">'+planCards+'</div><section class="cc92-compare-section" aria-labelledby="cc92CompareHeading"><div class="cc92-compare-heading"><h3 id="cc92CompareHeading">Özellik Karşılaştırması</h3><p>Paketlerin aylık ücretleri ve erişim hakları</p></div><div class="cc92-compare-scroller" tabindex="0" role="region" aria-label="Üyelik paketleri özellik karşılaştırması"><table class="cc92-compare-table"><thead><tr><th scope="col">Özellikler</th>'+packages.map(p=>'<th scope="col" data-compare-plan="'+p.id+'">'+p.name+'</th>').join('')+'</tr></thead><tbody>'+rows+'</tbody></table></div><p class="cc92-compare-note">Ödeme altyapısı henüz aktif değildir. Üyelik yükseltmelerini şimdilik yöneticiler, Yönetim Paneli → Kullanıcı Yönetimi bölümünden yapabilir.</p></section><div class="cc92-checkout"><div><b id="cc92PlanChoice">Ücretsiz üyelikle topluluğu kullanabilirsin.</b><span>Ödeme altyapısı henüz aktif değildir. Paket değişikliği yönetici onayıyla yapılır.</span></div><button id="ccPlanPayment" disabled>Ödeme henüz aktif değil</button></div></section>';
+ const cell=(v,p)=>{
+  const type=v===1?'yes':v===0?'no':v==='Demo'?'demo':'text';
+  const label=v===1?'✓':v===0?'—':v;
+  return '<td class="cc92-compare-cell cc92-cell-'+type+'" data-compare-plan="'+p.id+'"><span>'+label+'</span></td>';
+ };
+ const priceRow='<tr class="cc92-compare-price-row"><th scope="row">Aylık ücret</th>'+packages.map(p=>'<td data-compare-plan="'+p.id+'">'+p.price+'</td>').join('')+'</tr>';
+ const rows=features.map(([name,values])=>'<tr><th scope="row">'+name+'</th>'+values.map((v,i)=>cell(v,packages[i])).join('')+'</tr>').join('');
+ return '<section class="cc92-main-pane" data-member-page="plans"><div class="cc92-pane-title"><div><small>ÜYELİK PAKETLERİ</small><h3>Üyelik Seçenekleri</h3><p>İhtiyacına uygun üyelik planını inceleyebilir, özelliklerini karşılaştırabilirsin.</p></div></div><div class="cc92-plans cc92-plans-four">'+planCards+'</div><section class="cc92-compare-section" aria-labelledby="cc92CompareHeading"><div class="cc92-compare-heading"><h3 id="cc92CompareHeading">Üyelik Paketleri</h3><p>Paket özellikleri ve erişim karşılaştırması</p></div><div class="cc92-compare-scroller" tabindex="0" role="region" aria-label="Üyelik paketleri özellik karşılaştırması"><table class="cc92-compare-table"><thead><tr><th scope="col">Özellikler</th>'+packages.map(p=>'<th scope="col" data-compare-plan="'+p.id+'">'+p.name+'</th>').join('')+'</tr></thead><tbody>'+priceRow+rows+'</tbody></table></div><div class="cc92-compare-legend"><span><b class="cc92-legend-check" aria-hidden="true">✓</b> Tam erişim</span><span><b>Demo</b> Sınırlı kullanım</span><span><b class="cc92-legend-dash" aria-hidden="true">—</b> Pakete dahil değil</span></div><p class="cc92-compare-note"><b>Demo:</b> Eğitim Alanı, Kitap Modu ve ilgili testlerde yalnızca 01–05. fasıllar kullanılabilir.</p><p class="cc92-compare-admin-note">Ödeme altyapısı henüz aktif değildir. Paket yükseltmeleri Yönetim Paneli → Kullanıcı Yönetimi bölümünden yapılır.</p></section><div class="cc92-checkout"><div><b id="cc92PlanChoice">Ücretsiz üyelikle topluluğu kullanabilirsin.</b><span>Ödeme altyapısı henüz aktif değildir. Paket değişikliği yönetici tarafından yapılır.</span></div><button id="ccPlanPayment" disabled>Ödeme henüz aktif değil</button></div></section>';
 }
 function rewardsHTML(){return `<section class="cc92-main-pane" data-member-page="rewards" hidden><div class="cc92-pane-title"><div><small>TOPLULUĞUN GÜCÜ</small><h3>Katkıların, rozetin ve avantajların</h3><p>Bilgi paylaştıkça topluluğa değer kat, yeni rozetlere ilerle ve Plus indirimlerini artır.</p></div></div><section class="cc92-reward-board"><div class="cc92-section-heading"><div><span class="cc92-heading-icon">★</span><h3>Rozet yolculuğu</h3></div><span class="cc92-mutual">Son 90 gün</span></div><div class="cc92-badge-grid">${TIERS.map(levelCard).join('')}</div></section><section class="cc92-earnings"><div class="cc92-section-heading"><div><span class="cc92-heading-icon">↗</span><h3>Katkı puanı nasıl kazanılır?</h3></div></div><div class="cc92-earning-grid"><div><b>Bilgi paylaşımı</b><strong>+2</strong><span>En az 100 karakter, günde en fazla 2 paylaşım</span></div><div><b>Faydalı yorum</b><strong>+3</strong><span>En az 80 karakter</span></div><div><b>Özgün bilgi kartı</b><strong>+8</strong><span>Topluluğa açık, nitelikli kart</span></div><div><b>Topluluk etkileşimleri</b><strong>+2</strong><span>Başkalarından gelen beğeni, kalp veya kart favorisi</span></div></div><div class="cc92-section-heading cc92-webinar-header"><div><span class="cc92-heading-icon">▶</span><h3>Webinar düzenleyici puanları</h3></div></div><p class="cc92-soft-p">Tamamlanan webinarlarda puan, doğrulanan gerçek katılımcı sayısına göre belirlenir.</p><div class="cc92-webinar-grid">${WEBINARS.map(([r,p])=>`<div><span>${r} gerçek katılımcı</span><b>${p} puan</b></div>`).join('')}</div><div class="cc92-webinar-extra">✦ Katılımcı değerlendirmelerinde yüksek kalite başarısına <b>+30 puan</b>. Son 90 günde en fazla 2 doğrulanmış webinar hesaba katılır.</div></section><section class="cc92-table-section"><div class="cc92-section-heading"><div><span class="cc92-heading-icon">%</span><h3>İndirim seviyeleri</h3></div></div>${priceTable()}</section></section>`}
 function setup(){if($('ccMembershipModal'))return;
