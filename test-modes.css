@@ -28,3 +28,5 @@
 #view-test #ccCustomTest .cct-feedback{background:#f2f7fb;padding:14px;border-radius:10px;margin-top:15px;font-size:13px;color:#30506a}
 #view-test #ccCustomTest .cct-actions{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:20px}
 @media(max-width:600px){#view-test #ccTestModes{display:grid;grid-template-columns:1fr}#view-test #ccCustomTest{padding:15px}#view-test #ccCustomTest .cct-question{font-size:16px}}
+
+#view-test.cc-product-question #testArea .quiztext{display:none!important}
