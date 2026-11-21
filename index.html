@@ -5098,7 +5098,7 @@ window.CC_AUTH={login,logout,bootstrapAdmin,createUser,listUsers,setUserActive,d
 document.documentElement.classList.add('cc-auth-pending');
 document.addEventListener('DOMContentLoaded',()=>{let f=$id('ccLoginForm');if(f)f.addEventListener('submit',login);setTimeout(()=>{guardNav();hookSave();restore()},0)});
 })();
-</script><script>window.CC_BUILD="V103.86";</script><script id="cc-cache-version">(function(){const B="10386";try{const u=new URL(location.href);if(u.searchParams.get("v")!==B){u.searchParams.set("v",B);history.replaceState(null,"",u.pathname+"?"+u.searchParams.toString()+u.hash)}}catch(e){}})();</script>
+</script><script>window.CC_BUILD="V103.87";</script><script id="cc-cache-version">(function(){const B="10387";try{const u=new URL(location.href);if(u.searchParams.get("v")!==B){u.searchParams.set("v",B);history.replaceState(null,"",u.pathname+"?"+u.searchParams.toString()+u.hash)}}catch(e){}})();</script>
 <style id="cc-toast-style-v10231">
 #ccToastStack{position:fixed;right:20px;top:20px;z-index:99999;display:flex;flex-direction:column;gap:10px;max-width:min(390px,calc(100vw - 28px));pointer-events:none}
 .cc-toast{background:rgba(20,42,60,.96);color:#fff;border:1px solid rgba(255,255,255,.14);box-shadow:0 14px 38px rgba(0,0,0,.18);border-radius:14px;padding:12px 15px;font:600 13px/1.45 inherit;opacity:0;transform:translateY(-8px);transition:.2s ease;backdrop-filter:blur(12px)}
@@ -8821,6 +8821,13 @@ body.dark #ccxOverlay .ccx-topic{background:#1b3a51!important;color:#a9d8ee!impo
  #ccClassDemo .ccd-test-header-controls{justify-content:flex-start}
 }
 </style>
+<style id="cc-zoom-save-status-v10387">
+#ccClassDemo #ccdZoomSetupStatus{padding:12px 14px;border-radius:10px;line-height:1.55}
+#ccClassDemo #ccdZoomSetupStatus[data-state="success"]{color:#166044;background:#e5f5ed;border:1px solid #b0dcc3;font-weight:750}
+#ccClassDemo #ccdZoomSetupStatus[data-state="error"]{color:#a02c35;background:#fff0f0;border:1px solid #f5bfc4;font-weight:750}
+#ccClassDemo #ccdZoomSetupStatus[data-state="saving"]{color:#2f6e95;background:#ebf6ff;border:1px solid #c3deef}
+#ccClassDemo .ccd-zoom-form button:disabled{opacity:.55;cursor:wait}
+</style>
 <script id="cc-class-live-v10378">
 (function(){
 let rows=[],members=new Set(),filter='all',active=null,jitsiApi=null,jitsiRoom='',sdkPromise=null,loading=false;
@@ -9000,15 +9007,36 @@ async function showZoomSettings(){
 function hideZoomSettings(){$('ccdZoomSetup').hidden=true}
 async function saveZoomSettings(){
  if(!active||active.owner_id!==auth()?.id)return;
- const meeting_number=$('ccdZoomNumber').value.trim(),passcode=$('ccdZoomPasscode').value.trim();
- const n=meeting_number.replace(/[\s-]/g,'');
- if(!/^\d{9,11}$/.test(n)){alert('Zoom toplantı numarası 9 ila 11 rakamdan oluşmalı.');return}
+ const n=$('ccdZoomNumber').value.trim().replace(/[\s-]/g,'');
+ const passcode=$('ccdZoomPasscode').value.trim();
+ const status=$('ccdZoomSetupStatus');
+ if(!/^\d{9,11}$/.test(n)){
+  status.dataset.state='error';
+  status.textContent='Lütfen 9–11 rakamdan oluşan geçerli bir Zoom toplantı kimliği girin.';
+  return
+ }
+ const button=document.querySelector('#ccdZoomSetup .ccd-zoom-form button');
+ if(button)button.disabled=true;
+ status.dataset.state='saving';
+ status.textContent='Toplantı bilgileri kaydediliyor ve sunucudan doğrulanıyor…';
  try{
-  const r=await zoomApi('configure',{meeting_number:n,passcode});
-  $('ccdZoomSetupStatus').textContent=r.credentials_ready?'Zoom toplantısı kaydedildi. Gömülü görüşme bağlantısını açabilirsiniz.':'Toplantı kaydedildi. Görüntüyü açmak için Supabase Zoom Meeting SDK Client ID ve Secret bilgileri eklenmeli.';
+  await zoomApi('configure',{meeting_number:n,passcode});
+  // Do not report success before a verified server-side read.
+  const result=await zoomApi('status');
+  if(!result.configured||String(result.meeting_number)!==n){
+   throw Error('Sunucudan kayıt doğrulaması alınamadı. Lütfen tekrar deneyin.');
+  }
+  status.dataset.state='success';
+  status.textContent=result.credentials_ready
+   ? '✓ Zoom toplantı kimliği ve parolası kaydedildi. Gömülü görüşmeye bağlanabilirsiniz.'
+   : '✓ Zoom toplantı bilgileri kaydedildi. Görüntülü bağlantı için Zoom Meeting SDK anahtarları henüz tanımlanmamış.';
+  $('ccdZoomNumber').value=result.meeting_number;
   $('ccdZoomPasscode').value='';
   if(isLive(active))await connectLive();
- }catch(e){alert('Zoom toplantısı kaydedilemedi: '+(e.message||e))}
+ }catch(e){
+  status.dataset.state='error';
+  status.textContent='Zoom toplantısı kaydedilemedi: '+(e.message||'İşlem tamamlanamadı. Lütfen tekrar deneyin.');
+ }finally{if(button)button.disabled=false}
 }
 async function connectLive(){
  if(!active||!isLive(active))return;
