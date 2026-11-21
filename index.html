@@ -4247,6 +4247,7 @@ function list(){let e=document.getElementById('cnList');if(!e)return;let t=docum
 function context(){let e=document.getElementById('cnContext'),c=card();if(!e||!c)return;let x=get(),ch=String(+c.chapter),s=section(c.chapter),parts=[],si=s?SECS.indexOf(s)+1:0,sn=si?x.section[String(si)]:'',cn=x.chapter[ch];if(sn)parts.push('<div class="cn-block"><h4>BÖLÜM '+s[0]+' · '+esc(s[3])+'</h4><div class="cn-body">'+sn+'</div></div>');if(cn)parts.push('<div class="cn-block"><h4>FASIL '+String(+c.chapter).padStart(2,'0')+' · '+esc(c.chapterName||'')+'</h4><div class="cn-body">'+cn+'</div></div>');e.innerHTML=parts.length?parts.join(''):'<div class="cn-empty">Bu fasıl veya bölüm için henüz kişisel not eklenmemiş.</div>'}
 
 function openReference(){
+ if(!SECS.length&&window.GTA_ATLAS?.getSections)SECS=window.GTA_ATLAS.getSections();
  let old=document.getElementById('cnReferenceOverlay');if(old)old.remove();
  const overlay=document.createElement('div');overlay.id='cnReferenceOverlay';overlay.className='cn-reference-overlay';
  overlay.innerHTML='<div class="cn-ref-dialog" role="dialog" aria-modal="true" aria-label="Bölüm ve fasıl izahnamesi"><header class="cn-ref-header"><div><span class="cn-ref-kicker">TARİFE ATLASI · BÖLÜM / FASIL REHBERİ</span><h2>İzahname</h2><p>21 bölüm ve fasıllara ait açıklama notlarını inceleyin.</p></div><button class="cn-ref-close" type="button" aria-label="İzahnameyi kapat">✕</button></header><div class="cn-ref-tools"><input id="cnRefSearch" type="search" placeholder="Bölüm, fasıl veya not ara…" aria-label="İzahnamede ara"><span id="cnRefTotal"></span></div><div class="cn-ref-results" id="cnRefResults"></div></div>';
@@ -4261,7 +4262,7 @@ function openReference(){
 function drawReference(){
  let target=document.getElementById('cnRefResults');if(!target)return;
  let q=String(document.getElementById('cnRefSearch').value||'').toLocaleLowerCase('tr-TR').trim(),notes=get(),html='',total=0;
- let chapters=typeof CHAPTERS!=='undefined'?CHAPTERS:[];
+ let chapters=(typeof CHAPTERS!=='undefined'&&CHAPTERS.length)?CHAPTERS:(window.GTA_ATLAS?.getChapters?.()||[]);
  function clean(v){let d=document.createElement('div');d.innerHTML=String(v||'');return(d.textContent||'').toLocaleLowerCase('tr-TR')}
  let openFirst=!!q;
  SECS.forEach((sec,i)=>{
@@ -10147,7 +10148,7 @@ body.ccw-live-open{overflow:hidden!important}
  #ccxHubPanel .ccw-cover:not(.ccw-cover-empty){width:100%!important;height:160px!important}
  #ccxOverlay .cchub-detail-cover-webinar{height:220px!important}
 }
-</style><script src="membership-access.js?v=20261121-4"></script><script src="tarife-atlasi.js?v=20261121-3"></script><style id="cc-fcm-unified-v1">
+</style><script src="membership-access.js?v=20261121-4"></script><script src="tarife-atlasi.js?v=20261121-izahname"></script><style id="cc-fcm-unified-v1">
 /* Customs Community · Fazıl Çalışma Merkezi birleşik masaüstü/mobil düzen · 20.11.2026 */
 #view-home .cc-fcm{padding:20px 22px 17px!important;box-sizing:border-box;min-width:0;overflow:hidden}
 #view-home .cc-fcm *{box-sizing:border-box}
