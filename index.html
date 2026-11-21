@@ -5049,7 +5049,20 @@ const $id=id=>document.getElementById(id);
 function msg(t,bad=false){let e=$id('ccAuthMsg');if(e){e.textContent=t||'';e.className='cc-auth-msg '+(bad?'bad':'ok')}}
 function adminMsg(t,bad=false){let e=$id('ccUserAdminMsg');if(e){e.textContent=t||'';e.style.color=bad?'#b42318':'#087443'}}
 async function api(body,token){let h={'Content-Type':'application/json','apikey':PUBLISHABLE_KEY};if(token)h.Authorization='Bearer '+token;let r=await fetch(FN,{method:'POST',headers:h,body:JSON.stringify(body)});let j=await r.json().catch(()=>({error:'Sunucu yanıtı okunamadı.'}));if(!r.ok){let er=new Error(j.error||'İşlem başarısız.');er.data=j;throw er}return j}
-async function client(){if(sb)return sb;let mod=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');sb=mod.createClient(PROJECT_URL,PUBLISHABLE_KEY,{auth:{persistSession:false,autoRefreshToken:true,detectSessionInUrl:false}});return sb}
+async function client(){
+ if(sb)return sb;
+ let mod=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+ sb=mod.createClient(PROJECT_URL,PUBLISHABLE_KEY,{auth:{persistSession:false,autoRefreshToken:true,detectSessionInUrl:false}});
+ // Always retain refreshed tokens in the site's shared session and session restore record.
+ sb.auth.onAuthStateChange((_event,current)=>{
+  if(!session?.user?.id||!current?.user?.id||current.user.id!==session.user.id)return;
+  session.access_token=current.access_token;
+  session.refresh_token=current.refresh_token;
+  session.expires_at=current.expires_at;
+  try{sessionStorage.setItem(SESSION_KEY,JSON.stringify({access_token:session.access_token,refresh_token:session.refresh_token,expires_at:session.expires_at,profile}))}catch(_){}
+ });
+ return sb
+}
 function deviceId(){
   if(location.protocol==='file:'){
     let ua=String(navigator.userAgent||'').replace(/(Chrome|Chromium|Edg|Firefox|OPR)\/[\d.]+/g,'$1').replace(/Version\/[\d.]+/g,'Version');
@@ -5066,7 +5079,7 @@ async function loadCloudState(){let c=await client();let r=await c.from('user_st
 async function pushCloudState(){if(!session||typeof state==='undefined')return;try{let c=await client();let r=await c.from('user_state').upsert({user_id:session.user.id,state:cleanCloudState(state),updated_at:new Date().toISOString()});if(r.error)throw r.error}catch(e){console.warn('Bulut kayıt ertelendi',e)}}
 function scheduleSync(){clearTimeout(syncTimer);syncTimer=setTimeout(pushCloudState,450)}
 function setRoleUI(){let admin=profile&&profile.role==='admin';document.querySelectorAll('[data-view="adminhub"]').forEach(e=>e.classList.toggle('cc-admin-only-hidden',!admin));let card=$id('ccUserAdminCard');if(card)card.classList.toggle('cc-admin-only-hidden',!admin)}
-async function activate(s,p){session={...s,user:{id:(p&&p.user_id)||s.user_id||s.user?.id}};profile=p||profile||{};let c=await client();await c.auth.setSession({access_token:s.access_token,refresh_token:s.refresh_token});let u=await c.auth.getUser();if(u.error||!u.data.user)throw new Error('Oturum doğrulanamadı.');session.user=u.data.user;try{let pl=await c.from('profiles').select('membership_plan,role').eq('user_id',session.user.id).maybeSingle();if(pl.data){profile.membership_plan=pl.data.membership_plan||'free';profile.role=pl.data.role||profile.role}}catch(e){console.warn('Üyelik paketi okunamadı',e)}ccPrepareProgressAccount(session.user.id);sessionStorage.setItem(SESSION_KEY,JSON.stringify({access_token:s.access_token,refresh_token:s.refresh_token,profile}));msg('Ortak içerik Supabase’den yükleniyor…');await window.CC_SHARED_LOADER.load(c);await loadCloudState();document.documentElement.classList.remove('cc-auth-pending');document.documentElement.classList.add('cc-auth-ok');if($id('ccUserName'))$id('ccUserName').textContent=(profile.display_name||profile.username||'Kullanıcı')+(profile.role==='admin'?' · Yönetici':'');setRoleUI();startStatusMonitor();try{window.dispatchEvent(new CustomEvent('cc-authenticated',{detail:{profile,session}}))}catch(e){}try{nav('home');Promise.resolve(window.CCCommunity?.open?.()).catch(e=>console.error('Topluluk açılışı:',e))}catch(e){console.error('Topluluk yönlendirmesi:',e)}}
+async function activate(s,p){session={...s,user:{id:(p&&p.user_id)||s.user_id||s.user?.id}};profile=p||profile||{};let c=await client();let authResult=await c.auth.setSession({access_token:s.access_token,refresh_token:s.refresh_token});if(authResult.error||!authResult.data?.session)throw new Error('Oturum açılamadı. Lütfen yeniden giriş yapın.');session.access_token=authResult.data.session.access_token;session.refresh_token=authResult.data.session.refresh_token;session.expires_at=authResult.data.session.expires_at;let u=await c.auth.getUser();if(u.error||!u.data.user)throw new Error('Oturum doğrulanamadı.');session.user=u.data.user;try{let pl=await c.from('profiles').select('membership_plan,role').eq('user_id',session.user.id).maybeSingle();if(pl.data){profile.membership_plan=pl.data.membership_plan||'free';profile.role=pl.data.role||profile.role}}catch(e){console.warn('Üyelik paketi okunamadı',e)}ccPrepareProgressAccount(session.user.id);sessionStorage.setItem(SESSION_KEY,JSON.stringify({access_token:session.access_token,refresh_token:session.refresh_token,expires_at:session.expires_at,profile}));msg('Ortak içerik Supabase’den yükleniyor…');await window.CC_SHARED_LOADER.load(c);await loadCloudState();document.documentElement.classList.remove('cc-auth-pending');document.documentElement.classList.add('cc-auth-ok');if($id('ccUserName'))$id('ccUserName').textContent=(profile.display_name||profile.username||'Kullanıcı')+(profile.role==='admin'?' · Yönetici':'');setRoleUI();startStatusMonitor();try{window.dispatchEvent(new CustomEvent('cc-authenticated',{detail:{profile,session}}))}catch(e){}try{nav('home');Promise.resolve(window.CCCommunity?.open?.()).catch(e=>console.error('Topluluk açılışı:',e))}catch(e){console.error('Topluluk yönlendirmesi:',e)}}
 async function login(ev){ev&&ev.preventDefault();let u=$id('ccLoginUser').value.trim(),p=$id('ccLoginPass').value;msg('Giriş kontrol ediliyor…');try{let r=await api({action:'login',username:u,password:p,device_id:deviceId(),user_agent:navigator.userAgent||''});await activate(r.session,r.profile);msg('')}catch(e){msg(e.message,true)}}
 async function bootstrapAdmin(){let code=$id('ccSetupCode').value.trim(),u=$id('ccSetupUser').value.trim(),p=$id('ccSetupPass').value;msg('Yönetici hesabı oluşturuluyor…');try{let r=await api({action:'bootstrap_admin',bootstrap_code:code,username:u,password:p,display_name:u});msg(r.message||'Yönetici hesabı oluşturuldu. Şimdi giriş yap.');$id('ccLoginUser').value=u;$id('ccLoginPass').focus()}catch(e){msg(e.message,true)}}
 let ccCreatingUser=false;
@@ -5085,7 +5098,7 @@ window.CC_AUTH={login,logout,bootstrapAdmin,createUser,listUsers,setUserActive,d
 document.documentElement.classList.add('cc-auth-pending');
 document.addEventListener('DOMContentLoaded',()=>{let f=$id('ccLoginForm');if(f)f.addEventListener('submit',login);setTimeout(()=>{guardNav();hookSave();restore()},0)});
 })();
-</script><script>window.CC_BUILD="V103.79";</script><script id="cc-cache-version">(function(){const B="10379";try{const u=new URL(location.href);if(u.searchParams.get("v")!==B){u.searchParams.set("v",B);history.replaceState(null,"",u.pathname+"?"+u.searchParams.toString()+u.hash)}}catch(e){}})();</script>
+</script><script>window.CC_BUILD="V103.80";</script><script id="cc-cache-version">(function(){const B="10380";try{const u=new URL(location.href);if(u.searchParams.get("v")!==B){u.searchParams.set("v",B);history.replaceState(null,"",u.pathname+"?"+u.searchParams.toString()+u.hash)}}catch(e){}})();</script>
 <style id="cc-toast-style-v10231">
 #ccToastStack{position:fixed;right:20px;top:20px;z-index:99999;display:flex;flex-direction:column;gap:10px;max-width:min(390px,calc(100vw - 28px));pointer-events:none}
 .cc-toast{background:rgba(20,42,60,.96);color:#fff;border:1px solid rgba(255,255,255,.14);box-shadow:0 14px 38px rgba(0,0,0,.18);border-radius:14px;padding:12px 15px;font:600 13px/1.45 inherit;opacity:0;transform:translateY(-8px);transition:.2s ease;backdrop-filter:blur(12px)}
@@ -5101,7 +5114,7 @@ document.addEventListener('DOMContentLoaded',()=>{let f=$id('ccLoginForm');if(f)
    requestAnimationFrame(()=>el.classList.add('show'));setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),220)},ms)
  };
  window.alert=function(message){
-   let m=String(message||''),type=/başar|kayded|tamam|eklendi|güncellendi/i.test(m)?'ok':/hata|başarısız|bulunamadı|geçersiz|silinemedi|kaydedilemedi/i.test(m)?'err':'info';
+   let m=String(message||''),type=/hata|başarısız|katılamadınız|ayrılamadınız|bulunamadı|geçersiz|silinemedi|kaydedilemedi|doğrulanamadı|yetki|izin verilmedi/i.test(m)?'err':/başarıyla|başarılı|kaydedildi|tamamlandı|eklendi|güncellendi|ayrıldınız/i.test(m)?'ok':'info';
    window.ccToast(m,type);
  };
  window.CC_NATIVE_ALERT=nativeAlert;
@@ -6313,10 +6326,26 @@ window.CCCommunity=(()=>{
   return !!sb
  }
  async function profileApi(action,payload={}){
-  if(!await ensure())throw new Error('Oturum hazır değil.');
-  let r=await fetch(PROJECT_URL+'/functions/v1/cc-profile',{method:'POST',headers:{'Content-Type':'application/json','apikey':KEY,'Authorization':'Bearer '+session.access_token},body:JSON.stringify({action,...payload})});
+  if(!await ensure())throw new Error('Giriş yapmanız gerekiyor.');
+  // The Supabase client may have silently refreshed its token since CC_AUTH activated.
+  // The edge function must receive the *current* access token, not the login-time token.
+  const fresh=await sb.auth.getSession();
+  if(fresh.error||!fresh.data?.session?.access_token)throw new Error('Oturumunuz sona ermiş. Lütfen yeniden giriş yapın.');
+  session.access_token=fresh.data.session.access_token;
+  session.refresh_token=fresh.data.session.refresh_token;
+  const request=token=>fetch(PROJECT_URL+'/functions/v1/cc-profile',{method:'POST',headers:{'Content-Type':'application/json','apikey':KEY,'Authorization':'Bearer '+token},body:JSON.stringify({action,...payload})});
+  let r=await request(session.access_token);
+  if(r.status===401){
+   // Retry once using a renewed access token; never expose internal auth errors to users.
+   const renewed=await sb.auth.refreshSession();
+   if(renewed.error||!renewed.data?.session?.access_token)throw new Error('Oturumunuz doğrulanamadı. Lütfen çıkış yapıp yeniden giriş yapın.');
+   session.access_token=renewed.data.session.access_token;
+   session.refresh_token=renewed.data.session.refresh_token;
+   r=await request(session.access_token)
+  }
   let j=await r.json().catch(()=>({error:'Sunucu yanıtı okunamadı.'}));
-  if(!r.ok||j.ok===false)throw new Error(j.error||'İşlem tamamlanamadı.');
+  if(r.status===401)throw new Error('Oturumunuz doğrulanamadı. Lütfen çıkış yapıp yeniden giriş yapın.');
+  if(!r.ok||j.ok===false)throw new Error(j.error||'Profil işlemi tamamlanamadı. Lütfen tekrar deneyin.');
   return j
  }
  async function sign(path){
@@ -8680,7 +8709,7 @@ function startRefresh(){if(refreshTimer)clearInterval(refreshTimer);refreshTimer
 function stopRefresh(){if(refreshTimer)clearInterval(refreshTimer);refreshTimer=null;if(quizTimer)clearInterval(quizTimer);quizTimer=null}
 function stopHeartbeat(){if(liveTimer)clearInterval(liveTimer);liveTimer=null}
 function startHeartbeat(){stopHeartbeat();liveTimer=setInterval(async()=>{try{await liveWrite({live_heartbeat_at:new Date().toISOString()})}catch(e){console.warn('Canlı yayın kalp atışı başarısız',e)}},30000)}
-const client=async()=>{if(!window.CC_AUTH?.getClient)throw Error('Giriş altyapısı hazır değil');const db=await window.CC_AUTH.getClient();const session=window.CC_AUTH.getSession?.();if(session?.access_token){const current=await db.auth.getSession();if(current.data?.session?.access_token!==session.access_token){const r=await db.auth.setSession({access_token:session.access_token,refresh_token:session.refresh_token});if(r.error)throw r.error}}return db};
+const client=async()=>{if(!window.CC_AUTH?.getClient)throw Error('Giriş altyapısı hazır değil');const db=await window.CC_AUTH.getClient();const session=window.CC_AUTH.getSession?.();const current=await db.auth.getSession();if(!current.data?.session?.access_token&&session?.access_token){const r=await db.auth.setSession({access_token:session.access_token,refresh_token:session.refresh_token});if(r.error)throw r.error}return db};
 function notice(msg){$('ccdLiveStatus').textContent=msg||''}
 function stop(){try{jitsiApi?.dispose()}catch(e){}jitsiApi=null;jitsiRoom='';$('ccdJitsiMount')?.replaceChildren()}
 function sdk(){if(window.JitsiMeetExternalAPI)return Promise.resolve();if(sdkPromise)return sdkPromise;sdkPromise=new Promise((ok,no)=>{const el=document.createElement('script');el.src='https://meet.jit.si/external_api.js';el.onload=()=>window.JitsiMeetExternalAPI?ok():no(Error('Jitsi kullanılamıyor'));el.onerror=()=>no(Error('Jitsi yüklenemedi'));document.head.appendChild(el)}).catch(e=>{sdkPromise=null;throw e});return sdkPromise}
@@ -8729,8 +8758,22 @@ async function save(){
  }catch(e){alert('Kaydedilemedi: '+(e.message||e))}
 }
 async function join(id){
- const user=auth();if(!user){alert('Katılmak için giriş yapmalısın.');return}
- try{const db=await client();const q=members.has(id)?db.from('cc_live_class_members').delete().eq('class_id',id).eq('user_id',user.id):db.from('cc_live_class_members').insert({class_id:id,user_id:user.id});const r=await q;if(r.error)throw r.error;await load()}catch(e){alert('İşlem başarısız: '+(e.message||e))}
+ const user=auth();if(!user){alert('Sınıfa katılmak için hesabınıza giriş yapmalısınız.');return}
+ const leaving=members.has(id);
+ try{
+  const db=await client();
+  const q=leaving?db.from('cc_live_class_members').delete().eq('class_id',id).eq('user_id',user.id):db.from('cc_live_class_members').insert({class_id:id,user_id:user.id});
+  const r=await q;if(r.error)throw r.error;
+  await load();alert(leaving?'Sınıftan ayrıldınız.':'Sınıfa başarıyla katıldınız.')
+ }catch(e){
+  const reason=String(e?.message||e||'');
+  let detail='Lütfen sayfayı yenileyip tekrar deneyin.';
+  if(/row.level security|permission denied|42501/i.test(reason))detail='Hesabınızın sınıfa katılım izni doğrulanamadı. Sayfayı yenileyip tekrar deneyin.';
+  else if(/jwt|token|oturum|session|unauthorized|expired/i.test(reason))detail='Oturumunuzun süresi dolmuş olabilir. Çıkış yapıp yeniden giriş yapın.';
+  else if(/duplicate key|23505/i.test(reason))detail='Bu sınıfa zaten katılmışsınız. Listeyi yenileyin.';
+  else if(/network|fetch|bağlantı/i.test(reason))detail='İnternet bağlantınızı kontrol edip yeniden deneyin.';
+  alert((leaving?'Sınıftan ayrılamadınız: ':'Sınıfa katılamadınız: ')+detail)
+ }
 }
 async function remove(id){
  const user=auth(),row=rows.find(x=>x.id===id);if(!user||row?.owner_id!==user.id||!confirm('Bu sınıf ve katılımcı kayıtları silinsin mi?'))return;
