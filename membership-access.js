@@ -52,12 +52,24 @@ async function refresh(){
  })();
  return planLoading;
 }
+
+function installStyles(){
+ if($('ccMembershipAccessStyle'))return;
+ const st=document.createElement('style');st.id='ccMembershipAccessStyle';
+ st.textContent="\n#view-home .cc-membership-shortline{display:flex;flex-wrap:wrap;gap:7px;margin-top:13px;align-items:center}\n#view-home .cc-membership-shortline span{display:inline-flex;align-items:center;border:1px solid rgba(211,239,247,.28);background:rgba(255,255,255,.12);color:#e8f6fb;border-radius:20px;padding:6px 11px;font-size:11px;font-weight:750}\n#ccPackageAdmin{margin-top:18px;border:1px solid #d6e5ec;border-radius:15px;background:#fff;padding:18px;box-shadow:0 5px 17px #203b5510}\n#ccPackageAdmin .cc-package-admin-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px;flex-wrap:wrap}\n#ccPackageAdmin h3{font-size:17px;font-weight:850;color:#1b455d;margin:0 0 3px}\n#ccPackageAdmin p{font-size:12px;color:#6c8192;line-height:1.6;margin:0}\n#ccPackageAdmin button{border:1px solid #b8d2dd;background:#eff8fb;color:#25627a;border-radius:9px;padding:9px 12px;font-weight:750}\n#ccPackageAdminStatus{font-size:12px;color:#4d7083;line-height:1.5;margin:6px 0 11px}\n#ccPackageAdminRows{display:grid;gap:9px}\n#ccPackageAdmin .cc-package-admin-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(185px,270px);gap:14px;align-items:center;border:1px solid #e0ebf1;border-radius:11px;background:#f8fbfd;padding:12px 14px;min-width:0}\n#ccPackageAdmin .cc-package-user{display:flex;flex-direction:column;gap:4px;min-width:0}\n#ccPackageAdmin .cc-package-user strong{font-size:13px;color:#1d4358;overflow-wrap:anywhere}\n#ccPackageAdmin .cc-package-user small{font-size:11px;color:#718494}\n#ccPackageAdmin label{display:flex;flex-direction:column;gap:6px;min-width:0}\n#ccPackageAdmin label>span{font-size:10.5px;color:#6a8291;font-weight:800}\n#ccPackageAdmin select{width:100%;border:1px solid #bfd5df;border-radius:9px;background:#fff;color:#1d4b63;padding:10px;font-size:12px;font-weight:720;min-width:0}\n#ccPackageAdmin select:disabled{opacity:.55}\n#ccBookMembershipNotice{position:fixed;left:18px;bottom:12px;right:18px;z-index:2147482100;display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;pointer-events:none;text-align:center}\n#ccBookMembershipNotice[hidden]{display:none!important}\n#ccBookMembershipNotice span{padding:6px 10px;border-radius:16px;background:#153b57e8;color:#fff;font-size:11px;font-weight:750}\n#ccBookMembershipNotice .cc-book-locked{background:#4b647be8}\n#ccxCardLibraryPanel .cc-library-quota{font-size:11px;font-weight:770;color:#2e7386;margin-left:auto;white-space:nowrap}\nbody.dark #ccPackageAdmin{background:#142b3e;border-color:#34546a}\nbody.dark #ccPackageAdmin .cc-package-admin-row{background:#1a3549;border-color:#38566b}\nbody.dark #ccPackageAdmin h3,body.dark #ccPackageAdmin .cc-package-user strong{color:#e4f4fc}\nbody.dark #ccPackageAdmin select{background:#162e42;color:#e6f4fa;border-color:#385d70}\n@media(max-width:650px){#ccPackageAdmin{padding:13px}#ccPackageAdmin .cc-package-admin-row{grid-template-columns:1fr;gap:9px}#ccBookMembershipNotice{bottom:7px;left:8px;right:8px}#ccBookMembershipNotice span{font-size:9px}}\n";
+ document.head.appendChild(st);
+}
+
 function updateIndicators(){
  const badge=$('ccCurrentMembershipBadge');
  if(badge)badge.textContent='Aktif paket: '+PACKAGES[currentPlan()].name;
  const quota=$('ccCardQuotaText');
  if(quota)quota.textContent=currentPlan()==='free'?'Ücretsiz kart hakkı: '+Math.min(cardCount,10)+' / 10': 'Kart oluşturma: sınırsız';
  document.body.dataset.ccPlan=currentPlan();
+ let b=$('ccCardLibraryQuota');
+ const header=document.querySelector('#ccxCardLibraryPanel .cckl-head');
+ if(header&&!b){b=document.createElement('span');b.id='ccCardLibraryQuota';b.className='cc-library-quota';header.appendChild(b)}
+ if(b)b.textContent=currentPlan()==='free'?Math.min(cardCount,10)+'/10 kart oluşturuldu':PACKAGES[currentPlan()].name+' · sınırsız kart';
 }
 function createMemberSummary(){
  if($('ccCurrentMembershipBadge'))return;
@@ -92,7 +104,7 @@ async function loadAdmin(){
   const {data,error}=await db.rpc('cc_admin_memberships');
   if(error)throw error;
   rows.innerHTML=(data||[]).map(x=>{
-   const options=Object.entries(PACKAGES).map(([k,val])=>'<option value="'+k+'" '+(x.membership_plan===k?'selected':'')+'>'+esc(val.name)+' · '+val.price+' TL/ay</option>').join('');
+   const options=Object.entries(PACKAGES).map(([k,val])=>'<option value="'+k+'" '+((x.role==='admin'?'full':x.membership_plan)===k?'selected':'')+'>'+esc(val.name)+' · '+val.price+' TL/ay</option>').join('');
    return '<div class="cc-package-admin-row"><div class="cc-package-user"><strong>'+esc(x.display_name||x.username)+'</strong><small>@'+esc(x.username)+(x.role==='admin'?' · Yönetici':'')+'</small></div><label><span>Üyelik paketi</span><select data-cc-member="'+esc(x.user_id)+'" '+(x.role==='admin'?'disabled title="Yönetici tüm özelliklere erişir"':'')+'>'+options+'</select></label></div>';
   }).join('')||'<p>Henüz kullanıcı bulunamadı.</p>';
   status.textContent='Paket değişiklikleri kaydedildiğinde anında geçerli olur.';
@@ -174,7 +186,7 @@ function installObserver(){
  }
 }
 function init(){
- createMemberSummary();guardClassOpen();protectEducationNavigation();installClickGuards();installBookNotice();installObserver();setTimeout(protectEducationNavigation,200);
+ installStyles();createMemberSummary();guardClassOpen();protectEducationNavigation();installClickGuards();installBookNotice();installObserver();setTimeout(protectEducationNavigation,200);
  window.addEventListener('cc-authenticated',()=>{createMemberSummary();protectEducationNavigation();refresh()});
  window.addEventListener('cc-plan-updated',()=>{updateBookNotice();try{window.GTA_ATLAS?.render?.()}catch(_){}});
  window.addEventListener('focus',()=>{if(logged())refresh()});
