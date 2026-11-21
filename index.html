@@ -5098,7 +5098,7 @@ window.CC_AUTH={login,logout,bootstrapAdmin,createUser,listUsers,setUserActive,d
 document.documentElement.classList.add('cc-auth-pending');
 document.addEventListener('DOMContentLoaded',()=>{let f=$id('ccLoginForm');if(f)f.addEventListener('submit',login);setTimeout(()=>{guardNav();hookSave();restore()},0)});
 })();
-</script><script>window.CC_BUILD="V103.82";</script><script id="cc-cache-version">(function(){const B="10382";try{const u=new URL(location.href);if(u.searchParams.get("v")!==B){u.searchParams.set("v",B);history.replaceState(null,"",u.pathname+"?"+u.searchParams.toString()+u.hash)}}catch(e){}})();</script>
+</script><script>window.CC_BUILD="V103.83";</script><script id="cc-cache-version">(function(){const B="10383";try{const u=new URL(location.href);if(u.searchParams.get("v")!==B){u.searchParams.set("v",B);history.replaceState(null,"",u.pathname+"?"+u.searchParams.toString()+u.hash)}}catch(e){}})();</script>
 <style id="cc-toast-style-v10231">
 #ccToastStack{position:fixed;right:20px;top:20px;z-index:99999;display:flex;flex-direction:column;gap:10px;max-width:min(390px,calc(100vw - 28px));pointer-events:none}
 .cc-toast{background:rgba(20,42,60,.96);color:#fff;border:1px solid rgba(255,255,255,.14);box-shadow:0 14px 38px rgba(0,0,0,.18);border-radius:14px;padding:12px 15px;font:600 13px/1.45 inherit;opacity:0;transform:translateY(-8px);transition:.2s ease;backdrop-filter:blur(12px)}
@@ -8904,6 +8904,7 @@ async function sendQuiz(){
   const res=await db.from('cc_class_quizzes').insert({class_id:active.id,owner_id:auth().id,chapter,questions}).select('*').single();
   if(res.error)throw res.error;
   quizState=res.data;quizAnswers=[];quizResults=[];quizIndex=0;quizWasActiveThisRoom=true;resultsExpanded=true;
+  renderQuiz(); // Close the quiz setup form before refreshing so the teacher sees the new test.
   await refreshQuiz();
   alert('5 şıklı, '+questions.length+' soruluk test katılımcılara gönderildi. Canlı yayın devam ediyor.')
  }catch(e){alert('Test gönderilemedi: '+(e.message||e))}
