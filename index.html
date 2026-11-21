@@ -4368,15 +4368,19 @@ function localChallenge(id){
 }
 function allChapters(){return [...new Set(C0().map(c=>String(c.code).padStart(4,'0').slice(0,2)))].sort()}
 function getChapters(id=activeTheme){
- let x=L(id);
- if(Array.isArray(x.chapters))return x.chapters.slice();
- return allChapters()
+ const accessible=new Set(allChapters()),data=L(id);
+ if(Array.isArray(data.chapters)){
+  const selected=[...new Set(data.chapters.map(String))].filter(v=>accessible.has(v));
+  if(selected.length)return selected;
+ }
+ return [...accessible];
 }
 function setChapters(a){
- a=[...new Set((a||[]).map(String))].sort();
+ const accessible=new Set(allChapters());
+ a=[...new Set((a||[]).map(String).filter(v=>accessible.has(v)))].sort();
  let x=L();x.chapters=a.slice();S(x);
  try{localStorage.setItem(CHKEY,JSON.stringify(a))}catch(e){}
- renderChapters()
+ renderChapters();
 }
 function isBlankCard(c){let vals=[c&&c.text,c&&c.description,c&&c.title,c&&c.name].filter(v=>v!=null).map(v=>String(v).trim());if(vals.some(v=>/^(BOŞ|BOS)$/i.test(v)))return true;let r=raw(c),code=String(c&&c.code||'').padStart(4,'0'),clean=r.replace(new RegExp('^\\s*'+code+'\\s*[-–—:,.]*\\s*'),'').replace(/^\s*\d{4}\s*[-–—:,.]*\s*/,'').trim();return /^(BOŞ|BOS)$/i.test(clean)}
 function C0(){return CARDS.filter(c=>/^\d{4}$/.test(String(c.code||''))&&raw(c)&&!isBlankCard(c))}
@@ -4878,7 +4882,7 @@ window.GTA_MP=(()=>{
  const safe=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
  const stripCode=t=>String(t||'').replace(/^\s*\d{4}\s*/,'').trim();
  const cardById=id=>CARDS.find(c=>String(c.id)===String(id));
- const activeCard=c=>c&&/^\d{4}$/.test(String(c.code||''))&&stripCode(c.text)&&(!window.state||!state.status||state.status[c.id]!=='ignore');
+ const activeCard=c=>c&&/^\d{4}$/.test(String(c.code||''))&&stripCode(c.text)&&(!window.state||!state.status||state.status[c.id]!=='ignore')&&(!window.CC_ACCESS||window.CC_ACCESS.chapterAllowed(c.chapter));
  function readJSON(key){try{return JSON.parse(localStorage.getItem(key)||'{}')||{}}catch(e){return{}}}
  function coreSettings(){let x=(window.GTA_CORE_CONTENT&&GTA_CORE_CONTENT.multiplayer)||{};return x&&typeof x==='object'?x:{}}
  function settings(){let core=coreSettings(),local=readJSON(SETTINGS_KEY),legacy=readJSON(LEGACY_SETTINGS_KEY);if(!local.url&&legacy.url)local={...legacy,updatedAt:Number(legacy.updatedAt||1)};let chosen=Number(local.updatedAt||0)>Number(core.updatedAt||0)?local:core;return{url:String(chosen.url||'').replace(/\/$/,''),key:String(chosen.key||''),updatedAt:Number(chosen.updatedAt||0)}}
