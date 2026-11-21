@@ -4,7 +4,7 @@
 'use strict';
 const PACKAGES={
  free:{name:'Ücretsiz',price:0,limit:10,tariff:false,host:false},
- cards:{name:'Kart Üyeliği',price:100,limit:Infinity,tariff:false,host:false},
+ cards:{name:'Kart Plus',price:100,limit:Infinity,tariff:false,host:false},
  tariff:{name:'Tarife Modülü',price:200,limit:Infinity,tariff:true,host:false},
  full:{name:'Tam Erişim',price:300,limit:Infinity,tariff:true,host:true}
 };
