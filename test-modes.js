@@ -121,6 +121,9 @@ function wrapPositionControls(){
    const result=originalNext.apply(this,arguments);
    if(finished&&el('view-test')?.classList.contains('cc-test-running')){
     const area=el('testArea');
+    // Eski sonuç ekranının 'Aynı havuzdan yeni test oluştur' düğmesini kaldır.
+    const resultPanel=area?.querySelector('.quizresult')?.closest('.question');
+    if(resultPanel){for(const btn of resultPanel.querySelectorAll('button')){if(btn.textContent?.includes('Aynı havuzdan yeni test oluştur'))btn.remove()}}
     if(area&&!el('ccReturnToSelection')){
      const button=document.createElement('button');
      button.type='button';button.id='ccReturnToSelection';button.className='cc-position-return';
