@@ -53,9 +53,12 @@ function wrapStart(){
  originalStart=window.startTest;
  window.startTest=function(returnToReview=false){
   if(!el('ccProductChoice')?.querySelector('input[value="product"]')?.checked||returnToReview){
-   el('view-test')?.classList.remove('cc-product-question');
+   const host=el('view-test');
+   host?.classList.remove('cc-product-question');
+   // renderQuestion() çalışırken alttaki ortak düğmeler hazır olmalı.
+   if(!returnToReview)host?.classList.add('cc-test-running');
    const result=originalStart.apply(this,arguments);
-   if(!returnToReview&&typeof testState!=='undefined'&&testState.questions?.length)el('view-test')?.classList.add('cc-test-running');
+   if(returnToReview||typeof testState==='undefined'||!testState.questions?.length)host?.classList.remove('cc-test-running');
    return result;
   }
   const pool=getQuizPool(),productsPool=items(pool);
