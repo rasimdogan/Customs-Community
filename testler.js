@@ -93,7 +93,7 @@ async function openAdmin(){
 function adminShell(){
  const root=el('cctAdminRoot');if(!root)return null;
  root.innerHTML='<div class="hero"><div><button type="button" class="admin-page-back" id="cctAdminBack">← Yönetim Paneli</button><h2>Test Soruları Yönetimi</h2><p>İzahname ve Yönetici GTİP Soruları testleri için soru ekle, düzenle, yayımla veya kaldır.</p></div></div>'+
- '<div class="cct-admin-grid"><div class="cct-panel"><h3 id="cctFormTitle">Yeni Soru</h3><label>Etiket <select id="cctCategory"><option value="izahname">İzahname</option><option value="gtip">Yönetici GTİP Soruları</option></select></label><label>Soru <textarea id="cctQuestion" rows="4" maxlength="3000" placeholder="Soruyu yazın…" ></textarea></label><div class="cct-choice-fields">'+[0,1,2,3].map(i=>'<label>'+String.fromCharCode(65+i)+' şıkkı <input id="cctOption'+i+'" maxlength="1200" placeholder="'+String.fromCharCode(65+i)+' seçeneği"></label>').join('')+'</div><label>Doğru cevap <select id="cctCorrect">'+[0,1,2,3].map(i=>'<option value="'+i+'">'+String.fromCharCode(65+i)+' şıkkı</option>').join('')+'</select></label><label>Çözüm açıklaması (isteğe bağlı) <textarea id="cctExplanation" rows="3" placeholder="Doğru cevabın gerekçesi…"></textarea></label><label class="cct-checkbox"><input id="cctPublished" type="checkbox" checked> Yayımla (kullanıcılar çözebilsin)</label><div class="cct-admin-actions"><button type="button" id="cctSave">Soruyu Kaydet</button><button type="button" id="cctReset" class="cct-neutral">Yeni Soru</button></div><p id="cctMessage" aria-live="polite"></p></div><div class="cct-panel"><div class="cct-head"><h3>Kayıtlı Sorular</h3><select id="cctFilter"><option value="">Tüm etiketler</option><option value="izahname">İzahname</option><option value="gtip">Yönetici GTİP Soruları</option></select></div><div id="cctAdminList">Yükleniyor…</div></div></div>';
+ '<div class="cct-admin-grid"><div class="cct-panel"><h3 id="cctFormTitle">Yeni Soru</h3><p class="cct-note">A–D şıkları zorunlu, E şıkkı isteğe bağlıdır.</p><label>Etiket <select id="cctCategory"><option value="izahname">İzahname</option><option value="gtip">Yönetici GTİP Soruları</option></select></label><label>Soru <textarea id="cctQuestion" rows="4" maxlength="3000" placeholder="Soruyu yazın…" ></textarea></label><div class="cct-choice-fields">'+[0,1,2,3,4].map(i=>'<label>'+String.fromCharCode(65+i)+' şıkkı <input id="cctOption'+i+'" maxlength="1200" placeholder="'+String.fromCharCode(65+i)+' seçeneği"></label>').join('')+'</div><label>Doğru cevap <select id="cctCorrect">'+[0,1,2,3,4].map(i=>'<option value="'+i+'">'+String.fromCharCode(65+i)+' şıkkı</option>').join('')+'</select></label><label>Çözüm açıklaması (isteğe bağlı) <textarea id="cctExplanation" rows="3" placeholder="Doğru cevabın gerekçesi…"></textarea></label><label class="cct-checkbox"><input id="cctPublished" type="checkbox" checked> Yayımla (kullanıcılar çözebilsin)</label><div class="cct-admin-actions"><button type="button" id="cctSave">Soruyu Kaydet</button><button type="button" id="cctReset" class="cct-neutral">Yeni Soru</button></div><p id="cctMessage" aria-live="polite"></p></div><div class="cct-panel"><div class="cct-head"><h3>Kayıtlı Sorular</h3><select id="cctFilter"><option value="">Tüm etiketler</option><option value="izahname">İzahname</option><option value="gtip">Yönetici GTİP Soruları</option></select></div><div id="cctAdminList">Yükleniyor…</div></div></div>';
  el('cctAdminBack').onclick=()=>nav('adminhub');el('cctSave').onclick=saveAdmin;el('cctReset').onclick=resetAdmin;el('cctFilter').onchange=drawAdmin;
  return root;
 }
@@ -112,23 +112,23 @@ function drawAdmin(){
 function resetAdmin(){
  editing=null;el('cctFormTitle').textContent='Yeni Soru';
  el('cctQuestion').value='';el('cctCategory').value='izahname';
- for(let i=0;i<4;i++)el('cctOption'+i).value='';
+ for(let i=0;i<5;i++)el('cctOption'+i).value='';
  el('cctCorrect').value='0';el('cctExplanation').value='';el('cctPublished').checked=true;el('cctMessage').textContent='';
 }
 function editAdmin(id){
  const q=rows.find(x=>Number(x.id)===id);if(!q)return;
  editing=id;el('cctFormTitle').textContent='Soruyu Düzenle #'+id;
  el('cctCategory').value=q.category;el('cctQuestion').value=q.question;
- for(let i=0;i<4;i++)el('cctOption'+i).value=q.options[i]||'';
+ for(let i=0;i<5;i++)el('cctOption'+i).value=q.options[i]||'';
  el('cctCorrect').value=String(q.correct_index);
  el('cctExplanation').value=q.explanation||'';el('cctPublished').checked=!!q.is_published;el('cctMessage').textContent='';
  el('cctFormTitle').scrollIntoView({block:'center',behavior:'smooth'});
 }
 async function saveAdmin(){
  if(!admin())return;
- const question=el('cctQuestion').value.trim(),options=[0,1,2,3].map(i=>el('cctOption'+i).value.trim());
+ const question=el('cctQuestion').value.trim(),options=[0,1,2,3,4].map(i=>el('cctOption'+i).value.trim()).filter((x,i)=>i<4||x);
  const message=el('cctMessage');
- if(question.length<5||options.some(x=>!x)){message.textContent='Soru en az 5 karakter olmalı ve dört şık da doldurulmalı.';return}
+ if(question.length<5||options.some(x=>!x)||Number(el('cctCorrect').value)>=options.length){message.textContent='Soru en az 5 karakter olmalı; A–D şıkları doldurulmalı ve doğru seçenek mevcut olmalı. E şıkkı isteğe bağlıdır.';return}
  const data={category:el('cctCategory').value,question,options,correct_index:Number(el('cctCorrect').value),explanation:el('cctExplanation').value.trim(),is_published:el('cctPublished').checked,updated_at:new Date().toISOString()};
  if(editing)data.id=editing;
  const btn=el('cctSave');btn.disabled=true;message.textContent='Kaydediliyor…';
