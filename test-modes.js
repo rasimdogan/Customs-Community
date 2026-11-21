@@ -84,14 +84,19 @@ function showQuestion(){
 function choose(i){
  if(answered)return;answered=true;
  const q=round.questions[round.index],right=Number(q.correct_index),ok=i===right;if(ok)round.correct++;
- el('ccCustomTest').querySelectorAll('[data-choice]').forEach(b=>{const index=Number(b.dataset.choice);b.disabled=true;if(index===right)b.classList.add('correct');else if(index===i)b.classList.add('wrong')});
- el('ccCustomFeedback').innerHTML='<div class="cct-feedback"><strong>'+(ok?'✓ Doğru':'Yanlış — Doğru cevap '+String.fromCharCode(65+right))+'</strong>'+(q.explanation?'<p>'+esc(q.explanation)+'</p>':'')+'</div>';
+ el('ccCustomTest').querySelectorAll('[data-choice]').forEach(b=>{
+  const index=Number(b.dataset.choice);b.disabled=true;
+  if(index===right)b.classList.add('correct');
+  else if(index===i)b.classList.add('wrong');
+ });
+ el('ccCustomFeedback').innerHTML='<div class="cct-feedback '+(ok?'ok':'bad')+'"><strong>'+(ok?'✓ Doğru işaretlediniz.':'✕ Hatalı işaretlediniz. Doğru cevap: '+String.fromCharCode(65+right))+'</strong>'+(q.explanation?'<p>'+esc(q.explanation)+'</p>':'')+'</div>';
  el('ccCustomNext').disabled=false;
 }
 function finish(){
- const n=round.questions.length,correct=round.correct;
- el('ccCustomTest').innerHTML='<h3>Test Tamamlandı</h3><p>'+correct+' / '+n+' doğru · Başarı %'+Math.round(100*correct/n)+'</p><button type="button" id="ccCustomAgain">Yeni Test Oluştur</button>';
+ const n=round.questions.length,correct=round.correct,wrong=n-correct,pct=Math.round(correct/n*100);
+ el('ccCustomTest').innerHTML='<div class="cct-result"><h3>Test Tamamlandı</h3><div class="cct-stats"><div><span>Toplam</span><strong>'+n+'</strong></div><div><span>Doğru</span><strong class="cct-green">'+correct+'</strong></div><div><span>Yanlış</span><strong class="cct-red">'+wrong+'</strong></div><div><span>Başarı</span><strong>%'+pct+'</strong></div></div><div class="cct-success">Test tamamlandı · Başarı oranı: <strong>%'+pct+'</strong></div><div class="cct-actions"><button type="button" id="ccCustomAgain">Yeni Test Oluştur</button><button type="button" id="ccCustomExit" class="cct-secondary">Test Seçimine Dön</button></div></div>';
  el('ccCustomAgain').onclick=()=>{round=null;loadBank()};
+ el('ccCustomExit').onclick=()=>{round=null;loadBank()};
 }
 window.CC_TEST_MODES={setup,setMode,products,items};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup,{once:true});else setup();
