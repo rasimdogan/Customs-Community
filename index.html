@@ -5098,7 +5098,7 @@ window.CC_AUTH={login,logout,bootstrapAdmin,createUser,listUsers,setUserActive,d
 document.documentElement.classList.add('cc-auth-pending');
 document.addEventListener('DOMContentLoaded',()=>{let f=$id('ccLoginForm');if(f)f.addEventListener('submit',login);setTimeout(()=>{guardNav();hookSave();restore()},0)});
 })();
-</script><script>window.CC_BUILD="V103.83";</script><script id="cc-cache-version">(function(){const B="10383";try{const u=new URL(location.href);if(u.searchParams.get("v")!==B){u.searchParams.set("v",B);history.replaceState(null,"",u.pathname+"?"+u.searchParams.toString()+u.hash)}}catch(e){}})();</script>
+</script><script>window.CC_BUILD="V103.84";</script><script id="cc-cache-version">(function(){const B="10384";try{const u=new URL(location.href);if(u.searchParams.get("v")!==B){u.searchParams.set("v",B);history.replaceState(null,"",u.pathname+"?"+u.searchParams.toString()+u.hash)}}catch(e){}})();</script>
 <style id="cc-toast-style-v10231">
 #ccToastStack{position:fixed;right:20px;top:20px;z-index:99999;display:flex;flex-direction:column;gap:10px;max-width:min(390px,calc(100vw - 28px));pointer-events:none}
 .cc-toast{background:rgba(20,42,60,.96);color:#fff;border:1px solid rgba(255,255,255,.14);box-shadow:0 14px 38px rgba(0,0,0,.18);border-radius:14px;padding:12px 15px;font:600 13px/1.45 inherit;opacity:0;transform:translateY(-8px);transition:.2s ease;backdrop-filter:blur(12px)}
@@ -8773,8 +8773,63 @@ const repeatText=x=>x.repeat_type==='daily'?'Her gün':x.repeat_type==='weekly'?
 const nextDate=x=>{if(!x.starts_at)return null;const base=new Date(x.starts_at),now=new Date();if(x.repeat_type==='none'||!x.repeat_type)return base;let d=new Date(base);const days=Array.isArray(x.repeat_days)?x.repeat_days:[];for(let i=0;i<370&&d<now;i++){if(x.repeat_type==='daily')d.setDate(d.getDate()+1);else if(x.repeat_type==='monthly')d.setMonth(d.getMonth()+1);else{d.setDate(d.getDate()+1);while(days.length&&!days.includes(d.getDay()))d.setDate(d.getDate()+1)}}if(x.repeat_until&&d>new Date(x.repeat_until+'T23:59:59'))return null;return d};
 const isLive=x=>!!(x?.live_started_at&&x?.live_heartbeat_at&&(!x.live_ended_at||new Date(x.live_ended_at)<new Date(x.live_started_at))&&(Date.now()-new Date(x.live_heartbeat_at).getTime()<90000));
 let liveTimer=null,refreshTimer=null,quizTimer=null,quizState=null,quizAnswers=[],quizResults=[],quizIndex=0,quizBusy=false,quizWasActiveThisRoom=false,resultsExpanded=false;
-async function liveWrite(patch){if(!active||active.owner_id!==auth()?.id)return false;const db=await client();const q=await db.from('cc_live_classes').update(patch).eq('id',active.id).eq('owner_id',auth().id).select('*').single();if(q.error)throw q.error;active=q.data;rows=rows.map(x=>x.id===active.id?active:x);render();return true}
-async function refreshLive(){if(!document.getElementById('ccClassDemo')||document.getElementById('ccClassDemo').style.display==='none')return;try{const db=await client();const q=await db.from('cc_live_classes').select('*').order('created_at',{ascending:false}).limit(100);if(!q.error){rows=q.data||[];if(active){active=rows.find(x=>x.id===active.id)||active;const owner=active.owner_id===auth()?.id;if(!owner&&window.BOOK?.goToPage&&document.getElementById('ccdRoom').style.display==='block'){const book=document.getElementById('bkOverlay');if(active.book_open){if(!book?.classList.contains('open'))window.BOOK.open();if(window.BOOK.currentPage()!==active.book_page)window.BOOK.goToPage(active.book_page||0)}else if(book?.classList.contains('open'))window.BOOK.close()}if(!owner){document.getElementById('ccdJoinLive').hidden=!isLive(active);document.getElementById('ccdRoomState').textContent=isLive(active)?'🔴 CANLI · Ders devam ediyor.':'Eğitmen yayını başlattığında derse katılabilirsin.'}updateWaitingState()}render()}}catch(e){console.warn('Canlı durum yenilenemedi',e)}}
+function clearSessionQuiz(){
+ quizState=null;quizAnswers=[];quizResults=[];quizIndex=0;
+ quizWasActiveThisRoom=false;resultsExpanded=false;quizBusy=false;
+ const panel=$('ccdQuizPanel');
+ if(panel){panel.hidden=true;panel.replaceChildren()}
+ updateWaitingState();
+}
+async function liveWrite(patch){
+ if(!active||active.owner_id!==auth()?.id)return false;
+ const classId=active.id,ownerId=auth().id;
+ const db=await client();
+ const q=await db.from('cc_live_classes').update(patch).eq('id',classId).eq('owner_id',ownerId).select('*').single();
+ if(q.error)throw q.error;
+ if(patch.live_ended_at){
+  const closed=await db.from('cc_class_quizzes').update({status:'closed'}).eq('class_id',classId).eq('owner_id',ownerId).eq('status','active');
+  if(closed.error)console.warn('Yayın kapandı ancak aktif test kapatılamadı:',closed.error);
+ }
+ if(active?.id===classId){
+  active=q.data;
+  if(patch.live_ended_at)clearSessionQuiz()
+ }
+ rows=rows.map(x=>x.id===classId?q.data:x);
+ render();
+ return true
+}
+async function refreshLive(){
+ if(!document.getElementById('ccClassDemo')||document.getElementById('ccClassDemo').style.display==='none')return;
+ try{
+  const db=await client();
+  const q=await db.from('cc_live_classes').select('*').order('created_at',{ascending:false}).limit(100);
+  if(q.error)return;
+  rows=q.data||[];
+  if(active){
+   const wasLive=isLive(active),previousStart=active.live_started_at;
+   active=rows.find(x=>x.id===active.id)||active;
+   const owner=active.owner_id===auth()?.id,liveNow=isLive(active);
+   if(!liveNow||(previousStart&&active.live_started_at!==previousStart)){
+    clearSessionQuiz();
+    if(!liveNow){$('ccdJitsiPanel').hidden=true;stop()}
+   }
+   if(!owner&&window.BOOK?.goToPage&&$('ccdRoom').style.display==='block'){
+    const book=$('bkOverlay');
+    if(active.book_open){
+     if(!book?.classList.contains('open'))window.BOOK.open();
+     if(window.BOOK.currentPage()!==active.book_page)window.BOOK.goToPage(active.book_page||0)
+    }else if(book?.classList.contains('open'))window.BOOK.close()
+   }
+   $('ccdJoinLive').hidden=owner||!liveNow;
+   $('ccdStartLive').hidden=!owner||liveNow;
+   $('ccdStopLive').hidden=!owner||!liveNow;
+   $('ccdQuizOpen').hidden=!owner||!liveNow;
+   $('ccdRoomState').textContent=liveNow?'🔴 CANLI · Ders devam ediyor.':owner?'Hazır olduğunda canlı yayını başlat.':'Eğitmen yayını başlattığında derse katılabilirsin.';
+   updateWaitingState()
+  }
+  render()
+ }catch(e){console.warn('Canlı durum yenilenemedi',e)}
+}
 function startRefresh(){if(refreshTimer)clearInterval(refreshTimer);refreshTimer=setInterval(refreshLive,15000)}
 function stopRefresh(){if(refreshTimer)clearInterval(refreshTimer);refreshTimer=null;if(quizTimer)clearInterval(quizTimer);quizTimer=null}
 function stopHeartbeat(){if(liveTimer)clearInterval(liveTimer);liveTimer=null}
@@ -8853,11 +8908,11 @@ async function enter(id){
  const row=rows.find(x=>x.id===id),user=auth();if(!row)return;
  if(!user){alert('Canlı derse katılmak için giriş yapmalısın.');return}
  if(row.owner_id!==user.id&&!members.has(id)){alert('Önce sınıfa katılmalısın.');return}
- stop();active=row;quizState=null;quizAnswers=[];quizResults=[];quizIndex=0;quizBusy=false;quizWasActiveThisRoom=false;resultsExpanded=false;$('ccdBookOpen').hidden=row.owner_id!==user.id;$('ccdTeachingToolbar').hidden=row.owner_id!==user.id;$('ccdBookClose').hidden=true;quizAnswers=[];$('ccdQuizPanel').hidden=true;$('ccdQuizOpen').hidden=row.owner_id!==user.id;$('ccdRoomTitle').textContent=row.title;$('ccdDashboard').style.display='none';$('ccdRoom').style.display='block';
+ stop();active=row;quizState=null;quizAnswers=[];quizResults=[];quizIndex=0;quizBusy=false;quizWasActiveThisRoom=false;resultsExpanded=false;$('ccdBookOpen').hidden=row.owner_id!==user.id;$('ccdTeachingToolbar').hidden=row.owner_id!==user.id;$('ccdBookClose').hidden=true;quizAnswers=[];$('ccdQuizPanel').hidden=true;$('ccdQuizOpen').hidden=row.owner_id!==user.id||!isLive(row);$('ccdRoomTitle').textContent=row.title;$('ccdDashboard').style.display='none';$('ccdRoom').style.display='block';
  $('ccdJitsiPanel').hidden=true;$('ccdFakeVideo').style.display='none';
  const owner=row.owner_id===user.id;
- $('ccdStartLive').hidden=!owner;$('ccdStopLive').hidden=true;
- $('ccdRoomState').textContent=owner?'Hazır olduğunda canlı yayını başlat.':'Eğitmen yayını başlattığında derse katılabilirsin.';
+ $('ccdStartLive').hidden=!owner||isLive(row);$('ccdStopLive').hidden=!owner||!isLive(row);
+ $('ccdRoomState').textContent=isLive(row)?'🔴 CANLI · Ders devam ediyor.':owner?'Hazır olduğunda canlı yayını başlat.':'Eğitmen yayını başlattığında derse katılabilirsin.';if(owner&&isLive(row))connectLive();
  if(!owner&&row.book_open&&window.BOOK?.open){window.BOOK.open();window.BOOK.goToPage(row.book_page||0)}refreshQuiz();if(quizTimer)clearInterval(quizTimer);quizTimer=setInterval(refreshQuiz,5000);if(!owner){$('ccdStartLive').hidden=true;$('ccdJoinLive').hidden=!isLive(row);$('ccdRoomState').textContent=isLive(row)?'🔴 CANLI · Ders devam ediyor.':'Eğitmen yayını başlattığında derse katılabilirsin.'}else $('ccdJoinLive').hidden=true;updateWaitingState();
 }
 function connectLive(){
@@ -8869,21 +8924,41 @@ function connectLive(){
  mount.innerHTML='<div class="ccd-video-bridge"><div class="ccd-video-icon">🎥</div><div class="ccd-video-content"><h3>Canlı ders bağlantısı hazır</h3><p>Ücretsiz Jitsi görüşmesi ayrı bir sekmede açılır. Bu sayfada testler ve sınıf araçları açık kalır.</p><a class="btn primary ccd-meeting-link" href="'+esc(url)+'" rel="noopener noreferrer" target="_blank">↗ Görüntülü görüşmeye katıl</a><small>Jitsi sekmesi ayrı çalışır; buradaki “Yayını kapat” düğmesi yalnızca sınıftaki canlı durumunu kapatır.</small></div></div>';
  $('ccdJitsiError').textContent='';
 }
-async function startLive(){if(!active||active.owner_id!==auth()?.id)return;try{const now=new Date().toISOString();await liveWrite({live_started_at:now,live_heartbeat_at:now,live_ended_at:null});startHeartbeat();$('ccdStartLive').hidden=true;$('ccdStopLive').hidden=false;$('ccdRoomState').textContent='🔴 CANLI · Toplantı bağlantısı açılıyor.';connectLive()}catch(e){alert('Canlı yayın başlatılamadı: '+(e.message||e))}}
-async function stopLive(){stopHeartbeat();try{await liveWrite({live_ended_at:new Date().toISOString()})}catch(e){alert('Yayın durumu güncellenemedi: '+(e.message||e));return}stop();$('ccdJitsiPanel').hidden=true;$('ccdStartLive').hidden=false;$('ccdStopLive').hidden=true;$('ccdRoomState').textContent='Canlı yayın kapatıldı.'}
-
+async function startLive(){
+ if(!active||active.owner_id!==auth()?.id)return;
+ try{
+  const now=new Date().toISOString();
+  await liveWrite({live_started_at:now,live_heartbeat_at:now,live_ended_at:null});
+  clearSessionQuiz();
+  startHeartbeat();
+  $('ccdStartLive').hidden=true;$('ccdStopLive').hidden=false;$('ccdQuizOpen').hidden=false;
+  $('ccdRoomState').textContent='🔴 CANLI · Ders devam ediyor.';
+  connectLive();
+ }catch(e){alert('Canlı yayın başlatılamadı: '+(e.message||e))}
+}
+async function stopLive(){
+ if(!active||active.owner_id!==auth()?.id)return;
+ stopHeartbeat();
+ try{await liveWrite({live_ended_at:new Date().toISOString()})}
+ catch(e){alert('Yayın durumu güncellenemedi: '+(e.message||e));return}
+ clearSessionQuiz();stop();
+ $('ccdJitsiPanel').hidden=true;
+ $('ccdStartLive').hidden=false;$('ccdStopLive').hidden=true;$('ccdQuizOpen').hidden=true;
+ $('ccdRoomState').textContent='Canlı yayın kapatıldı. Bu yayına ait testler de kapatıldı.'
+}
 async function openBook(){if(!active||!window.BOOK?.open)return alert('Kitap Modu yüklenemedi.');if(active.owner_id!==auth()?.id)return alert('Kitabı eğitmen açabilir.');try{const db=await client();const r=await db.from('cc_live_classes').update({book_open:true,book_page:window.BOOK.currentPage?.()||0}).eq('id',active.id).eq('owner_id',auth().id);if(r.error)throw r.error;active.book_open=true;window.BOOK.open();$('ccdBookClose').hidden=false;$('ccdBookOpen').hidden=true}catch(e){alert('Kitap açılamadı: '+(e.message||e))}}
 async function closeBook(){if(!active||active.owner_id!==auth()?.id)return;try{const db=await client();const r=await db.from('cc_live_classes').update({book_open:false}).eq('id',active.id).eq('owner_id',auth().id);if(r.error)throw r.error;active.book_open=false;window.BOOK?.close?.();$('ccdBookClose').hidden=true;$('ccdBookOpen').hidden=false}catch(e){alert('Kitap kapatılamadı: '+(e.message||e))}}
-function toggleQuizSetup(){if(!$('ccdQuizPanel').hidden){$('ccdQuizPanel').hidden=true;return}openQuizSetup()}
+function toggleQuizSetup(){if(!isLive(active)){alert('Fasıl testini açmak için önce canlı yayını başlatmalısın.');return}if(!$('ccdQuizPanel').hidden){$('ccdQuizPanel').hidden=true;return}openQuizSetup()}
 window.addEventListener('cc-book-closed',()=>{if(active&&active.owner_id===auth()?.id&&active.book_open)closeBook()});
 window.addEventListener('cc-book-page',async e=>{if(!active||active.owner_id!==auth()?.id||!active.book_open)return;try{const db=await client();await db.from('cc_live_classes').update({book_page:e.detail.index}).eq('id',active.id).eq('owner_id',auth().id)}catch(err){console.warn(err)}});
 function questionPool(chapter){return (typeof CARDS!=='undefined'?CARDS:[]).filter(c=>Number(c.chapter)===chapter&&/^\d{4}$/.test(String(c.code||'').trim())&&String(c.text||c.chapterName||'').trim().length>0)}
 function shuffleQuiz(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function openQuizSetup(){if(!active||active.owner_id!==auth()?.id)return;const chapters=[...new Set((typeof CARDS!=='undefined'?CARDS:[]).map(c=>Number(c.chapter)).filter(x=>x>=1&&x<=99))].sort((a,b)=>a-b);$('ccdQuizPanel').hidden=false;$('ccdQuizPanel').innerHTML='<label>Fasıl <select id="ccdQuizChapter" onchange="CCClassDemo.updateQuizCount()">'+chapters.map(n=>'<option value="'+n+'">'+String(n).padStart(2,'0')+'. Fasıl</option>').join('')+'</select></label><label>Soru sayısı <select id="ccdQuizCount"><option>5</option><option selected>10</option><option>15</option><option>20</option><option value="all">Tüm kartlar</option></select></label><span id="ccdQuizAvailable" class="ccd-quiz-available"></span><button type="button" class="btn primary" onclick="CCClassDemo.sendQuiz()">Gönder</button><button type="button" class="btn" onclick="document.getElementById(\'ccdQuizPanel\').hidden=true">Vazgeç</button>';updateQuizCount()}
+function openQuizSetup(){if(!active||active.owner_id!==auth()?.id)return;if(!isLive(active)){alert('Fasıl testini başlatmak için önce canlı yayını başlatmalısın.');return}const chapters=[...new Set((typeof CARDS!=='undefined'?CARDS:[]).map(c=>Number(c.chapter)).filter(x=>x>=1&&x<=99))].sort((a,b)=>a-b);$('ccdQuizPanel').hidden=false;$('ccdQuizPanel').innerHTML='<label>Fasıl <select id="ccdQuizChapter" onchange="CCClassDemo.updateQuizCount()">'+chapters.map(n=>'<option value="'+n+'">'+String(n).padStart(2,'0')+'. Fasıl</option>').join('')+'</select></label><label>Soru sayısı <select id="ccdQuizCount"><option>5</option><option selected>10</option><option>15</option><option>20</option><option value="all">Tüm kartlar</option></select></label><span id="ccdQuizAvailable" class="ccd-quiz-available"></span><button type="button" class="btn primary" onclick="CCClassDemo.sendQuiz()">Gönder</button><button type="button" class="btn" onclick="document.getElementById(\'ccdQuizPanel\').hidden=true">Vazgeç</button>';updateQuizCount()}
 function updateQuizCount(){const pool=questionPool(Number($('ccdQuizChapter')?.value)),el=$('ccdQuizAvailable'),sel=$('ccdQuizCount');if(el)el.textContent=pool.length+' kart';if(sel){for(const o of sel.options){if(o.value!=='all')o.disabled=Number(o.value)>pool.length}if(sel.selectedOptions[0]?.disabled)sel.value='all'}}
 
 async function sendQuiz(){
  if(!active||active.owner_id!==auth()?.id)return;
+ if(!isLive(active)){alert('Test göndermek için önce canlı yayını başlatmalısın.');clearSessionQuiz();return}
  const chapter=Number($('ccdQuizChapter').value),pool=questionPool(chapter);
  const count=$('ccdQuizCount').value==='all'?pool.length:Number($('ccdQuizCount').value);
  const uniqueCodes=[...new Set(pool.map(c=>String(c.code||'').trim()))].filter(Boolean);
@@ -8911,12 +8986,14 @@ async function sendQuiz(){
 }
 async function refreshQuiz(){
  if(!active||quizBusy)return;
+ if(!isLive(active)){clearSessionQuiz();return}
  const classId=active.id,owner=active.owner_id===auth()?.id;
+ const liveStart=active.live_started_at;
  try{
   const db=await client();
-  const res=await db.from('cc_class_quizzes').select('*').eq('class_id',classId).order('created_at',{ascending:false}).limit(1);
+  const res=await db.from('cc_class_quizzes').select('*').eq('class_id',classId).gte('created_at',liveStart).order('created_at',{ascending:false}).limit(1);
   if(res.error)throw res.error;
-  if(active?.id!==classId)return;
+  if(active?.id!==classId||active.live_started_at!==liveStart||!isLive(active)){clearSessionQuiz();return}
   if(owner&&$('ccdQuizChapter'))return;
   const latest=res.data?.[0]||null;
   const previousId=quizState?.id;
@@ -8967,7 +9044,7 @@ function renderQuizLeaderboard(){
 }
 function renderQuiz(){
  const el=$('ccdQuizPanel');
- if(!active||!quizState||(!quizWasActiveThisRoom&&quizState.status==='closed'&&active.owner_id!==auth()?.id)){
+ if(!active||!isLive(active)||!quizState||(!quizWasActiveThisRoom&&quizState.status==='closed'&&active.owner_id!==auth()?.id)){
   el.hidden=true;el.innerHTML='';updateWaitingState();return
  }
  el.hidden=false;updateWaitingState();
