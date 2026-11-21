@@ -7855,13 +7855,16 @@ html.cc-auth-ok img{-webkit-user-drag:none!important;user-drag:none!important}
  const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){state.rng=(Math.imul(state.rng||1,1664525)+1013904223)>>>0;const j=Math.floor((state.rng/4294967296)*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
  const state={duration:600,castleEmoji:'🏰',castleName:'Mavi Hisar',defense:[42,61,84],shared:[39,54,85,95],placement:{north:42,center:61,south:84},game:null,timer:null,activeQuestion:null,questionPool:[],questionCursor:0,seed:0,rng:1,online:null,applyingRemote:false,answerPending:false,bombStreak:0,bombCharges:0};
  function fsShuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){state.rng=(Math.imul(state.rng||1,1664525)+1013904223)>>>0;const j=Math.floor((state.rng/4294967296)*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
- const chapters=()=>{try{if(typeof CHAPTERS!=='undefined'&&Array.isArray(CHAPTERS)&&CHAPTERS.length)return CHAPTERS.map(x=>Number(x.id)).filter(x=>x>0)}catch(e){}return Array.from({length:96},(_,i)=>i+1)};
- const records=()=>{try{if(typeof SG_DATA!=='undefined'&&Array.isArray(SG_DATA))return SG_DATA.filter(x=>x&&String(x.text||'').trim()&&Array.isArray(x.codes)&&x.codes.length&&String(x.codes[0]).trim())}catch(e){}return[]};
+ const chapters=()=>{try{if(typeof CHAPTERS!=='undefined'&&Array.isArray(CHAPTERS)&&CHAPTERS.length)return CHAPTERS.map(x=>Number(x.id)).filter(x=>x>0&&(!window.CC_ACCESS||window.CC_ACCESS.chapterAllowed(x)))}catch(e){}return Array.from({length:96},(_,i)=>i+1).filter(x=>!window.CC_ACCESS||window.CC_ACCESS.chapterAllowed(x))};
+ const records=()=>{try{if(typeof SG_DATA!=='undefined'&&Array.isArray(SG_DATA))return SG_DATA.filter(x=>x&&String(x.text||'').trim()&&Array.isArray(x.codes)&&x.codes.length&&String(x.codes[0]).trim()&&(!window.CC_ACCESS||window.CC_ACCESS.chapterAllowed(x.chapter)))}catch(e){}return[]};
  const recordsForChapter=n=>records().filter(x=>Number(x.chapter)===Number(n));
- const cards=()=>{try{return Array.isArray(CARDS)?CARDS.filter(x=>x&&Number(x.chapter)>0&&/^\d{4}$/.test(String(x.code||''))):[]}catch(e){return[]}};
+ const cards=()=>{try{return Array.isArray(CARDS)?CARDS.filter(x=>x&&Number(x.chapter)>0&&/^\d{4}$/.test(String(x.code||''))&&(!window.CC_ACCESS||window.CC_ACCESS.chapterAllowed(x.chapter))):[]}catch(e){return[]}};
  const cardsForChapter=n=>cards().filter(x=>Number(x.chapter)===Number(n));
  const codeOf=x=>String((Array.isArray(x.codes)&&x.codes[0])||x.code||'').trim();
  const durationLabel=()=>state.duration===0?'Süresiz':Math.round(state.duration/60)+' dakika';
+ const freeDemo=()=>window.CC_ACCESS?.hasTariff?.()===false;
+ const mainGoal=()=>freeDemo()?Math.min(15,records().length):50;
+ const minRecords=()=>freeDemo()?10:50;
  function renderChoices(){
   const all=chapters(),def=$('fsDefenseChoices'),shared=$('fsSharedChoices');
   if(!def||!shared)return;
@@ -7872,9 +7875,9 @@ html.cc-auth-ok img{-webkit-user-drag:none!important;user-drag:none!important}
   $('fsPlacement').innerHTML=slots.map(([id,label])=>'<div class="fs-place"><b>🛡️ '+label+' savunması</b><select onchange="FASIL_SAVASI.place(\''+id+'\',this.value)">'+options+'</select></div>').join('');
   slots.forEach(([id])=>{const el=$('fsPlacement').querySelector('select[onchange*=\"'+id+'\"]');if(el)el.value=String(state.placement[id])});
   ['fsPreviewFort1','fsPreviewFort2','fsPreviewFort3'].forEach((id,i)=>{if($(id))$(id).textContent=String(state.placement[['north','center','south'][i]]).padStart(2,'0')+'. Fasıl'});
-  const n=records().length;$('fsQuestionCount').textContent=n+' sınıflandırma kararı hazır. Ana kaleyi oluşturmak için 50 farklı karar kullanılacak.';
-  $('fsStartBtn').disabled=state.defense.length!==3||state.shared.length<2||new Set(Object.values(state.placement)).size!==3||n<50;
-  if(n<50)$('fsQuestionCount').textContent='Sınıflandırma kararları: '+n+' kayıt. Ana kale için en az 50 farklı karar gerekli.';
+  const n=records().length;$('fsQuestionCount').textContent=n+' sınıflandırma kararı hazır. '+(freeDemo()?'Demo: Ana kalede '+mainGoal()+' karar kullanılacak.':'Ana kaleyi oluşturmak için 50 farklı karar kullanılacak.');
+  $('fsStartBtn').disabled=state.defense.length!==3||state.shared.length<2||new Set(Object.values(state.placement)).size!==3||n<minRecords();
+  if(n<minRecords())$('fsQuestionCount').textContent='Sınıflandırma kararları: '+n+' kayıt. En az '+minRecords()+' karar gerekli.';
  }
  function renderPreview(){if($('fsPreviewCastle'))$('fsPreviewCastle').textContent=state.castleEmoji;if($('fsPreviewCastleName'))$('fsPreviewCastleName').textContent=state.castleName}
  function duration(v,el){state.duration=Number(v);document.querySelectorAll('#fsDurations .fs-choice').forEach(x=>x.classList.toggle('active',x===el))}
@@ -7916,7 +7919,7 @@ html.cc-auth-ok img{-webkit-user-drag:none!important;user-drag:none!important}
  }catch(e){fsStatus(e.message||String(e),'bad');if(state.online)await fsLeaveRoom(true)}}
  async function fsLeaveRoom(silent=false){const o=state.online;if(o?.channel){try{await o.channel.untrack()}catch(e){}try{await o.client.removeChannel(o.channel)}catch(e){}}state.online=null;state.answerPending=false;$('fsRoomCode').textContent='Oda bağlantısı yok';$('fsOnlinePlayers').textContent='Henüz odaya bağlanılmadı.';$('fsCreateRoom').disabled=false;$('fsJoinRoom').disabled=false;$('fsLeaveRoom').classList.add('fs-hidden');if(!silent)fsStatus('Canlı oda bağlantısı kapatıldı.')}
 
- function open(){$("fsSetup").classList.remove("fs-hidden");$("fsGame").classList.add("fs-hidden");$("fsQuestionModal").classList.add("fs-hidden");document.body.classList.add("fs-fullscreen");document.body.style.overflow="hidden";renderChoices();renderPreview();setTimeout(renderChoices,900);setTimeout(renderChoices,2500)}
+ function open(){if(freeDemo()){state.defense=[1,2,3];state.shared=[4,5];state.placement={north:1,center:2,south:3}}$("fsSetup").classList.remove("fs-hidden");$("fsGame").classList.add("fs-hidden");$("fsQuestionModal").classList.add("fs-hidden");document.body.classList.add("fs-fullscreen");document.body.style.overflow="hidden";renderChoices();renderPreview();setTimeout(renderChoices,900);setTimeout(renderChoices,2500)}
  function makeQuestion(x,poolRecords=records()){
   const accepted=(Array.isArray(x.codes)?x.codes:[x.code]).map(String).filter(Boolean),answer=accepted[0]||codeOf(x);
   const wrong=fsShuffle([...new Set(poolRecords.flatMap(y=>(Array.isArray(y.codes)?y.codes:[y.code]).map(String)).filter(c=>c&& !accepted.includes(c)))]).slice(0,3);
@@ -7927,7 +7930,7 @@ html.cc-auth-ok img{-webkit-user-drag:none!important;user-drag:none!important}
   return{kind:'card',source:x,answer,accepted:[answer],options:fsShuffle([answer,...wrong])};
  }
  function prepareQuestions(){
-  const all=fsShuffle(records());if(all.length<50)return false;
+  const all=fsShuffle(records());if(all.length<minRecords())return false;
   state.questionPool=all;state.questionCursor=0;
   return true;
  }
@@ -7939,14 +7942,14 @@ html.cc-auth-ok img{-webkit-user-drag:none!important;user-drag:none!important}
   if(state.defense.length!==3||state.shared.length<2||new Set(Object.values(state.placement)).size!==3){alert('Üç farklı savunma kalesi seçip üç ayrı konuma yerleştir.');return}
   const missing=[...state.defense,...state.shared].filter(n=>!cardsForChapter(n).length);
   if(missing.length){alert('Şu fasıllarda soru kartı bulunamadı: '+missing.map(n=>String(n).padStart(2,'0')).join(', ')+'. Başka fasıl seç.');return}
-  if(!prepareQuestions()){alert('Ana kaleyi kurmak için en az 50 farklı sınıflandırma kararı yüklenmiş olmalı.');return}
+  if(!prepareQuestions()){alert('Ana kaleyi kurmak için en az '+minRecords()+' farklı sınıflandırma kararı yüklenmiş olmalı.');return}
   const makeNode=(chapter,type,points,area)=>{const chapterCards=cardsForChapter(chapter);return{id:type+'-'+chapter,chapter,type,points,area,captured:false,questions:fsShuffle(chapterCards.map(x=>makeCardQuestion(x,chapterCards))),cursor:0}};
   const shared=state.shared.map(n=>makeNode(n,'field',1,1)),defense=state.defense.map(n=>makeNode(n,'fort',2,2));
-  const enemyPool=fsShuffle(chapters().filter(n=>!state.defense.includes(n)&&!state.shared.includes(n)&&cardsForChapter(n).length));
+  const enemyPool=fsShuffle(chapters().filter(n=>cardsForChapter(n).length&&(freeDemo()||(!state.defense.includes(n)&&!state.shared.includes(n)))));
   if(enemyPool.length<3){alert('Rakip savunma hattı için kartı bulunan en az üç farklı fasıl gerekli.');return}
   const enemyDefense=enemyPool.slice(0,3).map(n=>makeNode(n,'enemyFort',2,2));
-  const mainQuestions=fsShuffle(state.questionPool).slice(0,50).map(x=>makeQuestion(x,records()));
-  state.bombStreak=0;state.bombCharges=0;state.game={started:Date.now(),seconds:state.duration,remaining:state.duration,blueScore:0,redScore:0,blueArea:0,redArea:0,blueCaptured:0,redCaptured:0,blueDamage:0,redDamage:0,redHP:1000,blueHP:1000,field:shared,defense,enemyDefense,ownMain:{id:'own-main',type:'ownMain',points:3,area:3,captured:false,questions:fsShuffle(state.questionPool).slice(0,50).map(x=>makeQuestion(x,records())),cursor:0,correct:0},main:{id:'main',type:'main',points:3,area:3,captured:false,questions:mainQuestions,cursor:0,correct:0},mainCorrect:0,mainWrong:[],won:false,ended:false};
+  const mainQuestions=fsShuffle(state.questionPool).slice(0,mainGoal()).map(x=>makeQuestion(x,records()));
+  state.bombStreak=0;state.bombCharges=0;state.game={started:Date.now(),seconds:state.duration,remaining:state.duration,blueScore:0,redScore:0,blueArea:0,redArea:0,blueCaptured:0,redCaptured:0,blueDamage:0,redDamage:0,redHP:1000,blueHP:1000,field:shared,defense,enemyDefense,ownMain:{id:'own-main',type:'ownMain',points:3,area:3,captured:false,questions:fsShuffle(state.questionPool).slice(0,mainGoal()).map(x=>makeQuestion(x,records())),cursor:0,correct:0},main:{id:'main',type:'main',points:3,area:3,captured:false,questions:mainQuestions,cursor:0,correct:0},mainCorrect:0,mainWrong:[],won:false,ended:false};
   $('fsSetup').classList.add('fs-hidden');$('fsGame').classList.remove('fs-hidden');const zoomMap=$('fsMapGrid');if(zoomMap){zoomMap.dataset.zoom='1';zoomMap.style.transform='scale(1)';zoomMap.style.transformOrigin='top left'}$('fsGameTitle').textContent='🏰 '+state.castleName+' · '+durationLabel();$('fsGameSubtitle').textContent='Sol: senin kilitli kalelerin · Orta: ikinize açık ortak fasıllar · Sağ: rakibin savunması ve ana kalesi.';
   const blueEmoji=$('fsBlueEmoji');if(blueEmoji)blueEmoji.textContent=state.castleEmoji;$('fsBlueName').textContent=state.castleName;
   ensureBombUI();renderGame();log('Savaş başladı. Kendi kalelerin korumalı; ortak alanları ve rakibin kalelerini fethedebilirsin.');updateClock();
@@ -8026,12 +8029,12 @@ html.cc-auth-ok img{-webkit-user-drag:none!important;user-drag:none!important}
  function renderGame(){
   const g=state.game;if(!g)return;
   $('fsBlueHP').textContent=g.blueHP.toLocaleString('tr-TR')+' / 1.000';$('fsBlueBar').style.width=(g.blueHP/10)+'%';
-  $('fsRedHP').textContent=Math.max(0,1000-g.mainCorrect*20).toLocaleString('tr-TR')+' / 1.000';$('fsRedBar').style.width=Math.max(0,100-g.mainCorrect*2)+'%';
+  $('fsRedHP').textContent=Math.max(0,1000-Math.round(g.mainCorrect*1000/mainGoal())).toLocaleString('tr-TR')+' / 1.000';$('fsRedBar').style.width=Math.max(0,100-g.mainCorrect*100/mainGoal())+'%';
   $('fsBlueScore').textContent=g.blueScore.toLocaleString('tr-TR')+' puan';$('fsRedScore').textContent=g.redScore.toLocaleString('tr-TR')+' puan';$('fsBlueSummary').textContent=g.blueCaptured+' fetih · '+g.blueArea+' puanlık alan';$('fsRedSummary').textContent=g.redCaptured+' fetih · '+g.redArea+' puanlık alan';
   $('fsBlueArea').textContent=g.blueArea;$('fsRedArea').textContent=g.redArea;$('fsBlueDamage').textContent=g.blueDamage;$('fsRedDamage').textContent=g.redDamage;
   $('fsBlueCaptured').textContent=g.blueCaptured;$('fsRedCaptured').textContent=g.redCaptured;
   $('fsBlueDefence').innerHTML=g.defense.map(x=>'<div class="fs-defence-item"><span>🔒 '+String(x.chapter).padStart(2,'0')+'. Fasıl</span><b>'+((x.doneQuestions||[]).filter(Boolean).length)+'/'+x.questions.length+' · Hasar '+(x.damage||0)+'</b></div>').join('');
-  $('fsRedDefence').innerHTML=g.enemyDefense.map(x=>'<div class="fs-defence-item"><span>🛡️ '+String(x.chapter).padStart(2,'0')+'. Fasıl</span><b>'+(x.captured?'Fethedildi':(x.doneQuestions||[]).filter(Boolean).length+'/'+x.questions.length+' · Hasar '+(x.damage||0))+'</b></div>').join('')+'<div class="fs-defence-item"><span>🏰 Ana kale</span><b>'+g.mainCorrect+'/50 · Hasar '+g.redDamage+'</b></div>';
+  $('fsRedDefence').innerHTML=g.enemyDefense.map(x=>'<div class="fs-defence-item"><span>🛡️ '+String(x.chapter).padStart(2,'0')+'. Fasıl</span><b>'+(x.captured?'Fethedildi':(x.doneQuestions||[]).filter(Boolean).length+'/'+x.questions.length+' · Hasar '+(x.damage||0))+'</b></div>').join('')+'<div class="fs-defence-item"><span>🏰 Ana kale</span><b>'+g.mainCorrect+'/'+mainGoal()+' · Hasar '+g.redDamage+'</b></div>';
   const pos={own:[[500,255],[500,565],[500,875]],enemy:[[1800,255],[1800,565],[1800,875]],ownMain:[225,565],main:[2075,565]};
   const art=t=>'<svg class="fs-castle-art" viewBox="0 0 100 86" aria-hidden="true"><path d="M10 78V34h12V18h15v16h8V25h15v9h8V18h15v16h7v44z" fill="'+(t==='red'?'#9d4b4e':t==='gold'?'#a27a3d':'#34795e')+'" stroke="#f5e7c6" stroke-width="2"/><path d="M4 34h20V23H4zm28-9h18V14H32zm27 0h18V14H59zm20 9h17V23H79z" fill="'+(t==='red'?'#d78378':t==='gold'?'#e3bd70':'#72b891')+'" stroke="#f5e7c6" stroke-width="1.5"/></svg>';
   const questionRing=(target,type,index,cx,cy,count,disabled=false)=>{
@@ -8102,7 +8105,7 @@ html.cc-auth-ok img{-webkit-user-drag:none!important;user-drag:none!important}
   const q=target.questions[qIndex];if(!q){if(type==='main')finish(true);else{target.captured=true;renderGame()}return}
   state.activeQuestion={type,index,target,q,questionIndex:qIndex,answered:false,selected:null,correct:false,ownerId:attackerId||(state.online?.player?.id||'local')};
   $('fsQuestionType').textContent=type==='main'?'🏰 RAKİP ANA KALE · SINIFLANDIRMA KARARLARI · 3 PUAN':type==='ownMain'?'🏰 SENİN ANA KALE · SAVUNMA SORULARI':type==='fort'?'🛡️ SENİN '+String(target.chapter).padStart(2,'0')+'. FASIL SAVUNMASI · 2 PUAN':type==='enemyFort'?'🛡️ RAKİP '+String(target.chapter).padStart(2,'0')+'. FASIL SAVUNMASI · 2 PUAN':'⚔️ ORTAK '+String(target.chapter).padStart(2,'0')+'. FASIL · 1 PUAN';
-  $('fsQuestionProgress').textContent=type==='main'?'Ana kale: '+g.mainCorrect+'/50 doğru':String(target.chapter).padStart(2,'0')+'. Fasıl kartları · '+(target.cursor+1)+'/'+target.questions.length;
+  $('fsQuestionProgress').textContent=type==='main'?'Ana kale: '+g.mainCorrect+'/'+mainGoal()+' doğru':String(target.chapter).padStart(2,'0')+'. Fasıl kartları · '+(target.cursor+1)+'/'+target.questions.length;
   $('fsQuestionTitle').textContent=type==='main'?'Bu sınıflandırma kararında doğru GTİP hangisidir?':'Gösterilen eşyanın doğru GTİP’i hangisidir?';
   const questionText=cleanQuestionText(q.source.text||'');
   if(q.kind==='card')$('fsQuestionContext').innerHTML='<div class="fs-card-question-text">'+esc(questionText||'Karttaki eşya')+'</div>';else $('fsQuestionContext').textContent=questionText||'Sınıflandırma kararı';
@@ -8123,9 +8126,9 @@ html.cc-auth-ok img{-webkit-user-drag:none!important;user-drag:none!important}
    feedback.innerHTML='<b style="color:#78e0a9">✓ DOĞRU CEVAP!</b><br>Doğru GTİP: <b>'+esc(a.q.answer)+'</b><br><span>'+esc(cleanQuestionText(a.q.source.text||'').slice(0,650))+'</span>';
    const t=a.target;if(!Array.isArray(t.doneQuestions))t.doneQuestions=[];t.doneQuestions[a.questionIndex]=true;t.cursor=(a.questionIndex+1)%Math.max(1,t.questions.length);
    if(a.type==='main'){
-    t.correct=(t.correct||0)+1;g.mainCorrect=t.correct;g.redDamage=g.mainCorrect*20;g.redHP=Math.max(0,1000-g.mainCorrect*20);g.blueScore+=3;g.blueArea+=3;g.blueDamage+=20;
-    log('Rakip ana kaleye saldırı: +3 puan · '+g.mainCorrect+'/50.');
-    if(g.mainCorrect>=50){t.captured=true;t.cursor=50;g.blueCaptured++;log('Rakip ana kale fethedildi!')}
+    t.correct=(t.correct||0)+1;g.mainCorrect=t.correct;g.redDamage=Math.round(g.mainCorrect*1000/mainGoal());g.redHP=Math.max(0,1000-g.redDamage);g.blueScore+=3;g.blueArea+=3;g.blueDamage+=20;
+    log('Rakip ana kaleye saldırı: +3 puan · '+g.mainCorrect+'/'+mainGoal()+'.');
+    if(g.mainCorrect>=mainGoal()){t.captured=true;t.cursor=mainGoal();g.blueCaptured++;log('Rakip ana kale fethedildi!')}
    }else if(a.type==='ownMain'){
     t.correct=(t.correct||0)+1;g.blueScore+=3;log('Ana kale savunma sorusu doğru: +3 puan.');
    }else{
@@ -8146,14 +8149,14 @@ html.cc-auth-ok img{-webkit-user-drag:none!important;user-drag:none!important}
  function nextQuestion(){
   const a=state.activeQuestion;if(!a)return;
   if(state.online&&!state.online.host&&!state.applyingRemote){fsSend('next_request',{});return}
-  if(state.game&&state.game.mainCorrect>=50){$('fsQuestionModal').classList.add('fs-hidden');state.activeQuestion=null;finish(true);return}
+  if(state.game&&state.game.mainCorrect>=mainGoal()){$('fsQuestionModal').classList.add('fs-hidden');state.activeQuestion=null;finish(true);return}
   if(a.correct&&a.target.captured){$('fsQuestionModal').classList.add('fs-hidden');state.activeQuestion=null;return}
   attack(a.type,a.index);
  }
  function closeQuestion(){if(state.online&&!state.online.host&&!state.applyingRemote){fsSend('close_request',{});return}$('fsQuestionModal').classList.add('fs-hidden');state.activeQuestion=null;if(state.online?.host&&!state.applyingRemote)fsSend('close_question',{})}
   function finish(won){
   const g=state.game;if(!g||g.ended)return;g.ended=true;g.won=won;if(state.timer)clearInterval(state.timer);if(state.online?.host&&!state.applyingRemote)fsSend('end',{won});
-  const el=$('fsResult');el.classList.remove('fs-hidden');el.innerHTML='<div style="font-size:42px">'+(won?'🏆':'⏳')+'</div><h3>'+(won?'RAKİP KALE FETHEDİLDİ!':'SÜRE TAMAMLANDI')+'</h3><p>'+(won?'50 sınıflandırma kararını doğru cevapladın ve ana kaleyi fethettin.':'Süre doldu. Savaş karnen aşağıda.')+'</p><b>Fetih puanın: '+g.blueScore.toLocaleString('tr-TR')+' · Alan: '+g.blueArea+' · Ana kale: '+g.mainCorrect+'/50</b><div style="margin-top:12px"><button class="fs-choice" onclick="FASIL_SAVASI.back()">Yeni savaş kur</button></div>';
+  const el=$('fsResult');el.classList.remove('fs-hidden');el.innerHTML='<div style="font-size:42px">'+(won?'🏆':'⏳')+'</div><h3>'+(won?'RAKİP KALE FETHEDİLDİ!':'SÜRE TAMAMLANDI')+'</h3><p>'+(won?'50 sınıflandırma kararını doğru cevapladın ve ana kaleyi fethettin.':'Süre doldu. Savaş karnen aşağıda.')+'</p><b>Fetih puanın: '+g.blueScore.toLocaleString('tr-TR')+' · Alan: '+g.blueArea+' · Ana kale: '+g.mainCorrect+'/'+mainGoal()+'</b><div style="margin-top:12px"><button class="fs-choice" onclick="FASIL_SAVASI.back()">Yeni savaş kur</button></div>';
   log(won?'Zafer! Rakip ana kale fethedildi.':'Süre bitti. Maç tamamlandı.'); 
  }
  function back(){if(state.timer)clearInterval(state.timer);state.timer=null;state.game=null;state.activeQuestion=null;$('fsQuestionModal').classList.add('fs-hidden');$('fsGame').classList.add('fs-hidden');$('fsSetup').classList.remove('fs-hidden');renderChoices()}
