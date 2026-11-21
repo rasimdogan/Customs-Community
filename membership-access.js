@@ -198,6 +198,56 @@ function installBookNotice(){
  document.addEventListener('click',e=>{if(e.target?.closest?.('[onclick*="BOOK.open"],#bookFloatLauncher'))setTimeout(updateBookNotice,50)},true);
  document.addEventListener('cc-book-page',updateBookNotice);
 }
+
+function installCommunityLogout(){
+ if($('ccCommunityLogoutStyle'))return;
+ const style=document.createElement('style');
+ style.id='ccCommunityLogoutStyle';
+ style.textContent='#ccCommunityLogout{position:absolute;right:18px;bottom:18px;z-index:10050;display:inline-flex;align-items:center;gap:8px;padding:10px 15px;border:1px solid #cbdbe6;border-radius:10px;background:#fff;color:#2c4d62;font:700 13px/1.3 inherit;cursor:pointer;box-shadow:0 4px 15px #173b521c}#ccCommunityLogout:hover{background:#f1f7fa;border-color:#9bbdce}#ccCommunityLogout:focus-visible{outline:3px solid #2685b6;outline-offset:2px}#ccCommunityLogout[disabled]{opacity:.65;cursor:wait}@media(max-width:640px){#ccCommunityLogout{right:12px;bottom:12px;padding:9px 12px;font-size:12px}}';
+ document.head.appendChild(style);
+ const sync=()=>{
+  const hub=$('ccxOverlay');
+  if(!hub)return;
+  let btn=$('ccCommunityLogout');
+  if(!btn){
+   btn=document.createElement('button');
+   btn.type='button';btn.id='ccCommunityLogout';
+   btn.setAttribute('aria-label','Hesaptan çıkış yap');
+   btn.innerHTML='<span aria-hidden="true">⇥</span> Çıkış Yap';
+   btn.addEventListener('click',async()=>{
+    if(btn.disabled)return;
+    btn.disabled=true;
+    try{
+     /* Öncelikle eğitim alanının mevcut çıkış akışını kullan. */
+     const candidates=[...document.querySelectorAll('button,a,[role="button"]')].filter(el=>el!==btn&&!hub.contains(el));
+     const existing=candidates.find(el=>/^(çıkış yap|çıkış|oturumu kapat)$/i.test((el.textContent||'').trim())||/logout|signout|sign-out/i.test(el.id||''));
+     if(existing){existing.click();return}
+     if(typeof window.CC_AUTH?.signOut==='function'){
+      await window.CC_AUTH.signOut();
+     }else if(typeof window.CC_AUTH?.logout==='function'){
+      await window.CC_AUTH.logout();
+     }else{
+      const client=await window.CC_AUTH?.getClient?.();
+      if(!client?.auth?.signOut)throw new Error('Oturum kapatma işlevine ulaşılamadı.');
+      const result=await client.auth.signOut();
+      if(result?.error)throw result.error;
+     }
+     window.location.reload();
+    }catch(error){
+     btn.disabled=false;
+     notify('Çıkış yapılamadı: '+(error?.message||'Lütfen yeniden deneyin.'));
+    }
+   });
+   hub.appendChild(btn);
+  }
+  btn.hidden=!logged();
+ };
+ sync();
+ const observer=new MutationObserver(sync);
+ observer.observe(document.body,{childList:true,subtree:true});
+ window.addEventListener('cc-authenticated',sync);
+ window.addEventListener('cc-logged-out',sync);
+}
 function installObserver(){
  const adminView=$('view-useradmin');
  if(adminView){
@@ -209,7 +259,7 @@ function installObserver(){
  }
 }
 function init(){
- installStyles();createMemberSummary();guardClassOpen();protectEducationNavigation();installClickGuards();installBookPointerCursor();installBookNotice();installObserver();removeWelcomePostExplanation();
+ installStyles();createMemberSummary();guardClassOpen();protectEducationNavigation();installClickGuards();installBookPointerCursor();installBookNotice();installCommunityLogout();installObserver();removeWelcomePostExplanation();
  const welcomeObserver=new MutationObserver(removeWelcomePostExplanation);
  welcomeObserver.observe(document.body,{childList:true,subtree:true});setTimeout(protectEducationNavigation,200);
  window.addEventListener('cc-authenticated',()=>{createMemberSummary();protectEducationNavigation();refresh()});
