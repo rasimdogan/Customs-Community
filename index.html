@@ -5098,7 +5098,7 @@ window.CC_AUTH={login,logout,bootstrapAdmin,createUser,listUsers,setUserActive,d
 document.documentElement.classList.add('cc-auth-pending');
 document.addEventListener('DOMContentLoaded',()=>{let f=$id('ccLoginForm');if(f)f.addEventListener('submit',login);setTimeout(()=>{guardNav();hookSave();restore()},0)});
 })();
-</script><script>window.CC_BUILD="V103.81";</script><script id="cc-cache-version">(function(){const B="10381";try{const u=new URL(location.href);if(u.searchParams.get("v")!==B){u.searchParams.set("v",B);history.replaceState(null,"",u.pathname+"?"+u.searchParams.toString()+u.hash)}}catch(e){}})();</script>
+</script><script>window.CC_BUILD="V103.82";</script><script id="cc-cache-version">(function(){const B="10382";try{const u=new URL(location.href);if(u.searchParams.get("v")!==B){u.searchParams.set("v",B);history.replaceState(null,"",u.pathname+"?"+u.searchParams.toString()+u.hash)}}catch(e){}})();</script>
 <style id="cc-toast-style-v10231">
 #ccToastStack{position:fixed;right:20px;top:20px;z-index:99999;display:flex;flex-direction:column;gap:10px;max-width:min(390px,calc(100vw - 28px));pointer-events:none}
 .cc-toast{background:rgba(20,42,60,.96);color:#fff;border:1px solid rgba(255,255,255,.14);box-shadow:0 14px 38px rgba(0,0,0,.18);border-radius:14px;padding:12px 15px;font:600 13px/1.45 inherit;opacity:0;transform:translateY(-8px);transition:.2s ease;backdrop-filter:blur(12px)}
@@ -8632,7 +8632,7 @@ body.dark #ccxOverlay .ccx-topic{background:#1b3a51!important;color:#a9d8ee!impo
 </aside>
   </div>
  </div>
- <section class="room" id="ccdRoom"><div class="roominner"><div class="roomhead"><div><small style="color:#9ecde3">CUSTOMS COMMUNITY · CANLI SINIF</small><h2 id="ccdRoomTitle" style="margin:4px 0">Canlı ders</h2><small style="color:#9db3c2">Canlı ders odası</small></div><button class="btn" onclick="CCClassDemo.back()">Sınıflara dön</button></div><div id="ccdRoomManage" class="ccd-room-manage"><span id="ccdRoomState">Canlı yayın henüz başlatılmadı.</span><button id="ccdJoinLive" class="btn primary" type="button" onclick="CCClassDemo.joinLive()" hidden>▶ Canlı derse bağlan</button><button id="ccdStartLive" class="btn primary" type="button" onclick="CCClassDemo.startLive()">▶ Canlı yayını başlat</button><button id="ccdStopLive" class="btn" type="button" onclick="CCClassDemo.stopLive()" hidden>■ Yayını kapat</button></div><div class="ccd-teaching-toolbar" id="ccdTeachingToolbar"><button class="btn" type="button" id="ccdBookOpen" onclick="CCClassDemo.openBook()">📖 Kitabı Aç</button><button class="btn" type="button" id="ccdBookClose" onclick="CCClassDemo.closeBook()" hidden>✕ Kitabı Kapat</button><button class="btn primary" type="button" id="ccdQuizOpen" onclick="CCClassDemo.toggleQuizSetup()" hidden>✦ Fasıl Testi</button></div><div id="ccdQuizPanel" class="ccd-quiz-panel" hidden></div><section id="ccdWaitingPanel" class="ccd-waiting-panel" hidden aria-live="polite"><span class="ccd-waiting-icon" aria-hidden="true">🎓</span><div><h3>Dersin başlamasını bekliyorsun</h3><p>Sınıf üyeliğin aktif. Eğitmen canlı yayını başlattığında <strong>Canlı derse bağlan</strong> düğmesi açılacak. Buradan derse katılabileceksin.</p></div></section><div id="ccdJitsiPanel" class="ccd-jitsi-panel" hidden><div class="ccd-jitsi-notice">Jitsi canlı sınıf · Kamera, mikrofon ve ekran paylaşımı toplantı içinden yönetilir.</div><div id="ccdJitsiMount"></div><div class="ccd-jitsi-actions"><button type="button" class="btn" onclick="CCClassDemo.back()">← Sınıflara dön</button><button type="button" class="btn" onclick="CCClassDemo.openJitsiTab()">Yeni sekmede aç</button></div><div id="ccdJitsiError" role="status"></div></div><div id="ccdFakeVideo" class="videogrid"><div><div class="stage"><span class="liveflag">● DEMO OTURUM</span><div><div class="avatar">AY</div><h2>Ahmet Yılmaz</h2><p>Eğitmen · Örnek görüntü alanı</p></div><small style="position:absolute;bottom:14px;color:#c8d8e3">Gerçek video bağlantısı bu prototipte henüz etkin değil.</small></div><div class="controls"><button id="ccdMic" class="control" onclick="CCClassDemo.toggle('mic')">🎙 Mikrofon açık</button><button id="ccdCam" class="control" onclick="CCClassDemo.toggle('cam')">▣ Kamera açık</button><button class="control" onclick="CCClassDemo.notice()">▤ Ekran paylaş</button><button class="control" onclick="CCClassDemo.notice()">✋ Söz iste</button><button class="control leave" onclick="CCClassDemo.back()">Dersten ayrıl</button></div></div><aside class="roomside"><h3>Katılımcılar · 24</h3><div class="person">★ Ahmet Yılmaz · Eğitmen</div><div class="person">● Rasim Doğan · Sen</div><div class="person">● Elif Kaya</div><div class="person">● Mehmet Demir</div><div class="person">+ 20 katılımcı daha</div><h3 style="margin-top:20px">Ders sohbeti</h3><div class="person">Elif: Sunumu paylaşabilir misiniz?</div><div class="person">Eğitmen: Ders sonunda dosyalara ekleyeceğim.</div></aside></div></div></section>
+ <section class="room" id="ccdRoom"><div class="roominner"><div class="roomhead"><div><small style="color:#9ecde3">CUSTOMS COMMUNITY · CANLI SINIF</small><h2 id="ccdRoomTitle" style="margin:4px 0">Canlı ders</h2><small style="color:#9db3c2">Canlı ders odası</small></div><button class="btn" onclick="CCClassDemo.back()">Sınıflara dön</button></div><div id="ccdRoomManage" class="ccd-room-manage"><span id="ccdRoomState">Canlı yayın henüz başlatılmadı.</span><button id="ccdJoinLive" class="btn primary" type="button" onclick="CCClassDemo.joinLive()" hidden>▶ Canlı derse bağlan</button><button id="ccdStartLive" class="btn primary" type="button" onclick="CCClassDemo.startLive()">▶ Canlı yayını başlat</button><button id="ccdStopLive" class="btn" type="button" onclick="CCClassDemo.stopLive()" hidden>■ Yayını kapat</button></div><div class="ccd-teaching-toolbar" id="ccdTeachingToolbar"><button class="btn" type="button" id="ccdBookOpen" onclick="CCClassDemo.openBook()">📖 Kitabı Aç</button><button class="btn" type="button" id="ccdBookClose" onclick="CCClassDemo.closeBook()" hidden>✕ Kitabı Kapat</button><button class="btn primary" type="button" id="ccdQuizOpen" onclick="CCClassDemo.toggleQuizSetup()" hidden>✦ Fasıl Testi</button></div><div id="ccdQuizPanel" class="ccd-quiz-panel" hidden></div><section id="ccdWaitingPanel" class="ccd-waiting-panel" hidden aria-live="polite"><span class="ccd-waiting-icon" aria-hidden="true">🎓</span><div><h3>Dersin başlamasını bekliyorsun</h3><p>Sınıf üyeliğin aktif. Eğitmen canlı yayını başlattığında <strong>Canlı derse bağlan</strong> düğmesi açılacak. Buradan derse katılabileceksin.</p></div></section><div id="ccdJitsiPanel" class="ccd-jitsi-panel" hidden><div class="ccd-jitsi-notice">Canlı sınıf · Görüntülü görüşme yeni sekmede açılır. Test işlemleri yayını kapatmaz.</div><div id="ccdJitsiMount"></div><div class="ccd-jitsi-actions"><button type="button" class="btn" onclick="CCClassDemo.back()">← Sınıflara dön</button><button type="button" class="btn" onclick="CCClassDemo.openJitsiTab()">Yeni sekmede aç</button></div><div id="ccdJitsiError" role="status"></div></div><div id="ccdFakeVideo" class="videogrid"><div><div class="stage"><span class="liveflag">● DEMO OTURUM</span><div><div class="avatar">AY</div><h2>Ahmet Yılmaz</h2><p>Eğitmen · Örnek görüntü alanı</p></div><small style="position:absolute;bottom:14px;color:#c8d8e3">Gerçek video bağlantısı bu prototipte henüz etkin değil.</small></div><div class="controls"><button id="ccdMic" class="control" onclick="CCClassDemo.toggle('mic')">🎙 Mikrofon açık</button><button id="ccdCam" class="control" onclick="CCClassDemo.toggle('cam')">▣ Kamera açık</button><button class="control" onclick="CCClassDemo.notice()">▤ Ekran paylaş</button><button class="control" onclick="CCClassDemo.notice()">✋ Söz iste</button><button class="control leave" onclick="CCClassDemo.back()">Dersten ayrıl</button></div></div><aside class="roomside"><h3>Katılımcılar · 24</h3><div class="person">★ Ahmet Yılmaz · Eğitmen</div><div class="person">● Rasim Doğan · Sen</div><div class="person">● Elif Kaya</div><div class="person">● Mehmet Demir</div><div class="person">+ 20 katılımcı daha</div><h3 style="margin-top:20px">Ders sohbeti</h3><div class="person">Elif: Sunumu paylaşabilir misiniz?</div><div class="person">Eğitmen: Ders sonunda dosyalara ekleyeceğim.</div></aside></div></div></section>
 </div>
 <style id="cc-class-modern-v10380">
 /* Classes 2026 modern interface — scoped to classes only */
@@ -8693,7 +8693,77 @@ body.dark #ccxOverlay .ccx-topic{background:#1b3a51!important;color:#a9d8ee!impo
 #ccClassDemo .ccd-empty{padding:25px;background:#fff;border-radius:12px}
 #ccClassDemo #ccdLiveStatus{font-size:12px;color:#496579}
 #ccClassDemo .ccd-live-badge{display:inline-flex;align-items:center;gap:5px;background:#fff5f5;color:#b33a47;border:1px solid #f1cdd1;border-radius:99px;padding:5px 10px;margin-right:8px;font-size:11px;font-weight:750;letter-spacing:.45px}
-</style><script id="cc-class-live-v10378">
+</style>
+<style id="cc-single-quiz-v10382">
+#ccClassDemo #ccdQuizPanel.ccd-quiz-panel{display:block;width:min(100%,920px);margin:22px auto 28px;padding:0;max-width:100%;border:1px solid #d5e3f0;background:#fff;border-radius:20px;box-sizing:border-box;box-shadow:0 16px 38px rgba(10,38,69,.13);overflow:hidden;color:#1b3752}
+#ccClassDemo #ccdQuizPanel[hidden]{display:none!important}
+#ccClassDemo .ccd-test-header{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;padding:23px 27px;background:linear-gradient(115deg,#112e4e,#185c83);color:#fff}
+#ccClassDemo .ccd-test-header h3{font-size:21px;color:#fff;margin:5px 0 7px;line-height:1.35}
+#ccClassDemo .ccd-test-header p{color:#d8eaf7;font-size:12px;margin:0;line-height:1.5}
+#ccClassDemo .ccd-test-eyebrow{font-size:10px;letter-spacing:.13em;color:#a4d9f3;font-weight:900}
+#ccClassDemo .ccd-test-chip{font-size:10px;border-radius:20px;padding:8px 12px;background:#ffffff26;color:#fff;white-space:nowrap;font-weight:850}
+#ccClassDemo .ccd-quiz-progress-label{display:flex;justify-content:space-between;gap:10px;margin:18px 27px 8px;font-size:13px;color:#536d83}
+#ccClassDemo .ccd-quiz-progress-label b{color:#1c547b}
+#ccClassDemo .ccd-quiz-progress-track{height:7px;border-radius:50px;margin:0 27px 18px;background:#eaf1f7;overflow:hidden}
+#ccClassDemo .ccd-quiz-progress-track>div{height:100%;background:linear-gradient(90deg,#2495b7,#1a71a9);border-radius:50px;transition:width .2s}
+#ccClassDemo .ccd-question-shell{padding:14px 27px 25px}
+#ccClassDemo .ccd-question-tag{font-size:11px;font-weight:850;letter-spacing:.08em;color:#227ba3;background:#e9f5f9;border-radius:30px;padding:6px 10px}
+#ccClassDemo .ccd-question-shell h4{font-size:18px;line-height:1.55;color:#1b3550;margin:17px 0 6px;overflow-wrap:anywhere}
+#ccClassDemo .ccd-question-shell>p{font-size:13px;color:#758da0;margin:0 0 18px}
+#ccClassDemo .ccd-choice-list{display:grid;grid-template-columns:1fr;gap:9px}
+#ccClassDemo .ccd-choice-list .ccd-choice{width:100%;min-height:56px;border-radius:12px;border:1px solid #d7e5f1;background:#f8fbfe;display:flex;align-items:center;gap:13px;text-align:left;color:#244b66;font-size:15px;font-weight:750;padding:11px 15px;cursor:pointer;transition:background .15s,border-color .15s}
+#ccClassDemo .ccd-choice-list .ccd-choice:hover{background:#eaf5fb;border-color:#89c4de}
+#ccClassDemo .ccd-choice-list .ccd-choice:focus-visible{outline:3px solid #5dafda;outline-offset:1px}
+#ccClassDemo .ccd-choice-list .ccd-choice:disabled{opacity:.6;cursor:wait}
+#ccClassDemo .ccd-choice-letter{flex:0 0 30px;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:#dcecf5;color:#125b83;font-size:13px;font-weight:900}
+#ccClassDemo .ccd-choice-label{min-width:0;flex:1;overflow-wrap:anywhere}
+#ccClassDemo .ccd-choice-arrow{font-size:23px;color:#6597b2}
+#ccClassDemo .ccd-test-actions{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:16px 27px;border-top:1px solid #e7eef5}
+#ccClassDemo .ccd-test-actions>.btn{min-height:42px}
+#ccClassDemo .ccd-finish-btn{font-weight:800;border-color:#2a88af}
+#ccClassDemo .ccd-end-all{color:#9a3434;border-color:#efc5c5;background:#fff1f1}
+#ccClassDemo .ccd-end-all:hover{background:#ffe5e5}
+#ccClassDemo .ccd-test-summary{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:21px 27px;flex-wrap:wrap}
+#ccClassDemo .ccd-test-summary b{font-size:16px}
+#ccClassDemo .ccd-test-summary p{margin:5px 0 0;color:#60798b;font-size:13px;line-height:1.55}
+#ccClassDemo .ccd-complete-badge{display:inline-flex;padding:9px 12px;border-radius:20px;background:#e9f7ef;color:#267351;font-size:12px;font-weight:800}
+#ccClassDemo .ccd-finished-message{display:flex;align-items:center;gap:16px;padding:26px 27px;color:#19415e}
+#ccClassDemo .ccd-finish-icon{width:49px;height:49px;display:grid;place-items:center;border-radius:15px;background:#dff4e8;color:#1d8c5d;font-size:26px;font-weight:900;flex-shrink:0}
+#ccClassDemo .ccd-finished-message h4{font-size:19px;margin:0 0 7px}
+#ccClassDemo .ccd-finished-message p{color:#678194;font-size:13px;line-height:1.55;margin:0}
+#ccClassDemo .ccd-scores{border-top:1px solid #e3ecf4}
+#ccClassDemo .ccd-results-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 27px;background:#f0f7fb;border:0;cursor:pointer;color:#194d70;font-weight:800;font-size:14px;text-align:left}
+#ccClassDemo .ccd-results-toggle span:last-child{color:#31789c;font-size:12px;white-space:nowrap}
+#ccClassDemo .ccd-results-wrap{padding:6px 18px 19px;overflow-x:auto}
+#ccClassDemo .ccd-results-table{width:100%;border-collapse:collapse;min-width:550px;font-size:13px}
+#ccClassDemo .ccd-results-table th{background:#f4f8fc;color:#627e94;font-size:11px;letter-spacing:.02em;text-align:left;padding:11px 10px}
+#ccClassDemo .ccd-results-table td{border-bottom:1px solid #e9eff4;padding:12px 10px;color:#294b62}
+#ccClassDemo .ccd-result-mine{background:#eaf7fa}
+#ccClassDemo .ccd-rank{font-size:11px;color:#6b8ca3;display:inline-block;margin-right:7px}
+#ccClassDemo .ccd-result-status{background:#edf3f7;border-radius:20px;padding:5px 9px;font-size:11px;color:#31617b;white-space:nowrap}
+#ccClassDemo .ccd-video-bridge{display:flex;gap:18px;align-items:flex-start;padding:26px;background:#f5f9ff;border:1px solid #c8ddec;border-radius:16px;color:#274a65}
+#ccClassDemo .ccd-video-icon{font-size:36px}
+#ccClassDemo .ccd-video-content h3{font-size:19px;margin:0 0 8px;color:#153c5f}
+#ccClassDemo .ccd-video-content p{line-height:1.6;font-size:14px;color:#536e83;margin:0 0 15px}
+#ccClassDemo .ccd-video-content .ccd-meeting-link{display:inline-flex;align-items:center;text-decoration:none;margin:0 0 12px}
+#ccClassDemo .ccd-video-content small{display:block;line-height:1.5;color:#71879c}
+#ccClassDemo #ccdJitsiPanel .ccd-jitsi-notice{font-size:12px;color:#a1c6d9}
+@media(max-width:650px){
+ #ccClassDemo #ccdQuizPanel.ccd-quiz-panel{margin:14px 0;border-radius:13px}
+ #ccClassDemo .ccd-test-header{padding:18px}
+ #ccClassDemo .ccd-test-header h3{font-size:17px}
+ #ccClassDemo .ccd-quiz-progress-label{margin:17px 18px 8px}
+ #ccClassDemo .ccd-quiz-progress-track{margin:0 18px 16px}
+ #ccClassDemo .ccd-question-shell{padding:12px 18px 20px}
+ #ccClassDemo .ccd-question-shell h4{font-size:16px}
+ #ccClassDemo .ccd-choice-list .ccd-choice{min-height:52px}
+ #ccClassDemo .ccd-test-actions{padding:13px 18px}
+ #ccClassDemo .ccd-test-summary,#ccClassDemo .ccd-finished-message{padding:18px}
+ #ccClassDemo .ccd-results-toggle{padding:15px 18px}
+ #ccClassDemo .ccd-video-bridge{padding:16px;gap:11px}
+}
+</style>
+<script id="cc-class-live-v10378">
 (function(){
 let rows=[],members=new Set(),filter='all',active=null,jitsiApi=null,jitsiRoom='',sdkPromise=null,loading=false;
 const $=id=>document.getElementById(id);
@@ -8702,7 +8772,7 @@ const auth=()=>{const v=window.CC_AUTH?.getSession?.();return v?.user||null};
 const repeatText=x=>x.repeat_type==='daily'?'Her gün':x.repeat_type==='weekly'?'Her hafta':x.repeat_type==='monthly'?'Her ay':'';
 const nextDate=x=>{if(!x.starts_at)return null;const base=new Date(x.starts_at),now=new Date();if(x.repeat_type==='none'||!x.repeat_type)return base;let d=new Date(base);const days=Array.isArray(x.repeat_days)?x.repeat_days:[];for(let i=0;i<370&&d<now;i++){if(x.repeat_type==='daily')d.setDate(d.getDate()+1);else if(x.repeat_type==='monthly')d.setMonth(d.getMonth()+1);else{d.setDate(d.getDate()+1);while(days.length&&!days.includes(d.getDay()))d.setDate(d.getDate()+1)}}if(x.repeat_until&&d>new Date(x.repeat_until+'T23:59:59'))return null;return d};
 const isLive=x=>!!(x?.live_started_at&&x?.live_heartbeat_at&&(!x.live_ended_at||new Date(x.live_ended_at)<new Date(x.live_started_at))&&(Date.now()-new Date(x.live_heartbeat_at).getTime()<90000));
-let liveTimer=null,refreshTimer=null,quizTimer=null,quizState=null,quizAnswers=[];
+let liveTimer=null,refreshTimer=null,quizTimer=null,quizState=null,quizAnswers=[],quizResults=[],quizIndex=0,quizBusy=false,quizWasActiveThisRoom=false,resultsExpanded=false;
 async function liveWrite(patch){if(!active||active.owner_id!==auth()?.id)return false;const db=await client();const q=await db.from('cc_live_classes').update(patch).eq('id',active.id).eq('owner_id',auth().id).select('*').single();if(q.error)throw q.error;active=q.data;rows=rows.map(x=>x.id===active.id?active:x);render();return true}
 async function refreshLive(){if(!document.getElementById('ccClassDemo')||document.getElementById('ccClassDemo').style.display==='none')return;try{const db=await client();const q=await db.from('cc_live_classes').select('*').order('created_at',{ascending:false}).limit(100);if(!q.error){rows=q.data||[];if(active){active=rows.find(x=>x.id===active.id)||active;const owner=active.owner_id===auth()?.id;if(!owner&&window.BOOK?.goToPage&&document.getElementById('ccdRoom').style.display==='block'){const book=document.getElementById('bkOverlay');if(active.book_open){if(!book?.classList.contains('open'))window.BOOK.open();if(window.BOOK.currentPage()!==active.book_page)window.BOOK.goToPage(active.book_page||0)}else if(book?.classList.contains('open'))window.BOOK.close()}if(!owner){document.getElementById('ccdJoinLive').hidden=!isLive(active);document.getElementById('ccdRoomState').textContent=isLive(active)?'🔴 CANLI · Ders devam ediyor.':'Eğitmen yayını başlattığında derse katılabilirsin.'}updateWaitingState()}render()}}catch(e){console.warn('Canlı durum yenilenemedi',e)}}
 function startRefresh(){if(refreshTimer)clearInterval(refreshTimer);refreshTimer=setInterval(refreshLive,15000)}
@@ -8783,16 +8853,21 @@ async function enter(id){
  const row=rows.find(x=>x.id===id),user=auth();if(!row)return;
  if(!user){alert('Canlı derse katılmak için giriş yapmalısın.');return}
  if(row.owner_id!==user.id&&!members.has(id)){alert('Önce sınıfa katılmalısın.');return}
- stop();active=row;quizState=null;$('ccdBookOpen').hidden=row.owner_id!==user.id;$('ccdTeachingToolbar').hidden=row.owner_id!==user.id;$('ccdBookClose').hidden=true;quizAnswers=[];$('ccdQuizPanel').hidden=true;$('ccdQuizOpen').hidden=row.owner_id!==user.id;$('ccdRoomTitle').textContent=row.title;$('ccdDashboard').style.display='none';$('ccdRoom').style.display='block';
+ stop();active=row;quizState=null;quizAnswers=[];quizResults=[];quizIndex=0;quizBusy=false;quizWasActiveThisRoom=false;resultsExpanded=false;$('ccdBookOpen').hidden=row.owner_id!==user.id;$('ccdTeachingToolbar').hidden=row.owner_id!==user.id;$('ccdBookClose').hidden=true;quizAnswers=[];$('ccdQuizPanel').hidden=true;$('ccdQuizOpen').hidden=row.owner_id!==user.id;$('ccdRoomTitle').textContent=row.title;$('ccdDashboard').style.display='none';$('ccdRoom').style.display='block';
  $('ccdJitsiPanel').hidden=true;$('ccdFakeVideo').style.display='none';
  const owner=row.owner_id===user.id;
  $('ccdStartLive').hidden=!owner;$('ccdStopLive').hidden=true;
  $('ccdRoomState').textContent=owner?'Hazır olduğunda canlı yayını başlat.':'Eğitmen yayını başlattığında derse katılabilirsin.';
  if(!owner&&row.book_open&&window.BOOK?.open){window.BOOK.open();window.BOOK.goToPage(row.book_page||0)}refreshQuiz();if(quizTimer)clearInterval(quizTimer);quizTimer=setInterval(refreshQuiz,5000);if(!owner){$('ccdStartLive').hidden=true;$('ccdJoinLive').hidden=!isLive(row);$('ccdRoomState').textContent=isLive(row)?'🔴 CANLI · Ders devam ediyor.':'Eğitmen yayını başlattığında derse katılabilirsin.'}else $('ccdJoinLive').hidden=true;updateWaitingState();
 }
-async function connectLive(){
- if(!active)return;const room=active.room_name;jitsiRoom=room;$('ccdJitsiPanel').hidden=false;$('ccdJitsiError').textContent='Canlı ders hazırlanıyor…';
- try{await sdk();if(jitsiRoom!==room)return;jitsiApi=new window.JitsiMeetExternalAPI('meet.jit.si',{roomName:room,parentNode:$('ccdJitsiMount'),width:'100%',height:580,configOverwrite:{prejoinPageEnabled:true,startWithAudioMuted:true,startWithVideoMuted:true}});$('ccdJitsiError').textContent=''}catch(e){if(jitsiRoom===room)$('ccdJitsiError').textContent='Bağlantı kurulamadı. Yeni sekmede açmayı deneyin.'}
+function connectLive(){
+ if(!active?.room_name)return;
+ jitsiRoom=active.room_name;
+ const panel=$('ccdJitsiPanel'),mount=$('ccdJitsiMount');
+ panel.hidden=false;
+ const url='https://meet.jit.si/'+encodeURIComponent(jitsiRoom);
+ mount.innerHTML='<div class="ccd-video-bridge"><div class="ccd-video-icon">🎥</div><div class="ccd-video-content"><h3>Canlı ders bağlantısı hazır</h3><p>Ücretsiz Jitsi görüşmesi ayrı bir sekmede açılır. Bu sayfada testler ve sınıf araçları açık kalır.</p><a class="btn primary ccd-meeting-link" href="'+esc(url)+'" rel="noopener noreferrer" target="_blank">↗ Görüntülü görüşmeye katıl</a><small>Jitsi sekmesi ayrı çalışır; buradaki “Yayını kapat” düğmesi yalnızca sınıftaki canlı durumunu kapatır.</small></div></div>';
+ $('ccdJitsiError').textContent='';
 }
 async function startLive(){if(!active||active.owner_id!==auth()?.id)return;try{const now=new Date().toISOString();await liveWrite({live_started_at:now,live_heartbeat_at:now,live_ended_at:null});startHeartbeat();$('ccdStartLive').hidden=true;$('ccdStopLive').hidden=false;$('ccdRoomState').textContent='🔴 CANLI · Toplantı bağlantısı açılıyor.';connectLive()}catch(e){alert('Canlı yayın başlatılamadı: '+(e.message||e))}}
 async function stopLive(){stopHeartbeat();try{await liveWrite({live_ended_at:new Date().toISOString()})}catch(e){alert('Yayın durumu güncellenemedi: '+(e.message||e));return}stop();$('ccdJitsiPanel').hidden=true;$('ccdStartLive').hidden=false;$('ccdStopLive').hidden=true;$('ccdRoomState').textContent='Canlı yayın kapatıldı.'}
@@ -8806,37 +8881,182 @@ function questionPool(chapter){return (typeof CARDS!=='undefined'?CARDS:[]).filt
 function shuffleQuiz(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function openQuizSetup(){if(!active||active.owner_id!==auth()?.id)return;const chapters=[...new Set((typeof CARDS!=='undefined'?CARDS:[]).map(c=>Number(c.chapter)).filter(x=>x>=1&&x<=99))].sort((a,b)=>a-b);$('ccdQuizPanel').hidden=false;$('ccdQuizPanel').innerHTML='<label>Fasıl <select id="ccdQuizChapter" onchange="CCClassDemo.updateQuizCount()">'+chapters.map(n=>'<option value="'+n+'">'+String(n).padStart(2,'0')+'. Fasıl</option>').join('')+'</select></label><label>Soru sayısı <select id="ccdQuizCount"><option>5</option><option selected>10</option><option>15</option><option>20</option><option value="all">Tüm kartlar</option></select></label><span id="ccdQuizAvailable" class="ccd-quiz-available"></span><button type="button" class="btn primary" onclick="CCClassDemo.sendQuiz()">Gönder</button><button type="button" class="btn" onclick="document.getElementById(\'ccdQuizPanel\').hidden=true">Vazgeç</button>';updateQuizCount()}
 function updateQuizCount(){const pool=questionPool(Number($('ccdQuizChapter')?.value)),el=$('ccdQuizAvailable'),sel=$('ccdQuizCount');if(el)el.textContent=pool.length+' kart';if(sel){for(const o of sel.options){if(o.value!=='all')o.disabled=Number(o.value)>pool.length}if(sel.selectedOptions[0]?.disabled)sel.value='all'}}
-async function sendQuiz(){if(!active||active.owner_id!==auth()?.id)return;const chapter=Number($('ccdQuizChapter').value),pool=questionPool(chapter),count=$('ccdQuizCount').value==='all'?pool.length:Number($('ccdQuizCount').value);if(pool.length<4){alert('Bu fasılda test oluşturmak için yeterli kart bulunamadı.');return}const chosen=shuffleQuiz(pool).slice(0,Math.min(count,pool.length));const questions=chosen.map(c=>{const wrong=shuffleQuiz(pool.filter(x=>x.id!==c.id&&String(x.text)!==String(c.text))).slice(0,3);if(wrong.length<3)return null;const choices=shuffleQuiz([c,...wrong]);return {id:String(c.id),prompt:String(c.text),options:choices.map(x=>String(x.code)),correct:choices.findIndex(x=>x.id===c.id)}}).filter(Boolean);if(!questions.length)return alert('Sorular oluşturulamadı.');try{const db=await client();await db.from('cc_class_quizzes').update({status:'closed'}).eq('class_id',active.id).eq('owner_id',auth().id).eq('status','active');const res=await db.from('cc_class_quizzes').insert({class_id:active.id,owner_id:auth().id,chapter,questions}).select('*').single();if(res.error)throw res.error;quizState=res.data;quizAnswers=[];renderQuiz()}catch(e){alert('Test gönderilemedi: '+(e.message||e))}}
+
+async function sendQuiz(){
+ if(!active||active.owner_id!==auth()?.id)return;
+ const chapter=Number($('ccdQuizChapter').value),pool=questionPool(chapter);
+ const count=$('ccdQuizCount').value==='all'?pool.length:Number($('ccdQuizCount').value);
+ const uniqueCodes=[...new Set(pool.map(c=>String(c.code||'').trim()))].filter(Boolean);
+ if(uniqueCodes.length<5){alert('Bu fasılda 5 şıklı test oluşturmak için en az 5 farklı tarife pozisyonu bulunmalı.');return}
+ const chosen=shuffleQuiz(pool).slice(0,Math.min(count,pool.length));
+ const questions=chosen.map(c=>{
+  const correct=String(c.code||'').trim();
+  const distractors=shuffleQuiz(uniqueCodes.filter(code=>code!==correct)).slice(0,4);
+  if(distractors.length!==4)return null;
+  const options=shuffleQuiz([correct,...distractors]);
+  return {id:String(c.id),prompt:String(c.text),options,correct:options.indexOf(correct)}
+ }).filter(Boolean);
+ if(!questions.length)return alert('Sorular oluşturulamadı.');
+ try{
+  const db=await client();
+  const old=await db.from('cc_class_quizzes').update({status:'closed'}).eq('class_id',active.id).eq('owner_id',auth().id).eq('status','active');
+  if(old.error)throw old.error;
+  const res=await db.from('cc_class_quizzes').insert({class_id:active.id,owner_id:auth().id,chapter,questions}).select('*').single();
+  if(res.error)throw res.error;
+  quizState=res.data;quizAnswers=[];quizResults=[];quizIndex=0;quizWasActiveThisRoom=true;resultsExpanded=true;
+  await refreshQuiz();
+  alert('5 şıklı, '+questions.length+' soruluk test katılımcılara gönderildi. Canlı yayın devam ediyor.')
+ }catch(e){alert('Test gönderilemedi: '+(e.message||e))}
+}
 async function refreshQuiz(){
- if(!active)return;
+ if(!active||quizBusy)return;
  const classId=active.id,owner=active.owner_id===auth()?.id;
  try{
   const db=await client();
-  // Students must not see a historical, already-closed quiz on entering a room.
-  let query=db.from('cc_class_quizzes').select('*').eq('class_id',classId);
-  if(!owner)query=query.eq('status','active');
-  const r=await query.order('created_at',{ascending:false}).limit(1);
-  if(r.error)throw r.error;
+  const res=await db.from('cc_class_quizzes').select('*').eq('class_id',classId).order('created_at',{ascending:false}).limit(1);
+  if(res.error)throw res.error;
   if(active?.id!==classId)return;
-  if(owner&&$('ccdQuizChapter'))return; // Do not overwrite the teacher's quiz setup form.
-  quizState=r.data?.[0]||null;
-  quizAnswers=[];
-  if(quizState){
-   const a=await db.from('cc_class_quiz_answers').select('*').eq('quiz_id',quizState.id);
-   if(active?.id!==classId)return;
-   if(!a.error)quizAnswers=a.data||[];
+  if(owner&&$('ccdQuizChapter'))return;
+  const latest=res.data?.[0]||null;
+  const previousId=quizState?.id;
+  if(!owner&&latest?.status==='closed'&&latest.id!==previousId){
+   quizState=null;quizAnswers=[];quizResults=[];renderQuiz();return
+  }
+  if(latest?.id!==previousId){
+   quizIndex=0;quizAnswers=[];quizResults=[];resultsExpanded=owner;
+  }
+  quizState=latest;
+  if(latest?.status==='active')quizWasActiveThisRoom=true;
+  if(!quizState){quizAnswers=[];quizResults=[];renderQuiz();return}
+  const [answersResult,scoresResult]=await Promise.all([
+   db.from('cc_class_quiz_answers').select('*').eq('quiz_id',quizState.id),
+   db.rpc('cc_class_quiz_results',{p_quiz_id:quizState.id})
+  ]);
+  if(active?.id!==classId||quizState?.id!==latest.id)return;
+  if(!answersResult.error)quizAnswers=answersResult.data||[];
+  if(!scoresResult.error)quizResults=scoresResult.data||[];
+  else console.warn('Test sonuçları alınamadı:',scoresResult.error);
+  const mine=quizAnswers.find(x=>x.user_id===auth()?.id),answers=mine?.answers||{};
+  if(!owner&&mine?.finished_at)resultsExpanded=true;
+  if(latest.status==='closed'&&previousId===latest.id)resultsExpanded=true;
+  if(!owner&&latest.id!==previousId){
+   let first=(latest.questions||[]).findIndex((_,i)=>!Object.prototype.hasOwnProperty.call(answers,String(i)));
+   quizIndex=first<0?(latest.questions||[]).length:first;
   }
   renderQuiz()
- }catch(e){console.warn('Sınıf testi güncellenemedi',e)}
+ }catch(e){console.warn('Sınıf testi güncellenemedi:',e)}
 }
 function updateWaitingState(){
  const panel=$('ccdWaitingPanel');
  if(!panel)return;
- panel.hidden=!active||active.owner_id===auth()?.id||isLive(active)||quizState?.status==='active';
+ panel.hidden=!active||active.owner_id===auth()?.id||isLive(active)||!!quizState;
 }
-function renderQuiz(){const el=$('ccdQuizPanel');if(!active||!quizState||(active.owner_id!==auth()?.id&&quizState.status!=='active')){el.hidden=true;el.innerHTML='';updateWaitingState();return}el.hidden=false;updateWaitingState();const owner=active.owner_id===auth()?.id,q=quizState.questions||[];if(owner){const scored=quizAnswers.map(a=>{let correct=0;for(let i=0;i<q.length;i++)if(Number(a.answers?.[i])===q[i].correct)correct++;return {id:a.user_id,correct,answered:Object.keys(a.answers||{}).length}});el.innerHTML='<h3>'+quizState.chapter+'. Fasıl · Canlı test '+(quizState.status==='active'?'● Aktif':'· Bitti')+'</h3><p>'+q.length+' soru · '+scored.length+' katılımcı cevapladı</p><div class="ccd-quiz-results">'+(scored.map(x=>'<div><b>'+esc(x.id.slice(0,8))+'…</b><span>'+x.answered+'/'+q.length+' yanıt · '+x.correct+' doğru · %'+Math.round(x.correct/q.length*100)+'</span></div>').join('')||'<p>Henüz cevap gelmedi.</p>')+'</div>'+(quizState.status==='active'?'<button class="btn" onclick="CCClassDemo.closeQuiz()">Testi bitir</button>':'');return}const mine=quizAnswers.find(a=>a.user_id===auth()?.id),answers=mine?.answers||{};el.innerHTML='<h3>'+quizState.chapter+'. Fasıl · '+q.length+' soruluk test</h3>'+(quizState.status==='closed'?'<p>Test sona erdi.</p>':'<p>Cevaplar gönderildikçe kaydedilir.</p>')+q.map((x,i)=>'<div class="ccd-quiz-question"><b>'+(i+1)+'. '+esc(x.prompt)+'</b><div class="ccd-quiz-options">'+x.options.map((opt,j)=>'<button type="button" class="btn '+(Number(answers[i])===j?'primary':'')+'" '+(quizState.status==='closed'?'disabled':'')+' onclick="CCClassDemo.answerQuiz('+i+','+j+')">'+esc(opt)+'</button>').join('')+'</div></div>').join('')}
-async function answerQuiz(i,j){if(!quizState||quizState.status!=='active'||active?.owner_id===auth()?.id)return;const user=auth();if(!user)return;const mine=quizAnswers.find(a=>a.user_id===user.id),answers={...(mine?.answers||{}),[i]:j};try{const db=await client();const r=await db.from('cc_class_quiz_answers').upsert({quiz_id:quizState.id,user_id:user.id,answers,updated_at:new Date().toISOString()},{onConflict:'quiz_id,user_id'});if(r.error)throw r.error;quizAnswers=quizAnswers.filter(a=>a.user_id!==user.id).concat({user_id:user.id,answers});renderQuiz()}catch(e){alert('Cevap kaydedilemedi: '+(e.message||e))}}
-async function closeQuiz(){if(!quizState||active?.owner_id!==auth()?.id)return;try{const db=await client();const r=await db.from('cc_class_quizzes').update({status:'closed'}).eq('id',quizState.id).eq('owner_id',auth().id);if(r.error)throw r.error;quizState.status='closed';renderQuiz()}catch(e){alert('Test kapatılamadı: '+(e.message||e))}}
+function renderQuizLeaderboard(){
+ const items=quizResults||[];
+ const rows=items.map((x,i)=>{
+  const total=Number(x.total||0),correct=Number(x.correct||0),answered=Number(x.answered||0);
+  const percent=total?Math.round(correct*100/total):0;
+  const state=x.finished_at?'Tamamladı':quizState?.status==='closed'?'Süre doldu':answered?'Çözüyor':'Bekliyor';
+  const mine=x.user_id===auth()?.id;
+  return '<tr class="'+(mine?'ccd-result-mine':'')+'"><td><span class="ccd-rank">'+(i+1)+'</span> <strong>'+esc(x.display_name||'Katılımcı')+'</strong>'+(mine?' <small>(Sen)</small>':'')+'</td><td>'+answered+' / '+total+'</td><td><strong>'+correct+'</strong></td><td>%'+percent+'</td><td><span class="ccd-result-status">'+esc(state)+'</span></td></tr>'
+ }).join('');
+ const title='Katılımcı sonuçları ('+items.length+')';
+ return '<section class="ccd-scores"><button type="button" class="ccd-results-toggle" aria-expanded="'+String(resultsExpanded)+'" onclick="CCClassDemo.toggleQuizResults()"><span>🏆 '+title+'</span><span>'+ (resultsExpanded?'Gizle ▲':'Göster ▼')+'</span></button>'+
+  (resultsExpanded?'<div class="ccd-results-wrap"><table class="ccd-results-table"><thead><tr><th>Katılımcı</th><th>Yanıt</th><th>Doğru</th><th>Başarı</th><th>Durum</th></tr></thead><tbody>'+ (rows||'<tr><td colspan="5">Henüz sınıfa katılan kullanıcı bulunmuyor.</td></tr>')+'</tbody></table></div>':'')+'</section>'
+}
+function renderQuiz(){
+ const el=$('ccdQuizPanel');
+ if(!active||!quizState||(!quizWasActiveThisRoom&&quizState.status==='closed'&&active.owner_id!==auth()?.id)){
+  el.hidden=true;el.innerHTML='';updateWaitingState();return
+ }
+ el.hidden=false;updateWaitingState();
+ const owner=active.owner_id===auth()?.id,q=Array.isArray(quizState.questions)?quizState.questions:[];
+ const mine=quizAnswers.find(a=>a.user_id===auth()?.id),answers=mine?.answers||{};
+ const done=!!mine?.finished_at;
+ const answered=q.filter((_,i)=>Object.prototype.hasOwnProperty.call(answers,String(i))).length;
+ const heading='<header class="ccd-test-header"><div><span class="ccd-test-eyebrow">CUSTOMS COMMUNITY · FASIL SINAVI</span><h3>'+String(quizState.chapter).padStart(2,'0')+'. Fasıl · '+q.length+' Soruluk Test</h3><p>'+ (quizState.status==='active'?'● Test devam ediyor':'● Test tamamlandı')+' · Canlı ders bağlantısı bundan etkilenmez.</p></div><span class="ccd-test-chip">'+(quizState.status==='active'?'AKTİF':'BİTTİ')+'</span></header>';
+ const board=renderQuizLeaderboard();
+ if(owner){
+  el.innerHTML=heading+'<div class="ccd-test-summary"><div><b>Eğitmen paneli</b><p>Katılımcıların cevaplarını ve sonuçlarını aşağıdaki tablodan izle. Testi sonlandırmak canlı yayını kapatmaz.</p></div>'+
+   (quizState.status==='active'?'<button class="btn ccd-end-all" type="button" onclick="CCClassDemo.closeQuiz()">■ Testi herkes için sonlandır</button>':'<span class="ccd-complete-badge">✓ Test sonlandırıldı</span>')+'</div>'+board;
+  return
+ }
+ if(done||quizState.status==='closed'){
+  const result=quizResults.find(x=>x.user_id===auth()?.id),correct=Number(result?.correct||0);
+  el.innerHTML=heading+'<div class="ccd-finished-message"><span class="ccd-finish-icon">✓</span><div><h4>'+(done?'Testini tamamladın!':'Test eğitmen tarafından sonlandırıldı.')+'</h4><p>'+answered+' / '+q.length+' soru yanıtlandı'+(result?' · '+correct+' doğru':'')+'. Canlı derse katılmaya devam edebilirsin.</p></div></div>'+board;
+  return
+ }
+ if(quizIndex>=q.length){
+  el.innerHTML=heading+'<div class="ccd-finished-message"><span class="ccd-finish-icon">✓</span><div><h4>Bütün soruları yanıtladın</h4><p>Yanıtların kaydedildi. Testi bitirerek sonucunu kesinleştirebilirsin.</p></div></div><div class="ccd-test-actions"><button class="btn primary ccd-finish-btn" type="button" onclick="CCClassDemo.finishQuiz()">✓ Testi bitir</button><button class="btn" type="button" onclick="CCClassDemo.goQuizQuestion('+(q.length-1)+')">Önceki soruya dön</button></div>'+board;
+  return
+ }
+ const idx=Math.max(0,Math.min(quizIndex,q.length-1)),question=q[idx];
+ const options=Array.isArray(question?.options)?question.options:[];
+ const choices=options.map((opt,j)=>'<button type="button" class="ccd-choice" onclick="CCClassDemo.answerQuiz('+idx+','+j+')" '+(quizBusy?'disabled':'')+'><span class="ccd-choice-letter">'+String.fromCharCode(65+j)+'</span><span class="ccd-choice-label">'+esc(opt)+'</span><span class="ccd-choice-arrow">›</span></button>').join('');
+ const percent=Math.round(answered*100/Math.max(1,q.length));
+ el.innerHTML=heading+'<div class="ccd-quiz-progress-label"><span>Soru <b>'+(idx+1)+' / '+q.length+'</b></span><span><b>'+answered+'</b> yanıtlandı</span></div><div class="ccd-quiz-progress-track"><div style="width:'+percent+'%"></div></div>'+
+  '<div class="ccd-question-shell"><span class="ccd-question-tag">SORU '+(idx+1)+'</span><h4>'+esc(question.prompt||'Soru metni bulunamadı.')+'</h4><p>Doğru tarife pozisyonunu seçin.</p><div class="ccd-choice-list">'+choices+'</div></div>'+
+  '<div class="ccd-test-actions">'+(idx>0?'<button class="btn" type="button" onclick="CCClassDemo.goQuizQuestion('+(idx-1)+')">← Önceki soru</button>':'<span></span>')+
+  '<button class="btn ccd-finish-btn" type="button" onclick="CCClassDemo.finishQuiz()">Testi bitir</button></div>'+board
+}
+function goQuizQuestion(i){
+ if(!quizState||quizBusy||quizState.status!=='active')return;
+ const mine=quizAnswers.find(a=>a.user_id===auth()?.id);
+ if(mine?.finished_at)return;
+ quizIndex=Math.max(0,Math.min(Number(i)||0,(quizState.questions||[]).length));
+ renderQuiz()
+}
+function toggleQuizResults(){resultsExpanded=!resultsExpanded;renderQuiz()}
+async function answerQuiz(i,j){
+ if(quizBusy||!quizState||quizState.status!=='active'||active?.owner_id===auth()?.id)return;
+ const user=auth();if(!user)return;
+ const mine=quizAnswers.find(a=>a.user_id===user.id);
+ if(mine?.finished_at)return;
+ const q=quizState.questions||[];
+ if(i<0||i>=q.length||j<0||j>=(q[i].options||[]).length)return;
+ const answers={...(mine?.answers||{}),[i]:j};
+ quizBusy=true;
+ try{
+  const db=await client();
+  const res=await db.from('cc_class_quiz_answers').upsert({quiz_id:quizState.id,user_id:user.id,answers,updated_at:new Date().toISOString()},{onConflict:'quiz_id,user_id'});
+  if(res.error)throw res.error;
+  quizAnswers=quizAnswers.filter(a=>a.user_id!==user.id).concat({user_id:user.id,answers});
+  const next=q.findIndex((_,k)=>!Object.prototype.hasOwnProperty.call(answers,String(k)));
+  quizIndex=next<0?q.length:next;
+ }catch(e){alert('Yanıt kaydedilemedi: '+(e.message||e))}
+ finally{quizBusy=false;renderQuiz()}
+}
+async function finishQuiz(){
+ if(!active||!quizState||quizBusy||quizState.status!=='active'||active.owner_id===auth()?.id)return;
+ const user=auth();if(!user)return;
+ const mine=quizAnswers.find(a=>a.user_id===user.id),answers=mine?.answers||{},total=(quizState.questions||[]).length;
+ const count=Object.keys(answers).length;
+ if(mine?.finished_at)return;
+ if(count<total&&!confirm(count+' / '+total+' soruyu yanıtladın. Boş sorular yanlış sayılacak ve daha sonra cevap değiştiremeyeceksin. Testi bitirmek istiyor musun?'))return;
+ quizBusy=true;
+ try{
+  const db=await client();
+  const finished_at=new Date().toISOString();
+  const res=await db.from('cc_class_quiz_answers').upsert({quiz_id:quizState.id,user_id:user.id,answers,finished_at,updated_at:finished_at},{onConflict:'quiz_id,user_id'});
+  if(res.error)throw res.error;
+  quizAnswers=quizAnswers.filter(a=>a.user_id!==user.id).concat({user_id:user.id,answers,finished_at});
+  resultsExpanded=true;
+  alert('Testin tamamlandı. Canlı yayın devam ediyor.');
+ }catch(e){alert('Test tamamlanamadı: '+(e.message||e))}
+ finally{quizBusy=false;renderQuiz();refreshQuiz()}
+}
+async function closeQuiz(){
+ if(!quizState||active?.owner_id!==auth()?.id||quizState.status!=='active')return;
+ if(!confirm('Bu testi bütün katılımcılar için sonlandırmak istiyor musun? Canlı yayın devam edecek.'))return;
+ try{
+  const db=await client();
+  const r=await db.from('cc_class_quizzes').update({status:'closed'}).eq('id',quizState.id).eq('owner_id',auth().id);
+  if(r.error)throw r.error;
+  quizState.status='closed';resultsExpanded=true;
+  await refreshQuiz();renderQuiz();
+  alert('Test tüm katılımcılar için sonlandırıldı. Canlı yayın kapatılmadı.')
+ }catch(e){alert('Test sonlandırılamadı: '+(e.message||e))}
+}
 window.CCClassDemo={
  open(){ $('ccClassDemo').style.display='block';document.body.style.overflow='hidden';load();startRefresh()},
  close(){stopHeartbeat();stopRefresh();if(active?.owner_id===auth()?.id&&isLive(active))liveWrite({live_ended_at:new Date().toISOString()}).catch(console.warn);stop();active=null;$('ccdRoom').style.display='none';$('ccdDashboard').style.display='block';$('ccClassDemo').style.display='none';document.body.style.overflow=''},
@@ -8845,7 +9065,7 @@ window.CCClassDemo={
  create(){form(null)},edit(id){const row=rows.find(x=>x.id===id);if(row?.owner_id===auth()?.id)form(row)},
  save,join,remove,enter,
  cancelForm(){$('ccdClassForm').hidden=true},
- startLive,stopLive,repeatChanged,openBook,closeBook,toggleQuizSetup,openQuizSetup,updateQuizCount,sendQuiz,answerQuiz,closeQuiz,joinLive(){if(active&&(members.has(active.id)||active.owner_id===auth()?.id)&&isLive(active))connectLive()},
+ startLive,stopLive,repeatChanged,openBook,closeBook,toggleQuizSetup,openQuizSetup,updateQuizCount,sendQuiz,answerQuiz,finishQuiz,goQuizQuestion,toggleQuizResults,closeQuiz,joinLive(){if(active&&(members.has(active.id)||active.owner_id===auth()?.id)&&isLive(active))connectLive()},
  openJitsiTab(){if(jitsiRoom)window.open('https://meet.jit.si/'+encodeURIComponent(jitsiRoom),'_blank','noopener,noreferrer')},
  toggle(){},notice(){alert('Kamera, mikrofon, sohbet ve ekran paylaşımı için Jitsi toplantısının içindeki düğmeleri kullanın.')}
 };
