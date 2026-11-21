@@ -43,7 +43,7 @@ function wrapStart(){
  if(originalStart||typeof window.startTest!=='function')return;
  originalStart=window.startTest;
  window.startTest=function(returnToReview=false){
-  if(!el('ccProductChoice')?.querySelector('input[value="product"]')?.checked||returnToReview)return originalStart.apply(this,arguments);
+  if(!el('ccProductChoice')?.querySelector('input[value="product"]')?.checked||returnToReview){el('view-test')?.classList.remove('cc-product-question');return originalStart.apply(this,arguments)}
   const pool=getQuizPool(),productsPool=items(pool);
   if(!productsPool.length){alert('Seçilen fasıllarda ayrı bir ürün veya eşya adı belirlenemedi. Tüm Kart Bilgisi seçeneğini kullanabilirsiniz.');return}
   const val=el('testCount').value,count=val==='all'?productsPool.length:Math.min(+val,productsPool.length);
@@ -56,7 +56,7 @@ function wrapStart(){
    return {card:{...p.card,text:p.name},question:'"'+p.name+'" aşağıdaki hangi tarife pozisyonunda sınıflandırılmıştır?',answer:p.code,options:mix([p.code,...distractors]).map(code=>({code}))};
   }).filter(Boolean);
   if(!qs.length){alert('Şıklar için yeterli tarife pozisyonu yok.');return}
-  setTestRunning(true);testState={questions:qs,current:0,correct:0,wrong:0,answered:false,returnToReview:false};renderQuestion();
+  el('view-test')?.classList.add('cc-product-question');setTestRunning(true);testState={questions:qs,current:0,correct:0,wrong:0,answered:false,returnToReview:false};renderQuestion();
  };
 }
 async function loadBank(){
