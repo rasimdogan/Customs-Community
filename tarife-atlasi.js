@@ -246,7 +246,7 @@ function click(ev){
 }
 function studyChapter(no){open();const c=CHAPTER_MAP.get(String(no).padStart(2,'0'));if(c){openSection=c.section;search=c.no;render()}}
 function studySection(roman){open();openSection=roman;render()}
-window.GTA_ATLAS={open,close,isOpen,render,studyChapter,studySection};
+window.GTA_ATLAS={open,close,isOpen,render,studyChapter,studySection,getSections:()=>SOURCE_SECTIONS.map(s=>{const cc=SOURCE_CHAPTERS.filter(c=>c.section===s.roman).map(c=>Number(c.no));return [s.roman,Math.min(...cc),Math.max(...cc),s.title]}),getChapters:()=>SOURCE_CHAPTERS.map(c=>({id:Number(c.no),name:c.title}))};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount();
 window.addEventListener('cc-content-ready',()=>{if(isOpen())render()});
 })();
