@@ -203,7 +203,7 @@ function installCommunityLogout(){
  if($('ccCommunityLogoutStyle'))return;
  const style=document.createElement('style');
  style.id='ccCommunityLogoutStyle';
- style.textContent='#ccCommunityLogout{position:absolute;right:18px;bottom:18px;z-index:10050;display:inline-flex;align-items:center;gap:8px;padding:10px 15px;border:1px solid #cbdbe6;border-radius:10px;background:#fff;color:#2c4d62;font:700 13px/1.3 inherit;cursor:pointer;box-shadow:0 4px 15px #173b521c}#ccCommunityLogout:hover{background:#f1f7fa;border-color:#9bbdce}#ccCommunityLogout:focus-visible{outline:3px solid #2685b6;outline-offset:2px}#ccCommunityLogout[disabled]{opacity:.65;cursor:wait}@media(max-width:640px){#ccCommunityLogout{right:12px;bottom:12px;padding:9px 12px;font-size:12px}}';
+ style.textContent='#ccCommunityLogout[hidden]{display:none!important}#ccCommunityLogout{position:absolute;right:18px;bottom:18px;z-index:10050;display:inline-flex;align-items:center;gap:8px;padding:10px 15px;border:1px solid #cbdbe6;border-radius:10px;background:#fff;color:#2c4d62;font-family:inherit;font-weight:700;font-size:13px;line-height:1.3;cursor:pointer;box-shadow:0 4px 15px #173b521c}#ccCommunityLogout:hover{background:#f1f7fa;border-color:#9bbdce}#ccCommunityLogout:focus-visible{outline:3px solid #2685b6;outline-offset:2px}#ccCommunityLogout[disabled]{opacity:.65;cursor:wait}@media(max-width:640px){#ccCommunityLogout{right:12px;bottom:12px;padding:9px 12px;font-size:12px}}';
  document.head.appendChild(style);
  const sync=()=>{
   const hub=$('ccxOverlay');
