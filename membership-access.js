@@ -174,6 +174,26 @@ function removeWelcomePostExplanation(){
   if(value.includes(phrase)&&value.includes(suffix))el.remove();
  });
 }
+function installBookPointerCursor(){
+ /* Kitap kartlarının mevcut büyütme/öne gelme davranışına dokunmadan büyüteç imlecini kaldır. */
+ if(!$('ccBookPointerCursorStyle')){
+  const style=document.createElement('style');
+  style.id='ccBookPointerCursorStyle';
+  style.textContent='#bkOverlay [style*="zoom-in"],#bkOverlay [style*="zoom_out"],#bkOverlay [style*="zoom-out"],#bkOverlay [style*="zoom_in"]{cursor:pointer!important}';
+  document.head.appendChild(style);
+ }
+ document.addEventListener('pointerover',event=>{
+  const overlay=$('bkOverlay');
+  if(!overlay||!overlay.contains(event.target))return;
+  let node=event.target;
+  while(node&&node!==overlay){
+   if(node.nodeType===1&&['zoom-in','zoom-out'].includes(getComputedStyle(node).cursor)){
+    node.style.setProperty('cursor','pointer','important');
+   }
+   node=node.parentElement;
+  }
+ },{passive:true});
+}
 function installBookNotice(){
  document.addEventListener('click',e=>{if(e.target?.closest?.('[onclick*="BOOK.open"],#bookFloatLauncher'))setTimeout(updateBookNotice,50)},true);
  document.addEventListener('cc-book-page',updateBookNotice);
@@ -189,7 +209,7 @@ function installObserver(){
  }
 }
 function init(){
- installStyles();createMemberSummary();guardClassOpen();protectEducationNavigation();installClickGuards();installBookNotice();installObserver();removeWelcomePostExplanation();
+ installStyles();createMemberSummary();guardClassOpen();protectEducationNavigation();installClickGuards();installBookPointerCursor();installBookNotice();installObserver();removeWelcomePostExplanation();
  const welcomeObserver=new MutationObserver(removeWelcomePostExplanation);
  welcomeObserver.observe(document.body,{childList:true,subtree:true});setTimeout(protectEducationNavigation,200);
  window.addEventListener('cc-authenticated',()=>{createMemberSummary();protectEducationNavigation();refresh()});
