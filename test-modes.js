@@ -3,7 +3,7 @@
 const el=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const labels={gtip:'Yönetici Soruları',izahname:'İzahname'};
-let mode='position',bank=[],round=null,answered=false,request=0,originalStart=null;
+let mode='position',bank=[],round=null,answered=false,request=0,originalStart=null,originalCancel=null,originalNext=null;
 const mix=a=>{const b=a.slice();for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b};
 function setup(){
  const host=el('view-test'),focus=host?.querySelector('.test-focus');if(!focus||el('ccTestModes'))return;
@@ -18,12 +18,14 @@ function setup(){
  const custom=document.createElement('div');custom.id='ccCustomTest';custom.hidden=true;shell.after(custom);
  const intro=focus.querySelector('.test-hero p');if(intro)intro.textContent='İzahname, Yönetici Soruları veya kartlardan oluşturulan 4 haneli tarife testlerini çöz.';
  wrapStart();
+ wrapPositionControls();
 }
 function setMode(value){
  setup();mode=value;request++;
  const focus=el('view-test')?.querySelector('.test-focus'),shell=focus?.querySelector('.test-shell'),custom=el('ccCustomTest'),product=el('ccProductChoice');if(!shell||!custom)return;
  el('ccTestModes').querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.ccmode===value));
  shell.hidden=value!=='position';product.hidden=value!=='position';custom.hidden=value==='position';
+ if(value!=='position')el('view-test')?.classList.remove('cc-test-running');
  if(value!=='position')loadBank();
 }
 function products(card){
@@ -43,7 +45,12 @@ function wrapStart(){
  if(originalStart||typeof window.startTest!=='function')return;
  originalStart=window.startTest;
  window.startTest=function(returnToReview=false){
-  if(!el('ccProductChoice')?.querySelector('input[value="product"]')?.checked||returnToReview){el('view-test')?.classList.remove('cc-product-question');return originalStart.apply(this,arguments)}
+  if(!el('ccProductChoice')?.querySelector('input[value="product"]')?.checked||returnToReview){
+   el('view-test')?.classList.remove('cc-product-question');
+   const result=originalStart.apply(this,arguments);
+   if(!returnToReview&&typeof testState!=='undefined'&&testState.questions?.length)el('view-test')?.classList.add('cc-test-running');
+   return result;
+  }
   const pool=getQuizPool(),productsPool=items(pool);
   if(!productsPool.length){alert('Seçilen fasıllarda ayrı bir ürün veya eşya adı belirlenemedi. Tüm Kart Bilgisi seçeneğini kullanabilirsiniz.');return}
   const val=el('testCount').value,count=val==='all'?productsPool.length:Math.min(+val,productsPool.length);
@@ -56,8 +63,36 @@ function wrapStart(){
    return {card:{...p.card,text:p.name},question:'"'+p.name+'" aşağıdaki hangi tarife pozisyonunda sınıflandırılmıştır?',answer:p.code,options:mix([p.code,...distractors]).map(code=>({code}))};
   }).filter(Boolean);
   if(!qs.length){alert('Şıklar için yeterli tarife pozisyonu yok.');return}
-  el('view-test')?.classList.add('cc-product-question');setTestRunning(true);testState={questions:qs,current:0,correct:0,wrong:0,answered:false,returnToReview:false};renderQuestion();
+  el('view-test')?.classList.add('cc-product-question','cc-test-running');setTestRunning(true);testState={questions:qs,current:0,correct:0,wrong:0,answered:false,returnToReview:false};renderQuestion();
  };
+}
+function wrapPositionControls(){
+ if(!originalCancel&&typeof window.cancelPositionTest==='function'){
+  originalCancel=window.cancelPositionTest;
+  window.cancelPositionTest=function(){
+   const result=originalCancel.apply(this,arguments);
+   el('view-test')?.classList.remove('cc-test-running','cc-product-question');
+   return result;
+  };
+ }
+ if(!originalNext&&typeof window.nextTest==='function'){
+  originalNext=window.nextTest;
+  window.nextTest=function(){
+   const finished=typeof testState!=='undefined'&&testState.questions?.length&&testState.current===testState.questions.length-1;
+   const result=originalNext.apply(this,arguments);
+   if(finished&&el('view-test')?.classList.contains('cc-test-running')){
+    const area=el('testArea');
+    if(area&&!el('ccReturnToSelection')){
+     const button=document.createElement('button');
+     button.type='button';button.id='ccReturnToSelection';button.className='cc-position-return';
+     button.textContent='Test Seçimine Dön';
+     button.onclick=()=>window.cancelPositionTest();
+     area.querySelector('.question')?.appendChild(button);
+    }
+   }
+   return result;
+  };
+ }
 }
 async function loadBank(){
  const ticket=++request,box=el('ccCustomTest');if(!box)return;box.innerHTML='<p>Sorular yükleniyor…</p>';
@@ -76,7 +111,7 @@ function startCustom(){
 }
 function showQuestion(){
  const q=round.questions[round.index],n=round.questions.length;answered=false;
- el('ccCustomTest').innerHTML='<div class="cct-head"><h3>'+esc(labels[mode])+'</h3><span>Soru '+(round.index+1)+' / '+n+'</span></div><div class="cct-question">'+esc(q.question)+'</div><div class="cct-options">'+q.options.map((s,i)=>'<button type="button" data-choice="'+i+'"><b>'+String.fromCharCode(65+i)+'</b><span>'+esc(s)+'</span></button>').join('')+'</div><div id="ccCustomFeedback"></div><div class="cct-actions"><button type="button" id="ccCustomBack" class="cct-secondary">Test Seçimine Dön</button><button type="button" id="ccCustomNext" disabled>'+(round.index===n-1?'Sonuçları Gör':'Sonraki Soru')+'</button></div>';
+ el('ccCustomTest').innerHTML='<div class="cct-head"><h3>'+esc(labels[mode])+'</h3><span>Soru '+(round.index+1)+' / '+n+'</span></div><div class="cct-question">'+esc(q.question)+'</div><div class="cct-options">'+q.options.map((s,i)=>'<button type="button" data-choice="'+i+'"><b>'+String.fromCharCode(65+i)+'</b><span>'+esc(s)+'</span></button>').join('')+'</div><div id="ccCustomFeedback"></div><div class="cct-actions"><button type="button" id="ccCustomBack" class="cct-secondary">Test Seçimine Dön</button><button type="button" id="ccCustomNext" disabled>'+(round.index===n-1?'Testi Bitir':'Sonraki Soru')+'</button></div>';
  el('ccCustomBack').onclick=()=>{round=null;loadBank()};
  el('ccCustomNext').onclick=()=>{round.index++;if(round.index===n)finish();else showQuestion()};
  el('ccCustomTest').querySelectorAll('[data-choice]').forEach(b=>b.onclick=()=>choose(Number(b.dataset.choice)));
