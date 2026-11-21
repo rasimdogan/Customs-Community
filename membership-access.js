@@ -131,19 +131,30 @@ function protectEducationNavigation(){
 }
 
 function guardClassOpen(){
- const obj=window.CCClassDemo;if(!obj||obj.__ccPlanProtected)return;
- const open=obj.open;if(typeof open!=='function')return;
- obj.open=function(...args){if(!canHost()){upgrade('host');return}return open.apply(this,args)};
- obj.__ccPlanProtected=true;
+ /* Sınıf ekranını açmak, mevcut sınıflara katılmak ve yayını izlemek ücretsizdir.
+    Yetki kontrolü yalnızca yeni sınıf/webinar oluşturma eyleminde yapılır. */
 }
 function installClickGuards(){
  document.addEventListener('click',e=>{
   if(!logged())return;
-  const webinar=e.target?.closest?.('#ccxTabWebinars, #ccxOverlay [data-hub-view="webinars"]');
-  if(webinar&&!canHost()){
+  const target=e.target?.closest?.('button,a,[role="button"],[data-chapter],[data-fasil],[data-scene-index],[data-scene-order]');
+  if(!target)return;
+  const label=(target.textContent||'').trim().replace(/\\s+/g,' ').toLocaleLowerCase('tr-TR');
+  const action=String(target.dataset.action||target.dataset.ccAction||'').toLocaleLowerCase('tr-TR');
+  /* Katıl/izle/takvime ekle işlemleri her kayıtlı kullanıcıya açıktır. */
+  if(!canHost() && (/^(sınıf oluştur|yeni sınıf|webinar oluştur|yeni webinar|webinar planla|canlı sınıf oluştur)$/.test(label)||/^(create-class|create-webinar|new-class|new-webinar)$/.test(action))){
    e.preventDefault();e.stopImmediatePropagation();upgrade('host');return;
   }
-  /* Oyunlar ücretsiz ve Kart Plus için de açıktır. */
+  /* Oyunlara giriş açık, kilitli fasıl ve sahne seçimleri kısıtlı. */
+  if(hasTariff())return;
+  const ch=target.dataset.chapter??target.dataset.fasil??target.dataset.chapterNumber;
+  if(ch!==undefined && /^\\d{1,2}$/.test(String(ch)) && !chapterAllowed(ch)){
+   e.preventDefault();e.stopImmediatePropagation();upgrade('tariff');return;
+  }
+  const scene=target.dataset.sceneIndex??target.dataset.sceneOrder;
+  if(scene!==undefined && /^\\d+$/.test(String(scene)) && Number(scene)>(target.dataset.sceneIndex!==undefined?4:5)){
+   e.preventDefault();e.stopImmediatePropagation();upgrade('tariff');return;
+  }
  },true);
 }
 function updateBookNotice(){
@@ -153,6 +164,15 @@ function updateBookNotice(){
  const locked=!hasTariff();
  notice.hidden=!locked;
  if(locked)notice.innerHTML='<span>📖 Bölüm I · 01–05 fasıllar açık</span><span class="cc-book-locked">🔒 Bölüm II–XXI ve diğer fasıllar Tarife Modülü ile açılır.</span>';
+}
+function removeWelcomePostExplanation(){
+ const phrase='İlk üyelik kaydın tamamlandığında hesabından';
+ const suffix='Bu gönderiyi daha sonra silebilirsin.';
+ document.querySelectorAll('p,small,span,div,label').forEach(el=>{
+  if(el.children.length>0)return;
+  const value=(el.textContent||'').trim();
+  if(value.includes(phrase)&&value.includes(suffix))el.remove();
+ });
 }
 function installBookNotice(){
  document.addEventListener('click',e=>{if(e.target?.closest?.('[onclick*="BOOK.open"],#bookFloatLauncher'))setTimeout(updateBookNotice,50)},true);
@@ -169,13 +189,15 @@ function installObserver(){
  }
 }
 function init(){
- installStyles();createMemberSummary();guardClassOpen();protectEducationNavigation();installClickGuards();installBookNotice();installObserver();setTimeout(protectEducationNavigation,200);
+ installStyles();createMemberSummary();guardClassOpen();protectEducationNavigation();installClickGuards();installBookNotice();installObserver();removeWelcomePostExplanation();
+ const welcomeObserver=new MutationObserver(removeWelcomePostExplanation);
+ welcomeObserver.observe(document.body,{childList:true,subtree:true});setTimeout(protectEducationNavigation,200);
  window.addEventListener('cc-authenticated',()=>{createMemberSummary();protectEducationNavigation();refresh()});
  window.addEventListener('cc-plan-updated',()=>{updateBookNotice();try{window.GTA_ATLAS?.render?.()}catch(_){}});
  window.addEventListener('focus',()=>{if(logged())refresh()});
  window.addEventListener('cc-content-ready',createMemberSummary);
  if(logged())refresh();
 }
-window.CC_ACCESS={PACKAGES,refresh,currentPlan,hasTariff,canHost,chapterAllowed,upgrade,loadAdmin,cardCount:()=>cardCount};
+window.CC_ACCESS={PACKAGES,refresh,currentPlan,hasTariff,canHost,chapterAllowed,sceneAllowed:n=>hasTariff()||(Number(n)>=1&&Number(n)<=5),upgrade,loadAdmin,cardCount:()=>cardCount};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
