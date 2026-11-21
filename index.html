@@ -3374,7 +3374,7 @@ html.cc-auth-pending body{overflow:hidden}.cc-auth-gate{position:fixed;inset:0;z
 <button class="cc-auth-btn" type="submit">Giriş Yap</button>
 </form>
 <div class="cc-auth-help"><button class="cc-auth-forgot" type="button" onclick="CC_ACCOUNT.forgot()">Şifremi Unuttum</button></div>
-<div class="cc-google-login"><div class="cc-google-sep">veya</div><button type="button" id="ccGoogleLoginBtn" class="cc-google-btn" onclick="CC_MEMBERSHIP.googleLogin()"><span class="cc-google-mark">G</span> Google ile devam et</button></div><div class="cc-auth-msg" id="ccAuthMsg"></div>
+<div class="cc-google-login"><div class="cc-google-sep">veya</div><button type="button" id="ccGoogleLoginBtn" class="cc-google-btn" onclick="CC_MEMBERSHIP.googleLogin()"><span class="cc-google-mark">G</span> Google ile devam et</button><p class="cc-auto-welcome-notice">İlk üyelik kaydın tamamlandığında hesabından otomatik bir “Ben de artık Customs Community’deyim!” tanışma gönderisi paylaşılır. Bu gönderiyi daha sonra silebilirsin.</p></div><div class="cc-auth-msg" id="ccAuthMsg"></div>
 
 </div>
 <section class="cc-welcome-stage" aria-label="Customs Community tanıtım">
@@ -9464,4 +9464,4 @@ body.dark #view-home .cc-fcm-resume{color:#b6d6e5}
 #bkGrid .bk-card[data-id]{cursor:zoom-in}
 #bkGrid .bk-card[data-id]:focus-visible{outline:3px solid #1b839b;outline-offset:2px}
 @media(max-width:700px){#bkModal .bk-modal-inner{padding:8px}#bkModal .bk-modal-inner img{max-width:92vw!important;max-height:84dvh!important}}
-</style></body></html>
+</style><style id="cc-auto-welcome-notice-style">.cc-auto-welcome-notice{margin:11px 0 0;font-size:11px;line-height:1.55;color:#617a8c;text-align:center}.cc-auth-card .cc-auto-welcome-notice{max-width:100%}</style></body></html>
