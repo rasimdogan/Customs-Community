@@ -243,8 +243,17 @@ function installCommunityLogout(){
   btn.hidden=!logged();
  };
  sync();
- const observer=new MutationObserver(sync);
- observer.observe(document.body,{childList:true,subtree:true});
+ // The button belongs to the community overlay; unrelated page mutations do not require rescanning.
+ const hub=$('ccxOverlay');
+ if(hub){
+  let scheduled=false;
+  const observer=new MutationObserver(()=>{
+   if(scheduled||$('ccCommunityLogout'))return;
+   scheduled=true;
+   setTimeout(()=>{scheduled=false;sync()},200);
+  });
+  observer.observe(hub,{childList:true,subtree:false});
+ }
  window.addEventListener('cc-authenticated',sync);
  window.addEventListener('cc-logged-out',sync);
 }
@@ -260,8 +269,15 @@ function installObserver(){
 }
 function init(){
  installStyles();createMemberSummary();guardClassOpen();protectEducationNavigation();installClickGuards();installBookPointerCursor();installBookNotice();installCommunityLogout();installObserver();removeWelcomePostExplanation();
- const welcomeObserver=new MutationObserver(removeWelcomePostExplanation);
- welcomeObserver.observe(document.body,{childList:true,subtree:true});setTimeout(protectEducationNavigation,200);
+ // Avoid scanning thousands of card nodes on every feed/DOM mutation.
+ const welcomeObserver=new MutationObserver((records)=>{
+  if(records.some(r=>[...r.addedNodes].some(n=>n.nodeType===1&&n.textContent?.includes('İlk üyelik kaydın tamamlandığında hesabından')))){
+   removeWelcomePostExplanation();
+  }
+ });
+ const community=$('ccxOverlay');
+ if(community)welcomeObserver.observe(community,{childList:true,subtree:true});
+ setTimeout(protectEducationNavigation,200);
  window.addEventListener('cc-authenticated',()=>{createMemberSummary();protectEducationNavigation();refresh()});
  window.addEventListener('cc-plan-updated',()=>{updateBookNotice();try{window.GTA_ATLAS?.render?.()}catch(_){}});
  window.addEventListener('focus',()=>{if(logged())refresh()});
@@ -288,7 +304,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  if(document.getElementById('ccSocialSyncLoader'))return;
  const script=document.createElement('script');
  script.id='ccSocialSyncLoader';
- script.src='cc-social-sync.js?v=20261123c';
+ script.src='cc-social-sync.js?v=20261123f';
  script.defer=true;
  script.onerror=()=>console.warn('Sosyal görünüm eklentisi yüklenemedi');
  document.head.appendChild(script);
