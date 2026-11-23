@@ -8802,7 +8802,7 @@ body.dark #ccxOverlay .ccx-topic{background:#1b3a51!important;color:#a9d8ee!impo
 </aside>
   </div>
  </div>
- <section class="room" id="ccdRoom"><div class="roominner"><div class="roomhead"><div><small style="color:#9ecde3">CUSTOMS COMMUNITY · CANLI SINIF</small><h2 id="ccdRoomTitle" style="margin:4px 0">Canlı ders</h2><small style="color:#9db3c2">Canlı ders odası</small></div><button class="btn" onclick="CCClassDemo.back()">Sınıflara dön</button></div><div id="ccdRoomManage" class="ccd-room-manage"><span id="ccdRoomState">Canlı yayın henüz başlatılmadı.</span><button id="ccdJoinLive" class="btn primary" type="button" onclick="CCClassDemo.joinLive()" hidden>▶ Canlı derse bağlan</button><button id="ccdStartLive" class="btn primary" type="button" onclick="CCClassDemo.startLive()">▶ Canlı yayını başlat</button><button id="ccdStopLive" class="btn" type="button" onclick="CCClassDemo.stopLive()" hidden>■ Yayını kapat</button></div><div class="ccd-teaching-toolbar" id="ccdTeachingToolbar"><button class="btn" type="button" id="ccdBookOpen" onclick="CCClassDemo.openBook()">📖 Kitabı Aç</button><button class="btn" type="button" id="ccdBookClose" onclick="CCClassDemo.closeBook()" hidden>✕ Kitabı Kapat</button><button class="btn" id="ccdRefOpen" onclick="CCClassDemo.openReference()">▤ İzahnameyi Aç</button><button class="btn" id="ccdRefClose" onclick="CCClassDemo.closeReference()" hidden>✕ İzahnameyi Kapat</button><button class="btn primary" type="button" id="ccdQuizOpen" onclick="CCClassDemo.toggleQuizSetup()" hidden>✦ Fasıl Testi</button></div><div id="ccdQuizPanel" class="ccd-quiz-panel" hidden></div><section id="ccdWaitingPanel" class="ccd-waiting-panel" hidden aria-live="polite"><span class="ccd-waiting-icon" aria-hidden="true">🎓</span><div><h3>Dersin başlamasını bekliyorsun</h3><p>Sınıf üyeliğin aktif. Eğitmen canlı yayını başlattığında <strong>Canlı derse bağlan</strong> düğmesi açılacak. Buradan derse katılabileceksin.</p></div></section><div id="ccdJitsiPanel" class="ccd-jitsi-panel" hidden><div class="ccd-jitsi-notice">JİTSİ · Canlı sınıf · Video, ses, sohbet ve ekran paylaşımı · Test tamamlanınca yayın devam eder</div><div id="ccdJitsiMount"></div><div class="ccd-jitsi-actions"><button type="button" class="btn" onclick="CCClassDemo.reconnectJitsi()">↻ Bağlantıyı yenile</button><button type="button" class="btn" onclick="CCClassDemo.openJitsiTab()">↗ Yeni sekmede aç</button><button type="button" class="btn" onclick="CCClassDemo.back()">← Sınıflara geri dön</button></div><div id="ccdJitsiError" role="status"></div></div><div id="ccdFakeVideo" class="videogrid"><div><div class="stage"><span class="liveflag">● DEMO OTURUM</span><div><div class="avatar">AY</div><h2>Ahmet Yılmaz</h2><p>Eğitmen · Örnek görüntü alanı</p></div><small style="position:absolute;bottom:14px;color:#c8d8e3">Gerçek video bağlantısı bu prototipte henüz etkin değil.</small></div><div class="controls"><button id="ccdMic" class="control" onclick="CCClassDemo.toggle('mic')">🎙 Mikrofon açık</button><button id="ccdCam" class="control" onclick="CCClassDemo.toggle('cam')">▣ Kamera açık</button><button class="control" onclick="CCClassDemo.notice()">▤ Ekran paylaş</button><button class="control" onclick="CCClassDemo.notice()">✋ Söz iste</button><button class="control leave" onclick="CCClassDemo.back()">Dersten ayrıl</button></div></div><aside class="roomside"><h3>Katılımcılar · 24</h3><div class="person">★ Ahmet Yılmaz · Eğitmen</div><div class="person">● Rasim Doğan · Sen</div><div class="person">● Elif Kaya</div><div class="person">● Mehmet Demir</div><div class="person">+ 20 katılımcı daha</div><h3 style="margin-top:20px">Ders sohbeti</h3><div class="person">Elif: Sunumu paylaşabilir misiniz?</div><div class="person">Eğitmen: Ders sonunda dosyalara ekleyeceğim.</div></aside></div></div></section>
+ <section class="room" id="ccdRoom"><div class="roominner"><div class="roomhead"><div><small style="color:#9ecde3">CUSTOMS COMMUNITY · CANLI SINIF</small><h2 id="ccdRoomTitle" style="margin:4px 0">Canlı ders</h2><small style="color:#9db3c2">Canlı ders odası</small></div><button class="btn" onclick="CCClassDemo.back()">Sınıflara dön</button></div><div id="ccdRoomManage" class="ccd-room-manage"><span id="ccdRoomState">Canlı yayın henüz başlatılmadı.</span><button id="ccdJoinLive" class="btn primary" type="button" onclick="CCClassDemo.joinLive()" hidden>▶ Canlı derse bağlan</button><button id="ccdStartLive" class="btn primary" type="button" onclick="CCClassDemo.startLive()">▶ Canlı yayını başlat</button><button id="ccdStopLive" class="btn" type="button" onclick="CCClassDemo.stopLive()" hidden>■ Yayını kapat</button></div><div class="ccd-teaching-toolbar" id="ccdTeachingToolbar"><button class="btn" type="button" id="ccdBookOpen" onclick="CCClassDemo.openBook()">📖 Kitabı Aç</button><button class="btn" type="button" id="ccdBookClose" onclick="CCClassDemo.closeBook()" hidden>✕ Kitabı Kapat</button><button class="btn" id="ccdRefOpen" onclick="CCClassDemo.openReference()">▤ İzahnameyi Aç</button><button class="btn" id="ccdRefClose" onclick="CCClassDemo.closeReference()" hidden>✕ İzahnameyi Kapat</button><button class="btn primary" type="button" id="ccdQuizOpen" onclick="CCClassDemo.toggleQuizSetup()" hidden>✦ Test Gönder</button></div><div id="ccdQuizPanel" class="ccd-quiz-panel" hidden></div><section id="ccdWaitingPanel" class="ccd-waiting-panel" hidden aria-live="polite"><span class="ccd-waiting-icon" aria-hidden="true">🎓</span><div><h3>Dersin başlamasını bekliyorsun</h3><p>Sınıf üyeliğin aktif. Eğitmen canlı yayını başlattığında <strong>Canlı derse bağlan</strong> düğmesi açılacak. Buradan derse katılabileceksin.</p></div></section><div id="ccdJitsiPanel" class="ccd-jitsi-panel" hidden><div class="ccd-jitsi-notice">JİTSİ · Canlı sınıf · Video, ses, sohbet ve ekran paylaşımı · Test tamamlanınca yayın devam eder</div><div id="ccdJitsiMount"></div><div class="ccd-jitsi-actions"><button type="button" class="btn" onclick="CCClassDemo.reconnectJitsi()">↻ Bağlantıyı yenile</button><button type="button" class="btn" onclick="CCClassDemo.openJitsiTab()">↗ Yeni sekmede aç</button><button type="button" class="btn" onclick="CCClassDemo.back()">← Sınıflara geri dön</button></div><div id="ccdJitsiError" role="status"></div></div><div id="ccdFakeVideo" class="videogrid"><div><div class="stage"><span class="liveflag">● DEMO OTURUM</span><div><div class="avatar">AY</div><h2>Ahmet Yılmaz</h2><p>Eğitmen · Örnek görüntü alanı</p></div><small style="position:absolute;bottom:14px;color:#c8d8e3">Gerçek video bağlantısı bu prototipte henüz etkin değil.</small></div><div class="controls"><button id="ccdMic" class="control" onclick="CCClassDemo.toggle('mic')">🎙 Mikrofon açık</button><button id="ccdCam" class="control" onclick="CCClassDemo.toggle('cam')">▣ Kamera açık</button><button class="control" onclick="CCClassDemo.notice()">▤ Ekran paylaş</button><button class="control" onclick="CCClassDemo.notice()">✋ Söz iste</button><button class="control leave" onclick="CCClassDemo.back()">Dersten ayrıl</button></div></div><aside class="roomside"><h3>Katılımcılar · 24</h3><div class="person">★ Ahmet Yılmaz · Eğitmen</div><div class="person">● Rasim Doğan · Sen</div><div class="person">● Elif Kaya</div><div class="person">● Mehmet Demir</div><div class="person">+ 20 katılımcı daha</div><h3 style="margin-top:20px">Ders sohbeti</h3><div class="person">Elif: Sunumu paylaşabilir misiniz?</div><div class="person">Eğitmen: Ders sonunda dosyalara ekleyeceğim.</div></aside></div></div></section>
 </div>
 <style id="cc-class-modern-v10380">
 /* Classes 2026 modern interface — scoped to classes only */
@@ -9021,6 +9021,7 @@ const repeatText=x=>x.repeat_type==='daily'?'Her gün':x.repeat_type==='weekly'?
 const nextDate=x=>{if(!x.starts_at)return null;const base=new Date(x.starts_at),now=new Date();if(x.repeat_type==='none'||!x.repeat_type)return base;let d=new Date(base);const days=Array.isArray(x.repeat_days)?x.repeat_days:[];for(let i=0;i<370&&d<now;i++){if(x.repeat_type==='daily')d.setDate(d.getDate()+1);else if(x.repeat_type==='monthly')d.setMonth(d.getMonth()+1);else{d.setDate(d.getDate()+1);while(days.length&&!days.includes(d.getDay()))d.setDate(d.getDate()+1)}}if(x.repeat_until&&d>new Date(x.repeat_until+'T23:59:59'))return null;return d};
 const isLive=x=>!!(x?.live_started_at&&x?.live_heartbeat_at&&(!x.live_ended_at||new Date(x.live_ended_at)<new Date(x.live_started_at))&&(Date.now()-new Date(x.live_heartbeat_at).getTime()<90000));
 let liveTimer=null,refreshTimer=null,quizTimer=null,quizState=null,quizAnswers=[],quizResults=[],quizIndex=0,quizBusy=false,quizWasActiveThisRoom=false,resultsExpanded=false,quizDismissedId=null;
+let classBankTests=[],classBankQuestions=[],classBankLoaded=false,classBankBusy=false;
 function clearSessionQuiz(){
  quizState=null;quizAnswers=[];quizResults=[];quizIndex=0;
  quizWasActiveThisRoom=false;resultsExpanded=false;quizBusy=false;quizDismissedId=null;
@@ -9457,7 +9458,7 @@ async function closeReference(){
  }catch(e){alert('İzahname kapatılamadı: '+(e.message||e))}
 }
 
-function toggleQuizSetup(){if(!isLive(active)){alert('Fasıl testini açmak için önce canlı yayını başlatmalısın.');return}if(!$('ccdQuizPanel').hidden){$('ccdQuizPanel').hidden=true;return}openQuizSetup()}
+function toggleQuizSetup(){if(!isLive(active)){alert('Test göndermek için önce canlı yayını başlatmalısın.');return}if(!$('ccdQuizPanel').hidden){$('ccdQuizPanel').hidden=true;return}openQuizSetup()}
 window.addEventListener('cc-book-closed',()=>{if(active&&active.owner_id===auth()?.id&&active.book_open)closeBook()});
 window.addEventListener('cc-book-page',e=>{
  if(!active||active.owner_id!==auth()?.id||!active.book_open)return;
@@ -9476,51 +9477,138 @@ function questionPool(chapter){return (typeof CARDS!=='undefined'?CARDS:[]).filt
 function shuffleQuiz(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function openQuizSetup(){
  if(!active||active.owner_id!==auth()?.id)return;
- if(!isLive(active)){alert('Fasıl testini başlatmak için önce canlı yayını başlatmalısın.');return}
+ if(!isLive(active)){alert('Test göndermek için önce canlı yayını başlatmalısın.');return}
+ classBankTests=[];classBankQuestions=[];classBankLoaded=false;classBankBusy=false;
  const chapters=[...new Set((typeof CARDS!=='undefined'?CARDS:[]).map(c=>Number(c.chapter)).filter(x=>x>=1&&x<=99))].sort((a,b)=>a-b);
  $('ccdQuizPanel').hidden=false;
  $('ccdQuizPanel').innerHTML='<section class="ccd-quiz-form">'+
- '<header class="ccd-quiz-form-header"><div><span class="ccd-quiz-form-kicker">EĞİTMEN ARAÇLARI</span><h3>Yeni Fasıl Testi</h3><p>Bir fasıl seçin, soru sayısını belirleyin ve öğrencilerin ekranına beş seçenekli testi gönderin.</p></div><span class="ccd-quiz-form-icon" aria-hidden="true">✦</span></header>'+
- '<div class="ccd-quiz-form-body"><div class="ccd-quiz-form-fields"><label class="ccd-field-group" for="ccdQuizChapter"><span>Fasıl seçimi</span><select id="ccdQuizChapter" onchange="CCClassDemo.updateQuizCount()">'+chapters.map(n=>'<option value="'+n+'">'+String(n).padStart(2,'0')+'. Fasıl</option>').join('')+'</select><small>GTİP pozisyonlarıyla oluşturulacak</small></label>'+
+ '<header class="ccd-quiz-form-header"><div><span class="ccd-quiz-form-kicker">EĞİTMEN ARAÇLARI</span><h3>Katılımcılara Test Gönder</h3><p>İster fasıl kartlarından test oluştur, ister soru bankasında hazırladığın isimli testlerden birini gönder.</p></div><span class="ccd-quiz-form-icon" aria-hidden="true">✦</span></header>'+
+ '<div class="ccd-quiz-form-body">'+
+ '<div class="ccd-quiz-form-fields ccd-quiz-kind-fields"><label class="ccd-field-group" for="ccdQuizSource"><span>Test kaynağı</span><select id="ccdQuizSource" onchange="CCClassDemo.updateQuizSource()"><option value="chapter">Fasıl Soruları</option><option value="question_bank">Soru Bankasından Test</option></select><small>Mevcut fasıl soruları ve isimlendirilmiş testler</small></label></div>'+
+ '<div id="ccdQuizChapterFields" class="ccd-quiz-form-fields"><label class="ccd-field-group" for="ccdQuizChapter"><span>Fasıl seçimi</span><select id="ccdQuizChapter" onchange="CCClassDemo.updateQuizCount()">'+chapters.map(n=>'<option value="'+n+'">'+String(n).padStart(2,'0')+'. Fasıl</option>').join('')+'</select><small>GTİP pozisyonlarıyla oluşturulacak</small></label>'+
  '<label class="ccd-field-group" for="ccdQuizCount"><span>Soru sayısı</span><select id="ccdQuizCount"><option value="5">5 soru</option><option value="10" selected>10 soru</option><option value="15">15 soru</option><option value="20">20 soru</option><option value="all">Tüm kartlar</option></select><small>Her soruda 5 cevap seçeneği vardır</small></label></div>'+
- '<div class="ccd-quiz-form-info"><span class="ccd-quiz-stock-icon">▤</span><span><b id="ccdQuizAvailable">Kartlar hesaplanıyor…</b><small>Sorular seçili faslın güncel kartlarından rastgele hazırlanır.</small></span></div></div>'+
- '<footer class="ccd-quiz-form-footer"><button type="button" class="btn" onclick="CCClassDemo.cancelQuizSetup()">Vazgeç</button><button type="button" class="btn primary" onclick="CCClassDemo.sendQuiz()">Testi katılımcılara gönder <span aria-hidden="true">→</span></button></footer></section>';
- updateQuizCount()
+ '<div id="ccdQuizBankFields" class="ccd-quiz-form-fields" hidden><label class="ccd-field-group" for="ccdQuizBankCategory"><span>Soru kategorisi</span><select id="ccdQuizBankCategory" onchange="CCClassDemo.updateClassBankTests()"><option value="gtip">Yönetici Soruları</option><option value="izahname">İzahname Soruları</option></select><small>Yönetim panelinde hazırladığın sorular</small></label>'+
+ '<label class="ccd-field-group" for="ccdQuizBankTest"><span>Gönderilecek test</span><select id="ccdQuizBankTest" onchange="CCClassDemo.updateClassBankCount()"><option value="">Önce kategori seç</option></select><small>En fazla 50 soruluk yayımlanmış testler</small></label></div>'+
+ '<div class="ccd-quiz-form-info"><span class="ccd-quiz-stock-icon">▤</span><span><b id="ccdQuizAvailable">Kartlar hesaplanıyor…</b><small id="ccdQuizAvailableHelp">Sorular seçili faslın güncel kartlarından hazırlanır.</small></span></div></div>'+
+ '<footer class="ccd-quiz-form-footer"><button type="button" class="btn" onclick="CCClassDemo.cancelQuizSetup()">Vazgeç</button><button type="button" class="btn primary" id="ccdQuizSend" onclick="CCClassDemo.sendQuiz()">Testi katılımcılara gönder <span aria-hidden="true">→</span></button></footer></section>';
+ updateQuizCount();
 }
 function cancelQuizSetup(){
  const el=$('ccdQuizPanel');
  el.hidden=true;el.replaceChildren();
  if(quizState)renderQuiz();
 }
-function updateQuizCount(){const pool=questionPool(Number($('ccdQuizChapter')?.value)),el=$('ccdQuizAvailable'),sel=$('ccdQuizCount');if(el)el.textContent=pool.length+' kart';if(sel){for(const o of sel.options){if(o.value!=='all')o.disabled=Number(o.value)>pool.length}if(sel.selectedOptions[0]?.disabled)sel.value='all'}}
-
+function updateQuizSource(){
+ const named=$('ccdQuizSource')?.value==='question_bank';
+ const chapter=$('ccdQuizChapterFields'),bank=$('ccdQuizBankFields');
+ if(chapter)chapter.hidden=named;
+ if(bank)bank.hidden=!named;
+ const help=$('ccdQuizAvailableHelp');
+ if(help)help.textContent=named?'Seçilen testin yayımlanmış soruları aynen katılımcılara gönderilir.':'Sorular seçili faslın güncel kartlarından hazırlanır.';
+ if(named){
+  if(!classBankLoaded&&!classBankBusy)void loadNamedClassTests();
+  else updateClassBankTests();
+ }else updateQuizCount();
+}
+function updateQuizCount(){
+ const pool=questionPool(Number($('ccdQuizChapter')?.value));
+ const el=$('ccdQuizAvailable'),sel=$('ccdQuizCount');
+ if(el)el.textContent=pool.length+' kart';
+ if(sel){for(const o of sel.options){if(o.value!=='all')o.disabled=Number(o.value)>pool.length}if(sel.selectedOptions[0]?.disabled)sel.value='all'}
+ const send=$('ccdQuizSend');if(send)send.disabled=pool.length<5;
+}
+async function loadNamedClassTests(){
+ if(classBankBusy||!active||active.owner_id!==auth()?.id)return;
+ classBankBusy=true;
+ const classId=active.id,send=$('ccdQuizSend');
+ if(send)send.disabled=true;
+ if($('ccdQuizAvailable'))$('ccdQuizAvailable').textContent='Soru bankasındaki testler yükleniyor…';
+ try{
+  const db=await client();
+  const [testRes,questionRes]=await Promise.all([
+   db.from('cc_admin_question_tests').select('id,category,name').eq('is_published',true).order('created_at',{ascending:true}),
+   db.from('cc_admin_test_questions').select('id,test_id,category,question,options,correct_index,explanation').eq('is_published',true).order('id',{ascending:true})
+  ]);
+  if(testRes.error)throw testRes.error;
+  if(questionRes.error)throw questionRes.error;
+  if(active?.id!==classId)return;
+  classBankTests=testRes.data||[];
+  classBankQuestions=(questionRes.data||[]).filter(q=>Array.isArray(q.options)&&q.options.length===5&&q.options.every(o=>String(o||'').trim())&&Number.isInteger(q.correct_index)&&q.correct_index>=0&&q.correct_index<5);
+  classBankLoaded=true;
+  if($('ccdQuizSource')?.value==='question_bank')updateClassBankTests();
+ }catch(e){
+  if($('ccdQuizAvailable'))$('ccdQuizAvailable').textContent='Testler yüklenemedi: '+(e.message||e);
+  if(send)send.disabled=true;
+ }finally{classBankBusy=false}
+}
+function updateClassBankTests(){
+ const sel=$('ccdQuizBankTest'),cat=$('ccdQuizBankCategory')?.value;
+ if(!sel)return;
+ const prev=sel.value,available=classBankTests.filter(t=>t.category===cat);
+ sel.innerHTML='<option value="">Bir test seçin…</option>'+available.map(t=>{
+  const n=classBankQuestions.filter(q=>q.test_id===t.id&&q.category===cat).length;
+  return '<option value="'+esc(t.id)+'" '+(!n?'disabled':'')+'>'+esc(t.name)+' ('+n+' soru)</option>';
+ }).join('');
+ if(available.some(t=>t.id===prev&&classBankQuestions.some(q=>q.test_id===t.id)))sel.value=prev;
+ else {
+  const first=available.find(t=>classBankQuestions.some(q=>q.test_id===t.id&&q.category===cat));
+  if(first)sel.value=first.id;
+ }
+ updateClassBankCount();
+}
+function updateClassBankCount(){
+ const id=$('ccdQuizBankTest')?.value,cat=$('ccdQuizBankCategory')?.value;
+ const selected=classBankTests.find(t=>t.id===id&&t.category===cat);
+ const count=selected?classBankQuestions.filter(q=>q.test_id===id&&q.category===cat).length:0;
+ const label=$('ccdQuizAvailable'),send=$('ccdQuizSend');
+ if(label)label.textContent=!classBankLoaded?'Soru bankası yükleniyor…':selected?selected.name+' · '+count+' soru hazır':'Bu kategoride yayımlanmış soruları olan bir test seçin.';
+ if(send)send.disabled=classBankBusy||!selected||count<1||count>50;
+}
 async function sendQuiz(){
  if(!active||active.owner_id!==auth()?.id)return;
- if(!isLive(active)){alert('Test göndermek için önce canlı yayını başlatmalısın.');clearSessionQuiz();return}
- const chapter=Number($('ccdQuizChapter').value),pool=questionPool(chapter);
- const count=$('ccdQuizCount').value==='all'?pool.length:Number($('ccdQuizCount').value);
- const uniqueCodes=[...new Set(pool.map(c=>String(c.code||'').trim()))].filter(Boolean);
- if(uniqueCodes.length<5){alert('Bu fasılda 5 şıklı test oluşturmak için en az 5 farklı tarife pozisyonu bulunmalı.');return}
- const chosen=shuffleQuiz(pool).slice(0,Math.min(count,pool.length));
- const questions=chosen.map(c=>{
-  const correct=String(c.code||'').trim();
-  const distractors=shuffleQuiz(uniqueCodes.filter(code=>code!==correct)).slice(0,4);
-  if(distractors.length!==4)return null;
-  const options=shuffleQuiz([correct,...distractors]);
-  return {id:String(c.id),prompt:String(c.text),options,correct:options.indexOf(correct)}
- }).filter(Boolean);
- if(!questions.length)return alert('Sorular oluşturulamadı.');
+ if(!isLive(active)){alert('Test göndermek için önce canlı yayını başlatmalısın.');return}
+ const named=$('ccdQuizSource')?.value==='question_bank';
+ let questions=[],data={class_id:active.id,owner_id:auth().id};
+ if(named){
+  const id=$('ccdQuizBankTest')?.value,category=$('ccdQuizBankCategory')?.value;
+  const selected=classBankTests.find(t=>t.id===id&&t.category===category);
+  const rows=classBankQuestions.filter(q=>q.test_id===id&&q.category===category);
+  if(!classBankLoaded||!selected||!rows.length)return alert('Önce yayımlanmış bir test seç.');
+  if(rows.length>50)return alert('Bir test en fazla 50 soru içerebilir.');
+  questions=rows.map(q=>({id:'bank-'+q.id,prompt:String(q.question),options:q.options.map(String),correct:Number(q.correct_index),explanation:String(q.explanation||'')}));
+  data={...data,chapter:null,quiz_source:'question_bank',bank_test_id:selected.id,test_title:selected.name};
+ }else{
+  const chapter=Number($('ccdQuizChapter')?.value),pool=questionPool(chapter);
+  const count=$('ccdQuizCount')?.value==='all'?pool.length:Number($('ccdQuizCount')?.value);
+  const uniqueCodes=[...new Set(pool.map(c=>String(c.code||'').trim()))].filter(Boolean);
+  if(uniqueCodes.length<5)return alert('Bu fasılda 5 şıklı test oluşturmak için en az 5 farklı tarife pozisyonu bulunmalı.');
+  const chosen=shuffleQuiz(pool).slice(0,Math.min(count,pool.length));
+  questions=chosen.map(c=>{
+   const correct=String(c.code||'').trim();
+   const distractors=shuffleQuiz(uniqueCodes.filter(code=>code!==correct)).slice(0,4);
+   if(distractors.length!==4)return null;
+   const options=shuffleQuiz([correct,...distractors]);
+   return {id:String(c.id),prompt:String(c.text),options,correct:options.indexOf(correct)}
+  }).filter(Boolean);
+  data={...data,chapter};
+ }
+ if(!questions.length)return alert('Gönderilecek soru bulunamadı.');
+ data.questions=questions;
+ const send=$('ccdQuizSend');if(send)send.disabled=true;
  try{
   const db=await client();
   const old=await db.from('cc_class_quizzes').update({status:'closed'}).eq('class_id',active.id).eq('owner_id',auth().id).eq('status','active');
   if(old.error)throw old.error;
-  const res=await db.from('cc_class_quizzes').insert({class_id:active.id,owner_id:auth().id,chapter,questions}).select('*').single();
+  const res=await db.from('cc_class_quizzes').insert(data).select('*').single();
   if(res.error)throw res.error;
   quizState=res.data;quizAnswers=[];quizResults=[];quizIndex=0;quizWasActiveThisRoom=true;resultsExpanded=true;
-  renderQuiz(); // Close the quiz setup form before refreshing so the teacher sees the new test.
+  renderQuiz();
   await refreshQuiz();
-  alert('5 şıklı, '+questions.length+' soruluk test katılımcılara gönderildi. Canlı yayın devam ediyor.')
- }catch(e){alert('Test gönderilemedi: '+(e.message||e))}
+  alert((named?'“'+data.test_title+'”':'Fasıl')+' testi ('+questions.length+' soru) katılımcılara gönderildi. Canlı yayın devam ediyor.');
+ }catch(e){
+  alert('Test gönderilemedi: '+(e.message||e));
+  if(send?.isConnected)send.disabled=false;
+ }
 }
 async function refreshQuiz(){
  if(!active||quizBusy)return;
@@ -9577,7 +9665,12 @@ function renderQuizLeaderboard(){
   return '<tr class="'+(mine?'ccd-result-mine':'')+'"><td><span class="ccd-rank">'+(i+1)+'</span> <strong>'+esc(x.display_name||'Katılımcı')+'</strong>'+(mine?' <small>(Sen)</small>':'')+'</td><td>'+answered+' / '+total+'</td><td><strong>'+correct+'</strong></td><td>%'+percent+'</td><td><span class="ccd-result-status">'+esc(state)+'</span></td></tr>'
  }).join('');
  const title='Katılımcı sonuçları ('+items.length+')';
- return '<section class="ccd-scores"><button type="button" class="ccd-results-toggle" aria-expanded="'+String(resultsExpanded)+'" onclick="CCClassDemo.toggleQuizResults()"><span>🏆 '+title+'</span><span>'+ (resultsExpanded?'Gizle ▲':'Göster ▼')+'</span></button>'+
+ const started=items.filter(x=>Number(x.answered)>0);
+ const finished=items.filter(x=>!!x.finished_at).length;
+ const average=started.length?Math.round(started.reduce((sum,x)=>sum+(Number(x.total)>0?Number(x.correct)*100/Number(x.total):0),0)/started.length):null;
+ const averageLabel=quizState?.status==='active'?'Anlık sınıf ortalaması':'Sınıf ortalaması';
+ const summary='<div class="ccd-class-statistics"><div class="ccd-class-stat-highlight"><small>'+averageLabel+'</small><strong>'+(average===null?'—':'%'+average)+'</strong><span>'+started.length+' yanıtlayan katılımcı üzerinden</span></div><div><small>Yanıtlayan</small><strong>'+started.length+'</strong></div><div><small>Testi tamamlayan</small><strong>'+finished+'</strong></div></div>';
+ return '<section class="ccd-scores">'+summary+'<button type="button" class="ccd-results-toggle" aria-expanded="'+String(resultsExpanded)+'" onclick="CCClassDemo.toggleQuizResults()"><span>🏆 '+title+'</span><span>'+ (resultsExpanded?'Gizle ▲':'Göster ▼')+'</span></button>'+
   (resultsExpanded?'<div class="ccd-results-wrap"><table class="ccd-results-table"><thead><tr><th>Katılımcı</th><th>Yanıt</th><th>Doğru</th><th>Başarı</th><th>Durum</th></tr></thead><tbody>'+ (rows||'<tr><td colspan="5">Henüz sınıfa katılan kullanıcı bulunmuyor.</td></tr>')+'</tbody></table></div>':'')+'</section>'
 }
 function renderQuiz(){
@@ -9591,7 +9684,9 @@ function renderQuiz(){
  const done=!!mine?.finished_at;
  const answered=q.filter((_,i)=>Object.prototype.hasOwnProperty.call(answers,String(i))).length;
  const canDismiss=(quizState.status==='closed'||(!owner&&done));
- const heading='<header class="ccd-test-header"><div><span class="ccd-test-eyebrow">CUSTOMS COMMUNITY · FASIL SINAVI</span><h3>'+String(quizState.chapter).padStart(2,'0')+'. Fasıl · '+q.length+' Soruluk Test</h3><p>'+ (quizState.status==='active'?'● Test devam ediyor':'● Test tamamlandı')+' · Canlı ders bağlantısı bundan etkilenmez.</p></div><div class="ccd-test-header-controls"><span class="ccd-test-chip">'+(quizState.status==='active'?'AKTİF':'BİTTİ')+'</span>'+(canDismiss?'<button type="button" class="ccd-test-dismiss" onclick="CCClassDemo.dismissQuizPanel()" title="Test sonuçlarını kapat">✕ Kapat</button>':'')+'</div></header>';
+ const bankType=quizState.quiz_source==='question_bank';
+ const quizTitle=bankType?esc(quizState.test_title||'Soru Bankası Testi'):String(quizState.chapter).padStart(2,'0')+'. Fasıl · '+q.length+' Soruluk Test';
+ const heading='<header class="ccd-test-header"><div><span class="ccd-test-eyebrow">CUSTOMS COMMUNITY · '+(bankType?'SORU BANKASI':'FASIL SINAVI')+'</span><h3>'+quizTitle+(bankType?' · '+q.length+' Soru':'')+'</h3><p>'+ (quizState.status==='active'?'● Test devam ediyor':'● Test tamamlandı')+' · Canlı ders bağlantısı bundan etkilenmez.</p></div><div class="ccd-test-header-controls"><span class="ccd-test-chip">'+(quizState.status==='active'?'AKTİF':'BİTTİ')+'</span>'+(canDismiss?'<button type="button" class="ccd-test-dismiss" onclick="CCClassDemo.dismissQuizPanel()" title="Test sonuçlarını kapat">✕ Kapat</button>':'')+'</div></header>';
  const board=renderQuizLeaderboard();
  if(owner){
   el.innerHTML=heading+'<div class="ccd-test-summary"><div><b>Eğitmen paneli</b><p>Katılımcıların cevaplarını ve sonuçlarını aşağıdaki tablodan izle. Testi sonlandırmak canlı yayını kapatmaz.</p></div>'+
@@ -9618,7 +9713,7 @@ function renderQuiz(){
  const feedback=selected===null?'':'<p class="ccd-answer-feedback '+(selected===correctIndex?'ccd-feedback-correct':'ccd-feedback-wrong')+'">'+(selected===correctIndex?'✓ Doğru cevap!':'✕ Yanlış cevap. Doğru seçenek yeşil olarak işaretlendi.')+'</p>';
  const percent=Math.round(answered*100/Math.max(1,q.length));
  el.innerHTML=heading+'<div class="ccd-quiz-progress-label"><span>Soru <b>'+(idx+1)+' / '+q.length+'</b></span><span><b>'+answered+'</b> yanıtlandı</span></div><div class="ccd-quiz-progress-track"><div style="width:'+percent+'%"></div></div>'+
-  '<div class="ccd-question-shell"><span class="ccd-question-tag">SORU '+(idx+1)+'</span><h4>'+esc(question.prompt||'Soru metni bulunamadı.')+'</h4><p>Doğru tarife pozisyonunu seçin.</p><div class="ccd-choice-list">'+choices+'</div>'+feedback+'</div>'+
+  '<div class="ccd-question-shell"><span class="ccd-question-tag">SORU '+(idx+1)+'</span><h4>'+esc(question.prompt||'Soru metni bulunamadı.')+'</h4><p>'+(bankType?'Doğru seçeneği işaretleyin.':'Doğru tarife pozisyonunu seçin.')+'</p><div class="ccd-choice-list">'+choices+'</div>'+feedback+(selected!==null&&question.explanation?'<p class="ccd-bank-explanation"><b>Çözüm:</b> '+esc(question.explanation)+'</p>':'')+'</div>'+
   '<div class="ccd-test-actions">'+(idx>0?'<button class="btn" type="button" onclick="CCClassDemo.goQuizQuestion('+(idx-1)+')">← Önceki soru</button>':'<span></span>')+
   '<button class="btn primary ccd-finish-btn" type="button" '+(selected===null?'disabled':'')+' onclick="CCClassDemo.goQuizQuestion('+(idx+1)+')">'+(idx===q.length-1?'Sonuç ekranına geç':'Sonraki soru →')+'</button></div>'+board
 }
@@ -9695,7 +9790,7 @@ window.CCClassDemo={
  create(){form(null)},edit(id){const row=rows.find(x=>x.id===id);if(row?.owner_id===auth()?.id)form(row)},
  save,join,remove,enter,
  cancelForm(){$('ccdClassForm').hidden=true},
- startLive,stopLive,repeatChanged,openBook,closeBook,openReference,closeReference,toggleQuizSetup,openQuizSetup,updateQuizCount,sendQuiz,answerQuiz,finishQuiz,goQuizQuestion,toggleQuizResults,dismissQuizPanel,cancelQuizSetup,closeQuiz,reconnectJitsi,joinLive(){if(active&&(members.has(active.id)||active.owner_id===auth()?.id)&&isLive(active))connectLive()},
+ startLive,stopLive,repeatChanged,openBook,closeBook,openReference,closeReference,toggleQuizSetup,openQuizSetup,updateQuizCount,updateQuizSource,updateClassBankTests,updateClassBankCount,sendQuiz,answerQuiz,finishQuiz,goQuizQuestion,toggleQuizResults,dismissQuizPanel,cancelQuizSetup,closeQuiz,reconnectJitsi,joinLive(){if(active&&(members.has(active.id)||active.owner_id===auth()?.id)&&isLive(active))connectLive()},
  openJitsiTab,
  toggle(){},notice(){alert('Kamera, mikrofon ve ekran paylaşımı Jitsi toplantısı içindeki kontrollerle yönetilir.')}
 };
@@ -10596,4 +10691,18 @@ body.dark #view-home .cc-fcm-resume{color:#b6d6e5}
   max-width: 100%!important;
  }
 }
+</style>
+<style id="cc-class-named-bank-and-average-v1">
+#ccClassDemo #ccdQuizPanel .ccd-quiz-form-fields[hidden]{display:none!important}
+#ccClassDemo .ccd-quiz-kind-fields{margin-bottom:17px;grid-template-columns:minmax(0,1fr)!important}
+#ccClassDemo #ccdQuizPanel .ccd-quiz-kind-fields label{max-width:470px}
+#ccClassDemo #ccdQuizPanel #ccdQuizSend:disabled{opacity:.5;cursor:not-allowed}
+#ccClassDemo .ccd-class-statistics{display:grid;grid-template-columns:minmax(0,1.6fr) repeat(2,minmax(0,1fr));gap:10px;padding:15px 21px;background:#fbfdff}
+#ccClassDemo .ccd-class-statistics>div{display:flex;flex-direction:column;gap:5px;padding:12px 14px;border:1px solid #d9e7f1;border-radius:12px;background:#f4f9fc}
+#ccClassDemo .ccd-class-statistics>div.ccd-class-stat-highlight{background:#e7f3fb;border-color:#b9d9eb}
+#ccClassDemo .ccd-class-statistics small{font-size:11px;font-weight:800;color:#47718b}
+#ccClassDemo .ccd-class-statistics strong{font-size:24px;color:#174d72;line-height:1.1}
+#ccClassDemo .ccd-class-statistics span{font-size:10px;color:#607d90}
+#ccClassDemo .ccd-bank-explanation{margin-top:14px!important;padding:14px;background:#f2f8fc;border:1px solid #cfe2ef;border-radius:10px;color:#31576f!important;line-height:1.6}
+@media(max-width:600px){#ccClassDemo .ccd-class-statistics{grid-template-columns:1fr 1fr;padding:12px;gap:7px}#ccClassDemo .ccd-class-statistics>div.ccd-class-stat-highlight{grid-column:1/-1}#ccClassDemo .ccd-quiz-kind-fields{margin-bottom:12px}}
 </style></body></html>
