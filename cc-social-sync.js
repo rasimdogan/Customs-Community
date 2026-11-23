@@ -6,11 +6,11 @@ window.CC_SOCIAL_V2=true;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const norm=v=>String(v??'').toLocaleLowerCase('tr-TR').replace(/\s+/g,' ').trim();
 const me=()=>window.CC_AUTH?.getSession?.()?.user?.id;
-let db=null, owner=null,folders=[],cards=[],following=[],tick=null;
+let db=null, owner=null,folders=[],cards=[];
 function css(){
  if(document.getElementById('ccSocialV2Css'))return;
  const s=document.createElement('style');s.id='ccSocialV2Css';
- s.textContent='#ccPublicFolders{display:flex;flex-wrap:wrap;gap:7px;padding:12px 0;margin:9px 0;border-top:1px solid #dce7ef}#ccPublicFolders button{background:#f2f8fc;border:1px solid #c6d8e6;border-radius:10px;padding:9px 11px;color:#254a65;cursor:pointer;font-weight:700;font-size:12px}#ccFolderBrowse{position:fixed;inset:0;z-index:100500;background:#061a2bb8;display:flex;align-items:center;justify-content:center;padding:14px}#ccFolderBrowse[hidden]{display:none!important}#ccFolderBrowse *{box-sizing:border-box}#ccFolderBrowse>section{width:min(820px,100%);max-height:88vh;overflow:auto;background:#f7fafc;color:#253f55;border-radius:18px;padding:20px}#ccFolderBrowse header{display:flex;align-items:center;justify-content:space-between;gap:10px}#ccFolderBrowse h2{font-size:20px;margin:0}#ccFolderBrowse .ccf-grid{display:grid;grid-template-columns:170px 1fr;gap:14px;margin-top:17px}#ccFolderBrowse .ccf-nav{display:flex;flex-direction:column;gap:7px}#ccFolderBrowse button{cursor:pointer;background:#f0f6fa;color:#214963;border:1px solid #c6d9e5;border-radius:9px;padding:9px;font-weight:750}#ccFolderBrowse button[aria-pressed=true]{background:#286a92;color:white}#ccFolderBrowse .ccf-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:10px;align-content:start}#ccFolderBrowse article{border:1px solid #d9e6ef;border-radius:11px;background:#fff;padding:13px;overflow-wrap:anywhere}#ccFolderBrowse article h3{font-size:14px;margin:0 0 7px;color:#203b51}#ccFolderBrowse article p{font-size:12px;line-height:1.6;color:#52687b;white-space:pre-wrap}#ccFolderBrowse article small{color:#58748a}.ccFollowingSync{background:#eaf8f0!important;color:#24664b!important;border-color:#a6d5bf!important}@media(max-width:600px){#ccFolderBrowse .ccf-grid{grid-template-columns:1fr}#ccFolderBrowse .ccf-nav{flex-direction:row;overflow-x:auto}#ccFolderBrowse .ccf-nav button{white-space:nowrap}}';
+ s.textContent='#ccPublicFolders{display:flex;flex-wrap:wrap;gap:7px;padding:12px 0;margin:9px 0;border-top:1px solid #dce7ef}#ccPublicFolders button{background:#f2f8fc;border:1px solid #c6d8e6;border-radius:10px;padding:9px 11px;color:#254a65;cursor:pointer;font-weight:700;font-size:12px}#ccFolderBrowse{position:fixed;inset:0;z-index:100500;background:#061a2bb8;display:flex;align-items:center;justify-content:center;padding:14px}#ccFolderBrowse[hidden]{display:none!important}#ccFolderBrowse *{box-sizing:border-box}#ccFolderBrowse>section{width:min(820px,100%);max-height:88vh;overflow:auto;background:#f7fafc;color:#253f55;border-radius:18px;padding:20px}#ccFolderBrowse header{display:flex;align-items:center;justify-content:space-between;gap:10px}#ccFolderBrowse h2{font-size:20px;margin:0}#ccFolderBrowse .ccf-grid{display:grid;grid-template-columns:170px 1fr;gap:14px;margin-top:17px}#ccFolderBrowse .ccf-nav{display:flex;flex-direction:column;gap:7px}#ccFolderBrowse button{cursor:pointer;background:#f0f6fa;color:#214963;border:1px solid #c6d9e5;border-radius:9px;padding:9px;font-weight:750}#ccFolderBrowse button[aria-pressed=true]{background:#286a92;color:white}#ccFolderBrowse .ccf-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:10px;align-content:start}#ccFolderBrowse article{border:1px solid #d9e6ef;border-radius:11px;background:#fff;padding:13px;overflow-wrap:anywhere}#ccFolderBrowse article h3{font-size:14px;margin:0 0 7px;color:#203b51}#ccFolderBrowse article p{font-size:12px;line-height:1.6;color:#52687b;white-space:pre-wrap}#ccFolderBrowse article small{color:#58748a}@media(max-width:600px){#ccFolderBrowse .ccf-grid{grid-template-columns:1fr}#ccFolderBrowse .ccf-nav{flex-direction:row;overflow-x:auto}#ccFolderBrowse .ccf-nav button{white-space:nowrap}}';
  document.head.appendChild(s);
 }
 function header(){
@@ -57,59 +57,39 @@ async function loadOwner(p_owner){
   document.getElementById('ccPublicFolders')?.remove();mount();
  }catch(e){console.warn('Klasör bilgileri alınamadı',e)}
 }
-async function loadFollow(){
- if(!db||!me())return;
- try{const r=await db.rpc('cc_my_following_status');if(r.error)throw r.error;following=r.data||[];syncFollow()}
- catch(e){console.warn('Takip durumu sorgulanamadı',e)}
-}
-function syncFollow(){
- for(const b of document.querySelectorAll('button,a,[role="button"]')){
-  if(b.closest('#ccFolderBrowse,#ccPublicFolders'))continue;
-  if(!['takip et','takiptesin','takip ediliyor'].includes(norm(b.textContent)))continue;
-  const near=norm(b.parentElement?.parentElement?.parentElement?.textContent);
-  const isFollowed=following.some(u=>near.includes(norm(u.display_name))||near.includes(norm(u.username)));
-  if(isFollowed){
-   if(!b.dataset.ccOriginalFollow)b.dataset.ccOriginalFollow=b.textContent;
-   b.textContent='Takiptesin';b.classList.add('ccFollowingSync');
-  }else if(b.classList.contains('ccFollowingSync')){
-   b.textContent=b.dataset.ccOriginalFollow||'Takip et';b.classList.remove('ccFollowingSync');
-  }
- }
-}
 async function setup(){
  try{
- db=await window.CC_AUTH?.getClient?.();if(!db)return;
- if(!db.__ccSocialWrapped){
+  db=await window.CC_AUTH?.getClient?.();
+  if(!db||db.__ccFolderReaderWrapped)return;
   const orig=db.rpc.bind(db);
+  // Read-only folder extension. Follow controls are managed directly by CCCommunity.
   db.rpc=function(name,args,options){
-   const ret=orig(name,args,options);
+   const result=orig(name,args,options);
    if(name==='cc_card_public_library'&&args?.p_owner&&args.p_owner!==me()){
-    Promise.resolve(ret).then(()=>loadOwner(args.p_owner)).catch(()=>{});
+    Promise.resolve(result).then(()=>loadOwner(args.p_owner)).catch(()=>{});
    }
-   if(name==='cc_community_toggle_follow'){
-    Promise.resolve(ret).then(()=>loadFollow()).catch(()=>{});
-   }
-   return ret;
-  };db.__ccSocialWrapped=true;
- }
- await loadFollow();
- }catch(e){console.warn('Sosyal görünüm bağlantısı',e)}
+   return result;
+  };
+  db.__ccFolderReaderWrapped=true;
+ }catch(e){console.warn('Klasör bağlantısı kurulamadı',e)}
 }
 function init(){
  css();setup();
- document.addEventListener('click',e=>{
-  const b=e.target.closest('button,a');
-  if(b&&/^(takip et|takiptesin|takip ediliyor)$/i.test(b.textContent.trim()))setTimeout(loadFollow,600);
- },true);
- const observer=new MutationObserver(()=>{
-  if(tick)return;
-  tick=setTimeout(()=>{tick=null;mount();syncFollow()},350);
- });
- observer.observe(document.body,{childList:true,subtree:true});
+ const profile=document.getElementById('ccxUserProfilePage');
+ if(profile){
+  let scheduled=false;
+  new MutationObserver(()=>{
+   if(scheduled)return;
+   scheduled=true;
+   setTimeout(()=>{scheduled=false;if(!profile.hidden&&owner)mount()},500);
+  }).observe(profile,{childList:true,subtree:true});
+ }
  window.addEventListener('cc-authenticated',setup);
- window.addEventListener('cc-logged-out',()=>{following=[];owner=null;document.getElementById('ccPublicFolders')?.remove()});
- window.addEventListener('focus',loadFollow);
- document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadFollow()});
+ window.addEventListener('cc-logged-out',()=>{
+  owner=null;folders=[];cards=[];
+  document.getElementById('ccPublicFolders')?.remove();
+  document.getElementById('ccFolderBrowse')?.remove();
+ });
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
