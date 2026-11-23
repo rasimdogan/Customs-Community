@@ -271,3 +271,14 @@ function init(){
 window.CC_ACCESS={PACKAGES,refresh,currentPlan,hasTariff,canHost,chapterAllowed,sceneAllowed:n=>hasTariff()||(Number(n)>=1&&Number(n)<=5),upgrade,loadAdmin,cardCount:()=>cardCount};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
+
+/* Load live classroom indicators and readable upcoming lesson styles. */
+(function(){
+ if(document.getElementById('ccLiveUiLoader'))return;
+ const script=document.createElement('script');
+ script.id='ccLiveUiLoader';
+ script.src='cc-live-ui.js?v=20261123b';
+ script.defer=true;
+ script.onerror=()=>console.warn('Canlı sınıf arayüz modülü yüklenemedi');
+ document.head.appendChild(script);
+})();
