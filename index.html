@@ -10538,45 +10538,81 @@ body.dark #view-home .cc-fcm-resume{color:#b6d6e5}
 #ccClassDemo .ccd-answer-feedback{padding:12px 15px;margin-top:12px;border-radius:10px;font-size:14px;font-weight:800}
 #ccClassDemo .ccd-feedback-correct{background:#e4f7e9;color:#176a38}
 #ccClassDemo .ccd-feedback-wrong{background:#fde8e8;color:#a12626}
-</style><style id="cc-mobile-community-tabs-scroll-v1">
-/* Restore native horizontal touch scrolling in the community's top navigation. */
-@media (max-width: 980px) {
- #ccxOverlay .ccx-header-inner .ccx-nav-groups.ccx-nav-compact {
-  width:100%!important;
-  min-width:0!important;
-  max-width:100%!important;
-  overflow:hidden!important;
- }
- #ccxOverlay .ccx-header-inner .ccx-nav-compact .ccx-nav-social {
-  display:block!important;
-  width:100%!important;
-  min-width:0!important;
-  max-width:100%!important;
-  overflow:hidden!important;
-  flex:1 1 0%!important;
- }
- #ccxOverlay .ccx-header-inner .ccx-nav-compact .ccx-nav-buttons {
-  box-sizing:border-box!important;
-  display:flex!important;
-  width:100%!important;
-  max-width:100%!important;
-  min-width:0!important;
-  flex-wrap:nowrap!important;
-  justify-content:flex-start!important;
-  overflow-x:auto!important;
-  overflow-y:hidden!important;
+</style><style id="cc-mobile-gmt-nav-swipe-v2">
+/* v2: The actual mobile scrollbar is header.gmt-header nav.gmt-nav, not .ccx-nav-buttons.
+   Applies to the community header and its Classes clone without altering desktop navigation. */
+@media (max-width:980px){
+ #ccxOverlay header.gmt-header > .gmt-bar nav.gmt-nav,
+ #ccClassDemo header.gmt-header > .gmt-bar nav.gmt-nav{
+  box-sizing:border-box!important;display:flex!important;flex:1 1 auto!important;
+  width:auto!important;max-width:100%!important;min-width:0!important;
+  overflow-x:auto!important;overflow-y:hidden!important;
   -webkit-overflow-scrolling:touch!important;
-  touch-action:pan-x!important;
-  overscroll-behavior-x:contain!important;
-  scrollbar-width:none!important;
+  overscroll-behavior-x:contain!important;touch-action:pan-y!important;
+  scrollbar-width:none!important
  }
- #ccxOverlay .ccx-header-inner .ccx-nav-compact .ccx-nav-buttons button {
-  flex:0 0 auto!important;
-  white-space:nowrap!important;
-  touch-action:pan-x!important;
+ #ccxOverlay header.gmt-header > .gmt-bar nav.gmt-nav > .ccx-nav-social,
+ #ccClassDemo header.gmt-header > .gmt-bar nav.gmt-nav > .ccx-nav-social,
+ #ccxOverlay header.gmt-header > .gmt-bar nav.gmt-nav .ccx-nav-buttons,
+ #ccClassDemo header.gmt-header > .gmt-bar nav.gmt-nav .ccx-nav-buttons{
+  box-sizing:border-box!important;display:flex!important;flex:0 0 auto!important;
+  width:max-content!important;min-width:max-content!important;max-width:none!important;
+  overflow:visible!important;touch-action:pan-y!important
  }
- #ccxOverlay .ccx-header-inner .ccx-nav-compact .ccx-nav-buttons::-webkit-scrollbar {
-  display:none!important;
+ #ccxOverlay header.gmt-header > .gmt-bar nav.gmt-nav .ccx-nav-buttons > button,
+ #ccClassDemo header.gmt-header > .gmt-bar nav.gmt-nav .ccx-nav-buttons > button{
+  flex:0 0 auto!important;white-space:nowrap!important;touch-action:pan-y!important
+ }
+ #ccxOverlay header.gmt-header > .gmt-bar nav.gmt-nav::-webkit-scrollbar,
+ #ccClassDemo header.gmt-header > .gmt-bar nav.gmt-nav::-webkit-scrollbar{display:none!important}
+}
+@media (max-width:720px){
+ #ccxOverlay header.gmt-header > .gmt-bar nav.gmt-nav,
+ #ccClassDemo header.gmt-header > .gmt-bar nav.gmt-nav{
+  flex:0 0 100%!important;width:100%!important;max-width:100%!important;min-width:0!important
  }
 }
-</style></body></html>
+</style><script id="cc-mobile-gmt-touch-scroll-v2">
+/* A touch swipe fallback for mobile webviews that do not pan nested header nav elements.
+   Vertical gestures are left to the browser, while short taps still activate the tabs. */
+(function(){
+ 'use strict';
+ function bind(nav){
+  if(nav.dataset.gmtTouchBound==='1')return;
+  nav.dataset.gmtTouchBound='1';
+  let gesture=null,suppressClickUntil=0;
+  nav.addEventListener('touchstart',function(event){
+   if(event.touches.length!==1){gesture=null;return}
+   const t=event.touches[0];
+   gesture={x:t.clientX,y:t.clientY,left:nav.scrollLeft,axis:null,moved:false};
+  },{passive:true});
+  nav.addEventListener('touchmove',function(event){
+   if(!gesture||event.touches.length!==1)return;
+   const t=event.touches[0],dx=t.clientX-gesture.x,dy=t.clientY-gesture.y;
+   if(!gesture.axis&&Math.max(Math.abs(dx),Math.abs(dy))>7)
+    gesture.axis=Math.abs(dx)>Math.abs(dy)*1.12?'x':'y';
+   if(gesture.axis!=='x')return;
+   gesture.moved=true;
+   if(event.cancelable)event.preventDefault();
+   nav.scrollLeft=gesture.left-dx;
+  },{passive:false});
+  nav.addEventListener('touchend',function(){
+   if(gesture&&gesture.moved)suppressClickUntil=Date.now()+350;
+   gesture=null;
+  },{passive:true});
+  nav.addEventListener('touchcancel',function(){gesture=null},{passive:true});
+  nav.addEventListener('click',function(event){
+   if(Date.now()<suppressClickUntil){
+    event.preventDefault();event.stopImmediatePropagation();suppressClickUntil=0;
+   }
+  },true);
+ }
+ function bindAll(){
+  document.querySelectorAll('#ccxOverlay header.gmt-header nav.gmt-nav, #ccClassDemo header.gmt-header nav.gmt-nav').forEach(bind);
+ }
+ bindAll();
+ const classes=document.getElementById('ccClassDemo');
+ if(classes)new MutationObserver(bindAll).observe(classes,{childList:true});
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bindAll,{once:true});
+})();
+</script></body></html>
