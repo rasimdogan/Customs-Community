@@ -6948,7 +6948,8 @@ window.CCCommunity=(()=>{
     card_fav:`${esc(name)} “${esc(n.card_title||'kartına')}” Fav verdi.`,
     card_accepted:`${esc(name)} gönderdiğin “${esc(n.card_title||'kartı')}” kütüphanesine aldı.`,
     mention_post:`${esc(name)} bir gönderide senden bahsetti.`,
-    mention_comment:`${esc(name)} bir yorumda senden bahsetti.`
+    mention_comment:`${esc(name)} bir yorumda senden bahsetti.`,
+    class_live:`🔴 ${esc(n.comment_body||'Kayıtlı olduğun sınıf')} sınıfında canlı yayın başladı.`
    }[n.kind]||`${esc(name)} Toplulukta seninle etkileşime geçti.`;
    return `<button class="ccx-notif-item ${n.read_at?'':'unread'}" onclick="CCCommunity.openNotification(${n.id},'${esc(n.kind)}','${esc(n.card_id||'')}',${n.post_id??'null'},'${esc(n.actor_id||'')}')">${avatar(n.actor_avatar_url,name,n.actor_username,'ccx-avatar')}<span class="ccx-notif-copy"><b>${text}</b><small>${esc(relativeTime(n.created_at))}</small></span>${n.read_at?'':'<span class="ccx-notif-unread"></span>'}</button>`
   }).join(''):'<div class="ccx-empty" style="padding:28px">Henüz bildirimin yok.</div>'
@@ -6976,6 +6977,7 @@ window.CCCommunity=(()=>{
  async function openNotification(id,kind,cardId,postId,actorId){
   if(!await ensure())return;
   await sb.rpc('cc_community_mark_notification',{p_id:id});closeNotifications();refreshNotificationBadge();
+  if(kind==='class_live'){window.CCClassDemo?.open?.();return}
   if(kind==='card_sent'&&cardId){await window.CCCards?.openReceivedFromNotification?.(cardId);return}
   if(['post_like','post_comment','comment_heart','mention_post','mention_comment'].includes(kind)&&postId){
    window.CCCards?.closeLibraryView?.();await setFeed('all');
