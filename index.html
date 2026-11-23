@@ -9650,7 +9650,7 @@ async function refreshQuiz(){
   if(latest.status==='closed'&&previousId===latest.id)resultsExpanded=true;
   if(!owner&&latest.id!==previousId){
    let first=(latest.questions||[]).findIndex((_,i)=>!Object.prototype.hasOwnProperty.call(answers,String(i)));
-   quizIndex=first<0?(latest.questions||[]).length:first;
+   quizIndex=first<0?Math.max(0,(latest.questions||[]).length-1):first;
   }
   renderQuiz()
  }catch(e){console.warn('Sınıf testi güncellenemedi:',e)}
@@ -9703,10 +9703,6 @@ function renderQuiz(){
   el.innerHTML=heading+'<div class="ccd-finished-message"><span class="ccd-finish-icon">✓</span><div><h4>'+(done?'Testini tamamladın!':'Test eğitmen tarafından sonlandırıldı.')+'</h4><p>'+answered+' / '+q.length+' soru yanıtlandı'+(result?' · '+correct+' doğru':'')+'. Canlı derse katılmaya devam edebilirsin.</p></div></div>'+board;
   return
  }
- if(quizIndex>=q.length){
-  el.innerHTML=heading+'<div class="ccd-finished-message"><span class="ccd-finish-icon">✓</span><div><h4>Bütün soruları yanıtladın</h4><p>Yanıtların kaydedildi. Testi bitirerek sonucunu kesinleştirebilirsin.</p></div></div><div class="ccd-test-actions"><button class="btn primary ccd-finish-btn" type="button" onclick="CCClassDemo.finishQuiz()">✓ Testi bitir</button><button class="btn" type="button" onclick="CCClassDemo.goQuizQuestion('+(q.length-1)+')">Önceki soruya dön</button></div>'+board;
-  return
- }
  const idx=Math.max(0,Math.min(quizIndex,q.length-1)),question=q[idx];
  const options=Array.isArray(question?.options)?question.options:[];
  const selected=Object.prototype.hasOwnProperty.call(answers,String(idx))?Number(answers[idx]):null;
@@ -9720,13 +9716,13 @@ function renderQuiz(){
  el.innerHTML=heading+'<div class="ccd-quiz-progress-label"><span>Soru <b>'+(idx+1)+' / '+q.length+'</b></span><span><b>'+answered+'</b> yanıtlandı</span></div><div class="ccd-quiz-progress-track"><div style="width:'+percent+'%"></div></div>'+
   '<div class="ccd-question-shell"><span class="ccd-question-tag">SORU '+(idx+1)+'</span><h4>'+esc(question.prompt||'Soru metni bulunamadı.')+'</h4><p>'+(bankType?'Doğru seçeneği işaretleyin.':'Doğru tarife pozisyonunu seçin.')+'</p><div class="ccd-choice-list">'+choices+'</div>'+feedback+(selected!==null&&question.explanation?'<p class="ccd-bank-explanation"><b>Çözüm:</b> '+esc(question.explanation)+'</p>':'')+'</div>'+
   '<div class="ccd-test-actions">'+(idx>0?'<button class="btn" type="button" onclick="CCClassDemo.goQuizQuestion('+(idx-1)+')">← Önceki soru</button>':'<span></span>')+
-  '<button class="btn primary ccd-finish-btn" type="button" '+(selected===null?'disabled':'')+' onclick="CCClassDemo.goQuizQuestion('+(idx+1)+')">'+(idx===q.length-1?'Sonuç ekranına geç':'Sonraki soru →')+'</button></div>'+board
+  '<button class="btn primary ccd-finish-btn" type="button" '+(selected===null?'disabled':'')+' onclick="'+(idx===q.length-1?'CCClassDemo.finishQuiz()':'CCClassDemo.goQuizQuestion('+(idx+1)+')')+'">'+(idx===q.length-1?'✓ Testi Bitir':'Sonraki soru →')+'</button></div>'+board
 }
 function goQuizQuestion(i){
  if(!quizState||quizBusy||quizState.status!=='active')return;
  const mine=quizAnswers.find(a=>a.user_id===auth()?.id);
  if(mine?.finished_at)return;
- quizIndex=Math.max(0,Math.min(Number(i)||0,(quizState.questions||[]).length));
+ quizIndex=Math.max(0,Math.min(Number(i)||0,Math.max(0,(quizState.questions||[]).length-1)));
  renderQuiz()
 }
 function toggleQuizResults(){resultsExpanded=!resultsExpanded;renderQuiz()}
@@ -9771,7 +9767,7 @@ async function finishQuiz(){
   if(res.error)throw res.error;
   quizAnswers=quizAnswers.filter(a=>a.user_id!==user.id).concat({user_id:user.id,answers,finished_at});
   resultsExpanded=true;
-  alert('Testin tamamlandı. Canlı yayın devam ediyor.');
+
  }catch(e){alert('Test tamamlanamadı: '+(e.message||e))}
  finally{quizBusy=false;renderQuiz();refreshQuiz()}
 }
