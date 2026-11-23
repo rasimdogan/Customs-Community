@@ -282,3 +282,14 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  script.onerror=()=>console.warn('Canlı sınıf arayüz modülü yüklenemedi');
  document.head.appendChild(script);
 })();
+
+/* Public folder browsing and follow-status synchronization. */
+(function(){
+ if(document.getElementById('ccSocialSyncLoader'))return;
+ const script=document.createElement('script');
+ script.id='ccSocialSyncLoader';
+ script.src='cc-social-sync.js?v=20261123c';
+ script.defer=true;
+ script.onerror=()=>console.warn('Sosyal görünüm eklentisi yüklenemedi');
+ document.head.appendChild(script);
+})();
