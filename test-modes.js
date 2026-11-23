@@ -2,13 +2,13 @@
 'use strict';
 const el=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const labels={gtip:'Yönetici Soruları',izahname:'İzahname'};
+const labels={gtip:'Yönetici Soruları',izahname:'İzahname Soruları'};
 let mode='position',bank=[],tests=[],selectedTestId=null,round=null,answered=false,request=0,originalStart=null,originalCancel=null,originalNext=null,originalRender=null,originalAnswer=null;
 const mix=a=>{const b=a.slice();for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b};
 function setup(){
  const host=el('view-test'),focus=host?.querySelector('.test-focus');if(!focus||el('ccTestModes'))return;
  const modes=document.createElement('div');modes.id='ccTestModes';
- modes.innerHTML='<button type="button" data-ccmode="gtip">Yönetici Soruları</button><button type="button" data-ccmode="izahname">İzahname</button><button type="button" data-ccmode="position" class="active">Tarife Pozisyon Testi</button>';
+ modes.innerHTML='<button type="button" data-ccmode="gtip">Yönetici Soruları</button><button type="button" data-ccmode="izahname">İzahname Soruları</button><button type="button" data-ccmode="position" class="active">Tarife Pozisyon Testi</button>';
  focus.prepend(modes);
  modes.addEventListener('click',e=>{const b=e.target.closest('[data-ccmode]');if(b)setMode(b.dataset.ccmode)});
  const shell=focus.querySelector('.test-shell');
