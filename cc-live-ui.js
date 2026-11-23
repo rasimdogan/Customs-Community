@@ -18,22 +18,16 @@ function style(){
  #ccLiveClassesCard .cc-live-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-top:1px solid #e6edf3}
  #ccLiveClassesCard .cc-live-row strong{display:block;font-size:13px;line-height:1.4;color:#203448}
  #ccLiveClassesCard .cc-live-row small{font-size:11px;color:#61778b}
- #ccLiveClassesCard button,#ccLiveNoticePanel button{font:inherit;font-size:12px;font-weight:750;border-radius:9px;border:1px solid #bcd6e7;background:#eaf5fc;color:#225878;padding:8px 11px;cursor:pointer;flex-shrink:0}
+ @media(max-width:650px){#ccLiveClassesCard{padding:13px 14px}}
  #ccLiveClassesCard .cc-live-empty{font-size:13px;color:#586b7d;line-height:1.5;margin:4px 0}
- .cc-live-indicator{display:inline-flex!important;align-items:center;vertical-align:middle;gap:3px;white-space:nowrap;background:#cf2344!important;color:#fff!important;font-size:10px!important;font-weight:850!important;letter-spacing:.15px;border-radius:6px;padding:3px 7px;margin-left:7px;line-height:1.2}
+ .cc-live-indicator{display:inline-flex!important;align-items:center;vertical-align:middle;white-space:nowrap;background:transparent!important;color:#d51d3d!important;font-size:10px!important;font-weight:850!important;letter-spacing:.18px;padding:0 2px;margin-left:5px;line-height:1.2;animation:ccLiveTextBlink 1.2s ease-in-out infinite}
  .cc-live-indicator[hidden]{display:none!important}
- #ccLiveNoticeLauncher{position:fixed;right:22px;bottom:24px;z-index:100320;border:1px solid #c3d6e5;background:#fff;border-radius:100px;color:#29455d;box-shadow:0 6px 20px #152c4430;padding:10px 15px;font:750 12px inherit;cursor:pointer;display:flex;align-items:center;gap:8px}
- #ccLiveNoticeLauncher[hidden],#ccLiveNoticePanel[hidden]{display:none!important}
- #ccLiveNoticeLauncher .cc-count{background:#c92241;color:white;border-radius:30px;padding:2px 6px;font-size:10px}
- #ccLiveNoticePanel{position:fixed;right:20px;bottom:76px;z-index:100321;width:min(350px,calc(100vw - 30px));max-height:55vh;overflow:auto;background:white;border:1px solid #cbdbe8;border-radius:14px;box-shadow:0 16px 50px #142b4840;padding:15px;color:#223e55}
- #ccLiveNoticePanel h3{font-size:16px;margin:0 0 11px;color:#223e55}
- #ccLiveNoticePanel article{padding:10px 0;border-top:1px solid #e5edf4;font-size:12px;line-height:1.5}
- #ccLiveNoticePanel small{display:block;color:#697d8e;margin-top:3px}
+ @keyframes ccLiveTextBlink{0%,100%{opacity:1}50%{opacity:.16}}
+ @media(prefers-reduced-motion:reduce){.cc-live-indicator{animation:none!important;text-decoration:underline}}
  #ccLiveToast{position:fixed;z-index:100322;top:75px;right:18px;max-width:min(365px,calc(100vw - 36px));background:#193b51;color:#fff;border-radius:12px;padding:14px 16px;box-shadow:0 9px 32px #10283a4d;font-size:13px;font-weight:750;cursor:pointer;transition:width .22s ease,height .22s ease,background-color .22s ease,border-radius .22s ease,padding .22s ease;line-height:1.5}
  #ccLiveToast.cc-live-dot{width:18px;height:18px;min-width:18px;min-height:18px;padding:0;border-radius:50%;background:#db2346;box-shadow:0 0 0 4px #db234625,0 4px 14px #ad193c55;overflow:hidden;font-size:0;white-space:nowrap;max-width:none}
  #ccLiveToast.cc-live-dot:focus-visible{outline:3px solid #267fc4;outline-offset:4px}
  #ccLiveToast.cc-live-dot:hover,#ccLiveToast.cc-live-dot:focus-visible,#ccLiveToast.cc-live-dot.cc-live-peek{width:auto;height:auto;min-width:0;min-height:0;max-width:min(365px,calc(100vw - 36px));padding:14px 16px;border-radius:12px;background:#193b51;font-size:13px;white-space:normal;overflow:visible;box-shadow:0 9px 32px #10283a4d}
- @media(max-width:650px){#ccLiveNoticeLauncher{right:12px;bottom:15px}#ccLiveNoticePanel{right:10px;bottom:66px}#ccLiveClassesCard{padding:13px 14px}}
  `;
  document.head.appendChild(el);
 }
@@ -87,40 +81,12 @@ function renderCard(){
  body.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',navigateToClasses));
 }
 function renderBadges(){
- const any=classes.some(c=>c.is_live);
- for(const nav of labelNodes('Sınıflar')){
-  if(nav.closest('#ccLiveClassesCard'))continue;
-  const parent=nav.closest('a,button,[role="tab"]')||nav;
-  let badge=parent.querySelector('.cc-live-indicator');
-  if(!badge){badge=document.createElement('span');badge.className='cc-live-indicator';badge.textContent='Canlı';badge.setAttribute('aria-label','Canlı ders var');parent.appendChild(badge);}
-  badge.hidden=!any;
+ const live=classes.some(c=>c.is_live);
+ for(const nav of document.querySelectorAll('#ccxTabClasses,[data-gmt-source-id="ccxTabClasses"]')){
+  let badge=nav.querySelector('.cc-live-indicator');
+  if(!badge){badge=document.createElement('span');badge.className='cc-live-indicator';badge.textContent='Canlı';badge.setAttribute('aria-label','Canlı ders var');nav.appendChild(badge);}
+  badge.hidden=!live;
  }
-}
-function notices(){
- let launcher=$('ccLiveNoticeLauncher');
- if(!launcher){
-  launcher=document.createElement('button');launcher.type='button';launcher.id='ccLiveNoticeLauncher';
-  launcher.setAttribute('aria-label','Canlı ders bildirimleri');
-  launcher.addEventListener('click',()=>{const p=$('ccLiveNoticePanel');p.hidden=!p.hidden;});
-  document.body.appendChild(launcher);
- }
- launcher.hidden=!uid;
- const unread=alerts.filter(x=>!x.read_at);
- launcher.innerHTML='🔔 Ders Bildirimleri'+(unread.length?'<span class="cc-count">'+unread.length+'</span>':'');
- let panel=$('ccLiveNoticePanel');
- if(!panel){panel=document.createElement('section');panel.id='ccLiveNoticePanel';panel.hidden=true;document.body.appendChild(panel);}
- panel.innerHTML='<h3>Canlı ders bildirimleri</h3>'+(alerts.length?alerts.slice(0,15).map(x=>{
-  const title=classes.find(c=>c.id===x.class_id)?.title||'Kayıtlı olduğunuz sınıf';
-  return '<article><b>'+escape(title)+'</b><div>Canlı ders başladı.</div><small>'+new Date(x.started_at).toLocaleString('tr-TR')+'</small></article>';
- }).join(''):'<p>Henüz ders bildirimi bulunmuyor.</p>')+'<button id="ccLiveNoticeRead" type="button">Okundu olarak işaretle</button>';
- $('ccLiveNoticeRead')?.addEventListener('click',async()=>{
-  try{
-   const db=await window.CC_AUTH.getClient();
-   const ids=alerts.filter(x=>!x.read_at).map(x=>x.id);
-   if(ids.length){const r=await db.from('cc_class_live_notifications').update({read_at:new Date().toISOString()}).in('id',ids);if(r.error)throw r.error;}
-   alerts=alerts.map(x=>({...x,read_at:x.read_at||new Date().toISOString()}));notices();
-  }catch(err){console.warn('Canlı ders bildirimi işaretlenemedi',err)}
- });
 }
 function popup(text){
  let node=$('ccLiveToast');
@@ -150,7 +116,7 @@ function clearPopup(){
 }
 async function refresh(){
  const now=Date.now(),id=auth();
- if(!id){uid='';classes=[];alerts=[];clearPopup();renderCard();renderBadges();notices();return;}
+ if(!id){uid='';classes=[];alerts=[];clearPopup();renderCard();renderBadges();window.CCCommunity?.refreshNotificationBadge?.();return;}
  if(busy||now-lastRun<5000)return;
  busy=true;uid=id;lastRun=now;
  try{
@@ -168,13 +134,13 @@ async function refresh(){
     if(Date.now()-new Date(item.created_at).getTime()<120000)popup('🔴 Canlı ders başladı: '+(classes.find(c=>c.id===item.class_id)?.title||'Sınıfınız'));
    }
   }
-  renderCard();renderBadges();notices();
+  renderCard();renderBadges();window.CCCommunity?.refreshNotificationBadge?.();
  }catch(err){console.warn('Canlı sınıflarım yüklenemedi',err)}
  finally{busy=false;}
 }
 function init(){
  if(initialized)return;initialized=true;
- style();repairUpcoming();renderCard();renderBadges();notices();refresh();
+ style();repairUpcoming();renderCard();renderBadges();window.CCCommunity?.refreshNotificationBadge?.();refresh();
  window.setInterval(()=>{if(!document.hidden)refresh()},12000);
  window.addEventListener('cc-authenticated',()=>{lastRun=0;refresh()});
  window.addEventListener('cc-logged-out',()=>{uid='';classes=[];alerts=[];clearPopup();renderCard();renderBadges();notices()});
