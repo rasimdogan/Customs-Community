@@ -146,12 +146,20 @@ function init(){
  window.addEventListener('cc-logged-out',()=>{uid='';classes=[];alerts=[];clearPopup();renderCard();renderBadges();notices()});
  document.addEventListener('visibilitychange',()=>{if(!document.hidden){lastRun=0;refresh()}});
  window.addEventListener('focus',()=>{lastRun=0;refresh()});
+ // Observe only navigation containers, not the full feed and thousands of card nodes.
  let mutationTimer=null;
- const obs=new MutationObserver(()=>{
+ const obs=new MutationObserver((records)=>{
   if(mutationTimer)return;
-  mutationTimer=setTimeout(()=>{mutationTimer=null;repairUpcoming();renderCard();renderBadges()},350);
+  const relevant=records.some(r=>[...r.addedNodes].some(n=>n.nodeType===1&&(
+   n.id==='ccxTabClasses'||n.id==='ccxTabClasses'||n.getAttribute?.('data-gmt-source-id')==='ccxTabClasses'||
+   n.querySelector?.('#ccxTabClasses,[data-gmt-source-id="ccxTabClasses"]')
+  )));
+  if(!relevant)return;
+  mutationTimer=setTimeout(()=>{mutationTimer=null;renderBadges()},300);
  });
- obs.observe(document.body,{childList:true,subtree:true});
+ for(const root of [document.getElementById('ccxOverlay'),document.getElementById('ccClassDemo')]){
+  if(root)obs.observe(root,{childList:true,subtree:true});
+ }
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
