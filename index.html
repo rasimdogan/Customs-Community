@@ -6805,10 +6805,31 @@ window.CCCommunity=(()=>{
   let {data,error}=await sb.rpc('cc_community_toggle_follow',{p_target:target});if(error){rpcError(error);return}
   toast(data?'Takip etmeye başladın.':'Takipten çıktın.','ok');
   stats.following=Math.max(0,Number(stats.following||0)+(data?1:-1));renderMy();
-  if($('ccxUserSearch')?.value.trim().length>=2)searchUsers();
-  if(String(lastPublicUser)===String(target))openUser(target);
-  if($('ccxConnectionsBackdrop')?.classList.contains('open'))loadConnections();
-  if(feedMode==='following')loadFeed(true);else{feedRows.forEach(x=>{if(String(x.user_id)===String(target))x.following_author=!!data});renderFeed()}
+  // Update only follow controls; a full feed render destroys asynchronously
+  // decorated community cards and needlessly reloads images/comments.
+  const newLabel=data?'Takiptesin':'+ Takip Et';
+  feedRows.forEach(x=>{if(String(x.user_id)===String(target))x.following_author=!!data});
+  document.querySelectorAll('#ccxFeed .ccx-post').forEach(post=>{
+   const button=post.querySelector('.ccx-follow-mini');
+   if(button&&button.getAttribute('onclick')?.includes(String(target))){
+    button.textContent=newLabel;
+    button.classList.toggle('ccFollowingSync',!!data);
+   }
+  });
+  document.querySelectorAll('#ccxUserResults .ccx-user-result, #ccxConnectionsList .ccx-user-result').forEach(row=>{
+   const button=row.querySelector('button.ccx-follow');
+   if(button&&(button.dataset.user===String(target)||button.getAttribute('onclick')?.includes(String(target)))){
+    button.textContent=data?'Takiptesin':'Takip Et';
+    button.classList.toggle('ccFollowingSync',!!data);
+   }
+  });
+  if(String(lastPublicUser)===String(target)){
+   const button=$('ccxPublicProfile')?.querySelector('.ccx-li-action button');
+   if(button)button.textContent=data?'Takipten Çık':'Takip Et';
+   const counts=$('ccxPublicProfile')?.querySelector('.ccx-li-stats');
+   if(counts){const b=counts.querySelector('button:nth-child(2) strong');if(b)b.textContent=Math.max(0,Number(b.textContent||0)+(data?1:-1))}
+  }
+  if(feedMode==='following')await loadFeed(true);
  }
  async function openUser(target){
   if(!await ensure()||!target)return;
