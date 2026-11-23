@@ -5,7 +5,7 @@ if(window.__ccLiveUiInstalled)return;
 window.__ccLiveUiInstalled=true;
 const $=id=>document.getElementById(id);
 const escape=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let classes=[],alerts=[],busy=false,uid='',lastRun=0,toastSeen=new Set(),initialized=false;
+let classes=[],alerts=[],busy=false,uid='',lastRun=0,toastSeen=new Set(),initialized=false,cardSignature='';
 function auth(){return window.CC_AUTH?.getSession?.()?.user?.id||''}
 function style(){
  if($('ccLiveUiStyle'))return;
@@ -77,6 +77,9 @@ function renderCard(){
  host.hidden=!uid;
  const body=$('ccLiveClassesBody');if(!body)return;
  const live=classes.filter(c=>c.is_live);
+ const signature=uid+'|'+live.map(x=>x.id+':'+x.title).join(',');
+ if(cardSignature===signature)return;
+ cardSignature=signature;
  body.innerHTML=live.length?live.map(c=>'<div class="cc-live-row"><div><strong>'+escape(c.title)+'</strong><small>🔴 Yayın devam ediyor</small></div><button type="button" data-live-class="'+escape(c.id)+'">Derse katıl</button></div>').join(''):'<p class="cc-live-empty">Şu anda kayıtlı olduğunuz sınıflarda canlı yayın yok.</p>';
  body.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',navigateToClasses));
 }
@@ -154,7 +157,11 @@ function init(){
  window.addEventListener('cc-logged-out',()=>{uid='';classes=[];alerts=[];renderCard();renderBadges();notices()});
  document.addEventListener('visibilitychange',()=>{if(!document.hidden){lastRun=0;refresh()}});
  window.addEventListener('focus',()=>{lastRun=0;refresh()});
- const obs=new MutationObserver(()=>{repairUpcoming();renderCard();renderBadges()});
+ let mutationTimer=null;
+ const obs=new MutationObserver(()=>{
+  if(mutationTimer)return;
+  mutationTimer=setTimeout(()=>{mutationTimer=null;repairUpcoming();renderCard();renderBadges()},350);
+ });
  obs.observe(document.body,{childList:true,subtree:true});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
