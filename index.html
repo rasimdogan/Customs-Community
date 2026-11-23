@@ -9525,15 +9525,20 @@ async function loadNamedClassTests(){
  if($('ccdQuizAvailable'))$('ccdQuizAvailable').textContent='Soru bankasındaki testler yükleniyor…';
  try{
   const db=await client();
-  const [testRes,questionRes]=await Promise.all([
-   db.from('cc_admin_question_tests').select('id,category,name').eq('is_published',true).order('created_at',{ascending:true}),
-   db.from('cc_admin_test_questions').select('id,test_id,category,question,options,correct_index,explanation').eq('is_published',true).order('id',{ascending:true})
-  ]);
+  const testRes=await db.from('cc_admin_question_tests').select('id,category,name').eq('is_published',true).order('created_at',{ascending:true});
   if(testRes.error)throw testRes.error;
-  if(questionRes.error)throw questionRes.error;
+  const records=[];
+  // Supabase Data API has a per-request row cap. Page through published questions
+  // so that tests remain complete as the question bank grows beyond 1,000 records.
+  for(let offset=0;offset<100000;offset+=500){
+   const page=await db.from('cc_admin_test_questions').select('id,test_id,category,question,options,correct_index,explanation').eq('is_published',true).order('id',{ascending:true}).range(offset,offset+499);
+   if(page.error)throw page.error;
+   records.push(...(page.data||[]));
+   if((page.data||[]).length<500)break;
+  }
   if(active?.id!==classId)return;
   classBankTests=testRes.data||[];
-  classBankQuestions=(questionRes.data||[]).filter(q=>Array.isArray(q.options)&&q.options.length===5&&q.options.every(o=>String(o||'').trim())&&Number.isInteger(q.correct_index)&&q.correct_index>=0&&q.correct_index<5);
+  classBankQuestions=records.filter(q=>Array.isArray(q.options)&&q.options.length===5&&q.options.every(o=>String(o||'').trim())&&Number.isInteger(q.correct_index)&&q.correct_index>=0&&q.correct_index<5);
   classBankLoaded=true;
   if($('ccdQuizSource')?.value==='question_bank')updateClassBankTests();
  }catch(e){
