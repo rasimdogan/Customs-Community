@@ -293,7 +293,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  if(document.getElementById('ccLiveUiLoader'))return;
  const script=document.createElement('script');
  script.id='ccLiveUiLoader';
- script.src='cc-live-ui.js?v=20261123e';
+ script.src='cc-live-ui.js?v=20261123g';
  script.defer=true;
  script.onerror=()=>console.warn('Canlı sınıf arayüz modülü yüklenemedi');
  document.head.appendChild(script);
