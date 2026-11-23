@@ -98,3 +98,11 @@
  #view-test #testArea .cct-position-actions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
  #view-test #testArea .cct-position-actions button{padding:10px 8px;font-size:12px}
 }
+
+/* Named test chooser: long custom titles stay readable without overflowing on mobile. */
+#view-test #ccCustomTest .cct-controls label{flex:1 1 270px;min-width:0;font-weight:750}
+#view-test #ccCustomTest .cct-controls select{display:block;width:100%;min-width:0;max-width:100%;min-height:45px;font-size:14px;padding:10px 12px}
+#view-test #ccCustomTest .cct-controls #ccCustomStart{min-height:45px}
+#view-test #ccCustomTest .cct-test-selection-note{margin:13px 0 0;color:#45647b;font-size:12px}
+#view-test #ccCustomTest .cct-test-selection-note b{color:#194868}
+@media(max-width:600px){#view-test #ccCustomTest .cct-controls{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}#view-test #ccCustomTest .cct-controls label{flex:none}#view-test #ccCustomTest .cct-controls #ccCustomStart{width:100%}}
