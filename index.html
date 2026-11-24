@@ -7037,7 +7037,40 @@ window.CCCommunity=(()=>{
 body.dark #ccklEditorBackdrop .cckl-paste-help{color:#aac2d1}
 body.dark #ccklEditorBackdrop .cckl-clean-format-btn{background:#1e3b50!important;color:#d5edf9!important;border-color:#3a6278!important}
 </style>
-<style id="cckl-folders-modern-v10386">#ccklFolders{display:flex;flex-direction:column;gap:6px;margin-top:9px}#ccklFolders .cckl-folder{display:flex;align-items:center;gap:9px;width:100%;padding:10px 11px;border:1px solid transparent;border-radius:11px;background:transparent;text-align:left;color:#334c66;font-size:13px;font-weight:650;transition:.15s}#ccklFolders .cckl-folder:hover{background:#f0f5fa;border-color:#e1eaf3}#ccklFolders .cckl-folder.active{background:#eaf2fd;border-color:#cbdff7;color:#1b5b9c}#ccklFolders .cckl-folder-icon{display:grid;place-items:center;flex:0 0 30px;height:30px;border-radius:9px;background:#e8f1fb;color:#3b75ad;font-size:23px}#ccklFolders .cckl-folder-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#ccklFolders .cckl-folder-count{font-size:11px;color:#70869a;background:#edf2f6;border-radius:99px;padding:3px 7px}#ccklFolders .cckl-folder.cckl-drop-target{background:#dcecff;border:1px dashed #3279bb;transform:translateX(3px)}#ccklGrid .cckl-tile[draggable=true]{cursor:grab}#ccklGrid .cckl-tile.cckl-dragging{opacity:.45}</style><style id="cc-webinar-jitsi-v10387">.cchub-jitsi-entry{border:1px solid #a9cbe4!important;background:#eaf4fb!important;color:#175c89!important;font-weight:750!important}.cchub-jitsi-panel{margin:15px 18px 20px;border:1px solid #d6e3ee;border-radius:15px;overflow:hidden;background:#f7fafd}.cchub-jitsi-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 15px;background:#eaf2fa;color:#245276;font-size:13px}.cchub-jitsi-panel #cchubJitsiStatus{padding:8px 15px;color:#55718a;font-size:12px}.cchub-jitsi-panel #cchubJitsiMount{min-height:440px;background:#162639}.cchub-jitsi-panel #cchubJitsiMount iframe{display:block;width:100%;border:0}@media(max-width:700px){.cchub-jitsi-panel{margin:10px 6px}.cchub-jitsi-panel #cchubJitsiMount{min-height:340px}}</style><style id="cc-pricing-comparison-v10390">
+<style id="cckl-folders-modern-v10386">#ccklFolders{display:flex;flex-direction:column;gap:6px;margin-top:9px}#ccklFolders .cckl-folder{display:flex;align-items:center;gap:9px;width:100%;padding:10px 11px;border:1px solid transparent;border-radius:11px;background:transparent;text-align:left;color:#334c66;font-size:13px;font-weight:650;transition:.15s}#ccklFolders .cckl-folder:hover{background:#f0f5fa;border-color:#e1eaf3}#ccklFolders .cckl-folder.active{background:#eaf2fd;border-color:#cbdff7;color:#1b5b9c}#ccklFolders .cckl-folder-icon{display:grid;place-items:center;flex:0 0 30px;height:30px;border-radius:9px;background:#e8f1fb;color:#3b75ad;font-size:23px}#ccklFolders .cckl-folder-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#ccklFolders .cckl-folder-count{font-size:11px;color:#70869a;background:#edf2f6;border-radius:99px;padding:3px 7px}#ccklFolders .cckl-folder.cckl-drop-target{background:#dcecff;border:1px dashed #3279bb;transform:translateX(3px)}#ccklGrid .cckl-tile[draggable=true]{cursor:grab}#ccklGrid .cckl-tile.cckl-dragging{opacity:.45}</style><style id="cc-public-library-mirror-v10401">
+/* Public libraries share the same visual shell, folder items and card tiles as Kütüphanem. */
+#ccxUserCardsPane .cckl-public-library{margin:0;padding:0;border:0}
+#ccxUserCardsPane .cckl-public-head{margin:0 0 14px;padding:15px 18px}
+#ccxUserCardsPane .cckl-public-head h2{font-size:21px!important;margin:4px 0}
+#ccxUserCardsPane .cckl-public-readonly{color:#688198;font-size:11px;font-weight:650}
+#ccxUserCardsPane .cckl-public-shell{display:grid;grid-template-columns:210px minmax(0,1fr);gap:14px;align-items:start}
+#ccxUserCardsPane .cckl-public-nav{display:grid;gap:5px;position:relative;top:auto}
+#ccxUserCardsPane .cckl-public-nav .cckl-folder{display:flex!important;align-items:center;gap:9px;width:100%;min-width:0;padding:10px 11px;border:1px solid transparent;border-radius:11px;background:transparent;text-align:left;color:#334c66;font-size:13px;font-weight:650;cursor:pointer;transition:background-color .15s,border-color .15s}
+#ccxUserCardsPane .cckl-public-nav .cckl-folder:hover{background:#f0f5fa;border-color:#e1eaf3}
+#ccxUserCardsPane .cckl-public-nav .cckl-folder.active{background:#eaf2fd;border-color:#cbdff7;color:#1b5b9c}
+#ccxUserCardsPane .cckl-public-nav .cckl-folder-icon{display:grid;place-items:center;flex:0 0 30px;height:30px;border-radius:9px;background:#e8f1fb;color:#3b75ad;font-size:23px}
+#ccxUserCardsPane .cckl-public-nav .cckl-folder-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#ccxUserCardsPane .cckl-public-nav .cckl-folder-count{font-size:11px;color:#70869a;background:#edf2f6;border-radius:99px;padding:3px 7px}
+#ccxUserCardsPane .cckl-public-nav .cckl-folder-title{display:flex!important;align-items:center;justify-content:space-between;margin:12px 5px 3px;padding-top:10px;border-top:1px solid #ecebe8;color:#89969d;font-size:9px;font-weight:900;letter-spacing:.9px;text-transform:uppercase}
+#ccxUserCardsPane .cckl-public-folders{display:flex;flex-direction:column;gap:5px}
+#ccxUserCardsPane .cckl-public-shell .cckl-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+#ccxUserCardsPane .cckl-public-shell .cckl-tile{cursor:pointer}
+#ccxUserCardsPane .cckl-public-shell .cckl-tile:focus-visible{outline:3px solid #307bac;outline-offset:2px}
+#ccxUserCardsPane .cckl-public-info{font-size:11px;color:#607a8e;margin:14px 2px 2px;line-height:1.5}
+#ccxUserCardsPane .cckl-public-empty{grid-column:1/-1}
+body.dark #ccxUserCardsPane .cckl-public-nav .cckl-folder{color:#d1e1eb}
+body.dark #ccxUserCardsPane .cckl-public-nav .cckl-folder.active{background:#204363;color:#c5e6ff}
+@media(max-width:1050px){#ccxUserCardsPane .cckl-public-shell .cckl-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){
+ #ccxUserCardsPane .cckl-public-shell{grid-template-columns:minmax(0,1fr);gap:12px}
+ #ccxUserCardsPane .cckl-public-nav{position:relative;display:flex!important;align-items:center;overflow-x:auto;gap:7px;white-space:nowrap;padding:10px}
+ #ccxUserCardsPane .cckl-public-nav .cckl-folder{width:auto;flex:0 0 auto;white-space:nowrap}
+ #ccxUserCardsPane .cckl-public-folders{display:contents!important}
+ #ccxUserCardsPane .cckl-public-nav .cckl-folder-title{display:none!important}
+ #ccxUserCardsPane .cckl-public-readonly{font-size:10px}
+}
+@media(max-width:470px){#ccxUserCardsPane .cckl-public-shell .cckl-grid{grid-template-columns:1fr}}
+</style><style id="cc-webinar-jitsi-v10387">.cchub-jitsi-entry{border:1px solid #a9cbe4!important;background:#eaf4fb!important;color:#175c89!important;font-weight:750!important}.cchub-jitsi-panel{margin:15px 18px 20px;border:1px solid #d6e3ee;border-radius:15px;overflow:hidden;background:#f7fafd}.cchub-jitsi-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 15px;background:#eaf2fa;color:#245276;font-size:13px}.cchub-jitsi-panel #cchubJitsiStatus{padding:8px 15px;color:#55718a;font-size:12px}.cchub-jitsi-panel #cchubJitsiMount{min-height:440px;background:#162639}.cchub-jitsi-panel #cchubJitsiMount iframe{display:block;width:100%;border:0}@media(max-width:700px){.cchub-jitsi-panel{margin:10px 6px}.cchub-jitsi-panel #cchubJitsiMount{min-height:340px}}</style><style id="cc-pricing-comparison-v10390">
 
 #ccMembershipModal .cc92-compare-section{margin-top:18px;background:#fff;border:1px solid #dce6ed;border-radius:16px;padding:18px 17px 16px;min-width:0}
 #ccMembershipModal .cc92-compare-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 2px 15px;flex-wrap:wrap}
@@ -7506,7 +7539,7 @@ window.CCCards=(()=>{
    favorited:c.favorited,fav_count:c.fav_count,in_library:c.in_library,
    folder_id:c.folder_id,archived:c.archived,is_public:c.is_public,updated_at:c.updated_at
   })}};
-  rows.forEach(apply);weeklyRows.forEach(apply);feedCardMap.forEach(apply)
+  rows.forEach(apply);weeklyRows.forEach(apply);feedCardMap.forEach(apply);(window.__ccProfileLibraryRows||[]).forEach(apply)
  }
 
  function openSend(){
@@ -7553,19 +7586,104 @@ window.CCCards=(()=>{
  }
  function openExternalWeekly(i){let c=weeklyRows[i];if(c)openExternal(c,weeklyRows)}
 
+ let publicLibraryFolders=[],publicLibraryOwner='',publicLibraryFolder=null;
+ function publicLibraryTiles(){
+  const list=window.__ccProfileLibraryRows||[];
+  const available=list.map((card,index)=>({card,index})).filter(x=>{
+   if(!publicLibraryFolder)return true;
+   if(publicLibraryFolder==='unfiled')return !x.card.owner_folder_id;
+   return String(x.card.owner_folder_id||'')===String(publicLibraryFolder);
+  });
+  return available.length?available.map(({card:c,index:i})=>
+   '<article class="cckl-tile '+styleClass(c)+'" role="button" tabindex="0" data-public-card-index="'+i+'" aria-label="'+esc(c.title)+' kartını aç">'+
+    '<div class="cckl-tile-body"><span class="cckl-type">TOPLULUK KARTI</span><h4>'+esc(c.title)+'</h4>'+
+    '<div class="cckl-card-text">'+sanitizeCardMarkup(c.body||'')+'</div>'+
+    '<div class="cckl-tile-foot"><span class="cckl-tile-owner">👤 '+esc(nameOf(c))+'</span><span class="cckl-tile-fav">★ '+fmt(c.fav_count)+'</span></div>'+
+    '</div></article>'
+  ).join(''):'<div class="ccx-card ccx-empty cckl-public-empty">Bu klasörde görüntülenebilen kart bulunmuyor.</div>';
+ }
+ function selectPublicFolder(id){
+  const area=$('ccxPublicCardsArea');
+  if(!area||area.dataset.publicOwner!==publicLibraryOwner)return;
+  publicLibraryFolder=id||null;
+  area.querySelectorAll('[data-public-folder]').forEach(button=>{
+   const selected=button.dataset.publicFolder===(publicLibraryFolder||'all');
+   button.classList.toggle('active',selected);
+   button.setAttribute('aria-pressed',String(selected));
+  });
+  const selectedName=publicLibraryFolder==='unfiled'?'Klasörsüz':
+   (publicLibraryFolders.find(f=>String(f.folder_id)===String(publicLibraryFolder))?.folder_name||'Kütüphanem');
+  const title=$('ccklPublicSectionTitle');if(title)title.textContent=publicLibraryFolder?selectedName:'Kütüphanem';
+  const list=window.__ccProfileLibraryRows||[];
+  const count=list.filter(c=>!publicLibraryFolder||(
+   publicLibraryFolder==='unfiled'?!c.owner_folder_id:String(c.owner_folder_id||'')===String(publicLibraryFolder)
+  )).length;
+  const countLabel=$('ccklPublicCount');if(countLabel)countLabel.textContent=count+' kart';
+  const grid=$('ccklPublicGrid');if(grid)grid.innerHTML=publicLibraryTiles();
+ }
  async function renderUserCards(target){
   if(!await ensure())return;
-  let area=$('ccxPublicCardsArea');if(!area)return;
-  const [visRes,libRes]=await Promise.all([
+  const area=$('ccxPublicCardsArea');if(!area)return;
+  const [visRes,libRes,foldersRes,folderCardsRes]=await Promise.all([
    sb.rpc('cc_community_library_visibility',{p_target:target}),
-   sb.rpc('cc_card_public_library',{p_owner:target})
+   sb.rpc('cc_card_public_library',{p_owner:target}),
+   sb.rpc('cc_public_library_folders',{p_owner:target}),
+   sb.rpc('cc_public_library_folder_cards',{p_owner:target})
   ]);
   if(String(window.CCCommunity?.currentUserId?.()||'')!==String(target))return;
-  if(libRes.error){area.innerHTML='<div class="ccx-side-note">Kart kütüphanesi yüklenemedi.</div>';return}
-  let visible=!!visRes.data,library=(await hydrate(libRes.data||[])).map(normalize);
+  if(visRes.error||libRes.error||foldersRes.error||folderCardsRes.error){
+   area.innerHTML='<div class="ccx-side-note">Kart kütüphanesi yüklenemedi. Lütfen tekrar dene.</div>';
+   console.warn('Kütüphane klasörleri yüklenemedi',visRes.error||libRes.error||foldersRes.error||folderCardsRes.error);
+   return;
+  }
+  const visible=!!visRes.data;
+  if(!visible){
+   publicLibraryOwner='';publicLibraryFolders=[];window.__ccProfileLibraryRows=[];
+   area.innerHTML='<section class="cckl-profile-section"><h4>Kart Kütüphanesi</h4><div class="cckl-profile-hidden">🔒 Bu kullanıcı kütüphanesini gizli tutuyor.</div></section>';
+   return;
+  }
+  const associations=new Map((folderCardsRes.data||[]).map(x=>[String(x.card_id),x.folder_id]));
+  const library=(await hydrate(libRes.data||[])).map(x=>normalize({
+   ...x,owner_folder_id:associations.get(String(x.card_id))||null
+  }));
+  if(String(window.CCCommunity?.currentUserId?.()||'')!==String(target))return;
+  publicLibraryOwner=String(target);publicLibraryFolder=null;
+  publicLibraryFolders=foldersRes.data||[];
   window.__ccProfileLibraryRows=library;
-  let libHTML=!visible?'<div class="cckl-profile-hidden">🔒 Bu kullanıcı kütüphanesini gizli tutuyor.</div>':library.length?`<div class="cckl-profile-grid">${library.map((c,i)=>`<button class="cckl-profile-tile ${styleClass(c)}"${styleVars(c)} onclick="CCCards.openProfileLibraryCard(${i})"><span class="ccx-user-card-type">TOPLULUK KARTI</span><b>${esc(c.title)}</b><div class="ccx-user-card-preview">${sanitizeCardMarkup(c.body||'')}</div><small>${esc(nameOf(c))} · ★ ${fmt(c.fav_count)} Fav</small></button>`).join('')}</div>`:'<div class="ccx-side-note">Kütüphanede gösterilecek kart yok.</div>';
-  area.innerHTML=`<section class="cckl-profile-section"><h4>Kart Kütüphanesi${visible?' · '+library.length:''}</h4>${libHTML}</section>`
+  const unfiled=library.filter(x=>!x.owner_folder_id).length;
+  const folderButtons=publicLibraryFolders.map(f=>
+   '<button type="button" class="cckl-folder" data-public-folder="'+esc(f.folder_id)+'" aria-pressed="false">'+
+    '<span class="cckl-folder-icon">▱</span><span class="cckl-folder-name">'+esc(f.folder_name)+'</span>'+
+    '<span class="cckl-folder-count">'+fmt(f.card_count)+'</span></button>'
+  ).join('');
+  area.dataset.publicOwner=publicLibraryOwner;
+  area.innerHTML=
+   '<section class="cckl-profile-section cckl-public-library">'+
+    '<div class="cckl-head cckl-public-head"><div><small>TOPLULUK KARTLARI</small><h2>Kart Kütüphanesi</h2></div><span class="cckl-public-readonly">Üyenin kütüphanesi · görüntüleme</span></div>'+
+    '<div class="cckl-shell cckl-public-shell"><aside class="cckl-nav cckl-public-nav" aria-label="Kart klasörleri">'+
+     '<button type="button" class="cckl-folder active" data-public-folder="all" aria-pressed="true">'+
+      '<span class="cckl-folder-icon">▱</span><span class="cckl-folder-name">Tümü</span><span class="cckl-folder-count">'+fmt(library.length)+'</span></button>'+
+     '<div class="cckl-folder-title"><span>Klasörler</span></div>'+
+     '<div class="cckl-public-folders">'+folderButtons+'</div>'+
+     (unfiled?'<button type="button" class="cckl-folder" data-public-folder="unfiled" aria-pressed="false"><span class="cckl-folder-icon">▱</span><span class="cckl-folder-name">Klasörsüz</span><span class="cckl-folder-count">'+fmt(unfiled)+'</span></button>':'')+
+    '</aside><main class="cckl-main"><div class="cckl-toolbar"><div><b id="ccklPublicSectionTitle">Kütüphanem</b><small id="ccklPublicCount">'+fmt(library.length)+' kart</small></div></div>'+
+     '<div id="ccklPublicGrid" class="cckl-grid">'+publicLibraryTiles()+'</div>'+
+    '</main></div>'+
+    '<p class="cckl-public-info">Kartı açarak kendi kütüphanene ekleyebilirsin. PDF yalnızca kendi kütüphanende oluşturulur.</p>'+
+   '</section>';
+  area.querySelectorAll('[data-public-folder]').forEach(button=>{
+   button.addEventListener('click',()=>selectPublicFolder(button.dataset.publicFolder==='all'?null:button.dataset.publicFolder));
+  });
+  const grid=$('ccklPublicGrid');
+  grid?.addEventListener('click',event=>{
+   const card=event.target.closest('[data-public-card-index]');
+   if(card)openProfileLibraryCard(Number(card.dataset.publicCardIndex));
+  });
+  grid?.addEventListener('keydown',event=>{
+   if(event.key!=='Enter'&&event.key!==' ')return;
+   const card=event.target.closest('[data-public-card-index]');
+   if(card){event.preventDefault();openProfileLibraryCard(Number(card.dataset.publicCardIndex))}
+  });
  }
  function openProfileCard(i){let list=window.__ccProfileCardRows||[],c=list[i];if(c)openExternal(c,list)}
  function openProfileLibraryCard(i){let list=window.__ccProfileLibraryRows||[],c=list[i];if(c)openExternal(c,list)}
