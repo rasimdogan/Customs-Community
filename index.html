@@ -6129,12 +6129,19 @@ body.dark #ccxOverlay .ccx-header-inner .ccx-brand-title{color:#e5f2f8!important
     <label class="cchub-span2"><span>Başlık</span><input id="cchubNewsTitle" maxlength="180" placeholder="Başlık"></label>
     <label class="cchub-span2"><span>Kısa özet</span><textarea id="cchubNewsSummary" maxlength="500" placeholder="Liste görünümünde gösterilecek kısa açıklama"></textarea></label>
     <label class="cchub-span2"><span>İçerik</span><textarea id="cchubNewsBody" maxlength="10000" placeholder="Detaylı içerik"></textarea></label>
-    <label><span>Bağlantı</span><input id="cchubNewsUrl" type="url" maxlength="1000" placeholder="https://..."></label>
-    <label><span>Buton yazısı</span><input id="cchubNewsLinkLabel" maxlength="80" placeholder="Detayları Gör"></label>
-    <label><span>Yayın başlangıcı</span><input id="cchubNewsStart" type="datetime-local"></label>
-    <label><span>Yayın bitişi</span><input id="cchubNewsEnd" type="datetime-local"></label>
+    <label><span>Kaynak bağlantısı</span><input id="cchubNewsUrl" type="url" maxlength="1000" placeholder="https://..."></label>
+    <label><span>Buton yazısı</span><input id="cchubNewsLinkLabel" maxlength="80" placeholder="Kaynağı Aç"></label>
+    <label><span>Kaynak türü</span><select id="cchubNewsSourceType">
+      <option value="admin">Customs Community / Editör</option><option value="resmi_gazete">Resmî Gazete</option>
+      <option value="ticaret_bakanligi">Ticaret Bakanlığı</option><option value="sektor_kurulusu">Sektör kuruluşu</option>
+      <option value="official">Diğer resmî kaynak</option><option value="eu_official_journal">AB Resmî Gazetesi</option>
+    </select></label>
+    <label><span>Haberin kaynak tarihi</span><input id="cchubNewsSourceDate" type="date"></label>
+    <label><span>Yayın başlangıcı (isteğe bağlı)</span><input id="cchubNewsStart" type="datetime-local"></label>
+    <label><span>Yayın bitişi (isteğe bağlı)</span><input id="cchubNewsEnd" type="datetime-local"></label>
+    <label class="cchub-span2 cc-news-published-toggle"><input id="cchubNewsPublished" type="checkbox" checked><span>Hemen yayımla (işareti kaldırılırsa taslakta kalır)</span></label>
    </div>
-   <div class="cchub-editor-actions"><button class="ccx-lite" onclick="CCHub.closeNewsEditor()">Vazgeç</button><button id="cchubNewsSave" class="ccx-primary" onclick="CCHub.saveNews()">Yayınla</button></div>
+   <div class="cchub-editor-actions"><button class="ccx-lite" onclick="CCHub.closeNewsEditor()">Vazgeç</button><button id="cchubNewsSave" class="ccx-primary" onclick="CCHub.saveNews()">Kaydet ve Yayımla</button></div>
   </section>
  </div>
 </div>
@@ -6172,6 +6179,19 @@ body.dark #ccxOverlay .ccx-header-inner .ccx-brand-title{color:#e5f2f8!important
 #ccxOverlay .cc-news-sources p{color:#526f84;font-size:12px;line-height:1.6;margin:0}
 #ccxOverlay .cc-news-sources>div:last-child{display:flex;flex-wrap:wrap;gap:8px}
 #ccxOverlay .cc-news-sources a{display:inline-flex;align-items:center;background:#edf5fb;color:#24648d;border:1px solid #c7dbea;border-radius:9px;text-decoration:none;font-size:11px;font-weight:800;padding:9px 12px}
+#ccxOverlay .cc-news-published-toggle{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid #d9e6ee;border-radius:10px;background:#f4f9fc}
+#ccxOverlay .cc-news-published-toggle input{width:18px;height:18px;flex:none;accent-color:#1676aa}
+#ccxOverlay .cc-news-published-toggle span{color:#38586c;font-size:12px}
+#ccxOverlay .cc-news-manager[hidden]{display:none!important}
+#ccxOverlay .cc-news-manager-list{display:grid;gap:7px;max-height:520px;overflow:auto;margin-top:12px}
+#ccxOverlay .cc-news-manager-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px;border:1px solid #dce8f0;border-radius:11px;background:#fbfcfe}
+#ccxOverlay .cc-news-manager-row .copy{min-width:0;display:grid;gap:4px}
+#ccxOverlay .cc-news-manager-row .copy b{font-size:12px;color:#24465b;overflow-wrap:anywhere}
+#ccxOverlay .cc-news-manager-row .copy small{font-size:10px;color:#627d90}
+#ccxOverlay .cc-news-manager-row .actions{display:flex;gap:7px;flex-shrink:0}
+#ccxOverlay .cc-news-manager-row .actions button{font-size:11px;font-weight:750;border:1px solid #c4d8e5;background:#ecf5fa;color:#285f82;border-radius:8px;padding:7px 9px;cursor:pointer}
+#ccxOverlay .cc-news-manager-row .actions button.danger{background:#fff3f3;border-color:#edcaca;color:#a34242}
+@media(max-width:650px){#ccxOverlay .cc-news-manager-row{align-items:flex-start;flex-direction:column}#ccxOverlay .cc-news-manager-row .actions{flex-wrap:wrap}}
 #ccxOverlay .cc-news-update-empty{font-size:12px;color:#698094;padding:8px 0}
 body.dark #ccxOverlay .cc-news-filters,body.dark #ccxOverlay .cc-news-archive{background:#17232d;border-color:#344d5c}
 body.dark #ccxOverlay .cc-news-filter input,body.dark #ccxOverlay .cc-news-filter select{background:#1d3445;color:#e8f1f7;border-color:#466178}
@@ -6417,7 +6437,7 @@ window.CCHub=(()=>{
  async function renderNewsView(){
   setHeader('GÜNCEL BİLGİ','Haber Merkezi',
     'Gümrük ve dış ticaret haberleri: arama, konu, kaynak ve tarih filtreleriyle tüm yayımlanmış içerik.',
-    isAdmin()?'<button class="ccx-primary" onclick="CCHub.openNewsEditor()">＋ Haber Yayımla</button>':'');
+    isAdmin()?'<button class="ccx-primary" onclick="CCHub.openNewsEditor()">＋ Haber Ekle</button><button class="ccx-lite" onclick="CCHub.toggleNewsManager()">Haberleri Yönet</button>':'');
   const st=newsArchiveState;
   $('cchubContent').innerHTML=
    '<div class="cchub-news-page cc-news-center">'+
@@ -6441,6 +6461,7 @@ window.CCHub=(()=>{
      '<div id="ccNewsArchiveGrid" class="cchub-news-grid" aria-live="polite"><div class="ccx-loading">Haber arşivi yükleniyor…</div></div>'+
      '<div id="ccNewsArchivePages"></div>'+
     '</section>'+
+    '<section id="ccNewsManagerPanel" class="cchub-card cchub-section cc-news-manager" hidden><div class="cchub-news-list-head"><div><small>YÖNETİCİ</small><h3>Haber Yönetimi</h3></div><p>Yayımdaki haberler ve taslaklar. Düzenleyebilir veya yayımdan kaldırabilirsin.</p></div><div id="ccNewsManagerRows"><div class="ccx-loading">Haberler getiriliyor…</div></div></section>'+
     '<section class="cchub-card cchub-section cc-news-sources"><div><small>GÜVENİLİR KAYNAKLAR</small><h3>Haber kaynakları</h3></div>'+
      '<p>Haberler resmî duyurular ve sektör kaynakları esas alınarak hazırlanır. Hukuki işlem öncesinde özgün metin kontrol edilmelidir.</p>'+
      '<div><a href="https://www.resmigazete.gov.tr/" target="_blank" rel="noopener noreferrer">Resmî Gazete ↗</a>'+
