@@ -6264,36 +6264,163 @@ window.CCHub=(()=>{
    <b>${esc(n.title)}</b><small>${esc((n.summary||newsExcerpt(n)||'Haberi okumak için tıkla').slice(0,150))}</small>
   </button>`).join(''):'<div class="ccx-home-news-empty">Şu anda yeni bir gümrük veya dış ticaret haberi bulunmuyor.</div>';
  }
+
+ const newsArchiveState={page:1,size:12,query:'',topic:'',source:'',from:'',to:'',sort:'newest'};
+ const newsArchiveCache=new Map();
+ let newsArchiveRequest=0,newsSearchTimer=null;
+
+ function newsSourceLabel(n){
+  const type=String(n.source_type||'').toLowerCase();
+  const url=String(n.source_url||n.link_url||'').toLowerCase();
+  if(type==='resmi_gazete'||url.includes('resmigazete.gov.tr'))return 'Resmî Gazete';
+  if(type==='ticaret_bakanligi'||type==='bakanlik'||url.includes('ticaret.gov.tr'))return 'Ticaret Bakanlığı';
+  if(type==='sektor_kurulusu')return 'Sektör duyurusu';
+  if(type==='eu_official_journal'||url.includes('eur-lex.europa.eu'))return 'AB Resmî Gazetesi';
+  if(type==='official')return 'Resmî kaynak';
+  return 'Customs Community';
+ }
+ function newsOption(value,label,selected){
+  return '<option value="'+esc(value)+'"'+(selected===value?' selected':'')+'>'+esc(label)+'</option>';
+ }
+ function newsArchiveCard(n){
+  const url=n.source_url||n.link_url;
+  return '<article class="cchub-news-card cc-news-article" tabindex="0" role="button" aria-label="'+esc(n.title)+'" onclick="CCHub.openNews('+Number(n.id)+')" onkeydown="if(event.target===this&&(event.key===\'Enter\'||event.key===\' \')){event.preventDefault();CCHub.openNews('+Number(n.id)+')}">'+
+    '<div class="cchub-news-card-top"><div class="cchub-news-card-badges">'+newsBadge(n)+'<span class="cchub-topic-tag" data-tag="'+esc(newsTopic(n))+'">'+esc(newsTopic(n))+'</span></div><time>'+esc(shortDate(n.source_date||n.created_at))+'</time></div>'+
+    '<h3>'+esc(n.title)+'</h3><p>'+esc(newsExcerpt(n))+'</p>'+
+    '<div class="cchub-news-card-footer"><small class="cchub-news-source">'+esc(newsSourceLabel(n))+'</small>'+
+    '<button class="ccx-lite" type="button" onclick="event.stopPropagation();CCHub.openNews('+Number(n.id)+')">Haberi Oku</button></div>'+
+   '</article>';
+ }
+ function newsPageButtons(total,page,size){
+  const pages=Math.ceil(total/size);
+  if(pages<=1)return '';
+  const links=[];
+  const add=n=>links.push('<button type="button"'+(n===page?' class="is-current" aria-current="page"':'')+
+    ' onclick="CCHub.newsGoPage('+n+')">'+n+'</button>');
+  let last=0;
+  for(let n=1;n<=pages;n++){
+   if(n===1||n===pages||Math.abs(n-page)<=2){
+    if(n-last>1)links.push('<span aria-hidden="true">…</span>');
+    add(n);last=n;
+   }
+  }
+  return '<nav class="cc-news-pages" aria-label="Haber sayfaları">'+
+    '<button type="button" onclick="CCHub.newsGoPage('+(page-1)+')"'+(page===1?' disabled':'')+'>← Önceki</button>'+
+    links.join('')+
+    '<button type="button" onclick="CCHub.newsGoPage('+(page+1)+')"'+(page===pages?' disabled':'')+'>Sonraki →</button></nav>';
+ }
+ async function loadNewsArchive(){
+  if(!await ensure())return;
+  const request=++newsArchiveRequest;
+  const grid=$('ccNewsArchiveGrid');
+  if(grid)grid.innerHTML='<div class="ccx-loading">Haber arşivi yükleniyor…</div>';
+  const state=newsArchiveState;
+  const args={
+   p_page:state.page,p_page_size:state.size,p_query:state.query,p_topic:state.topic,
+   p_source:state.source,p_from:state.from||null,p_to:state.to||null,p_sort:state.sort
+  };
+  const result=await sb.rpc('cc_news_archive',args);
+  if(request!==newsArchiveRequest||current!=='news')return;
+  if(result.error){
+   if(grid)grid.innerHTML='<div class="cchub-empty">Haber arşivi yüklenemedi. Yeniden denemek için sayfayı yenileyin.</div>';
+   toast('Haberler okunamadı: '+result.error.message,'err');return;
+  }
+  const payload=typeof result.data==='string'?JSON.parse(result.data):result.data||{};
+  const total=Number(payload.total||0),items=Array.isArray(payload.items)?payload.items:[];
+  const maxPage=Math.max(1,Math.ceil(total/state.size));
+  if(state.page>maxPage){state.page=maxPage;return loadNewsArchive()}
+  items.forEach(n=>newsArchiveCache.set(Number(n.id),n));
+  if(grid)grid.innerHTML=items.map(newsArchiveCard).join('')||
+    '<div class="cchub-empty">Bu arama ve filtrelere uygun haber bulunamadı. Filtreleri değiştirebilirsin.</div>';
+  const summary=$('ccNewsArchiveSummary');
+  if(summary)summary.textContent=total+' haber bulundu · Sayfa '+state.page+' / '+maxPage;
+  const pages=$('ccNewsArchivePages');if(pages)pages.innerHTML=newsPageButtons(total,state.page,state.size);
+ }
+ function applyNewsFilters(){
+  const find=id=>$(id)?.value||'';
+  newsArchiveState.query=find('ccNewsSearch').trim();
+  newsArchiveState.topic=find('ccNewsTopic');
+  newsArchiveState.source=find('ccNewsSource');
+  newsArchiveState.from=find('ccNewsFrom');
+  newsArchiveState.to=find('ccNewsTo');
+  newsArchiveState.sort=find('ccNewsSort')||'newest';
+  if(newsArchiveState.from&&newsArchiveState.to&&newsArchiveState.from>newsArchiveState.to){
+   toast('Başlangıç tarihi bitiş tarihinden sonra olamaz.','err');return;
+  }
+  newsArchiveState.page=1;loadNewsArchive();
+ }
+ function newsSearchInput(){
+  if(newsSearchTimer)clearTimeout(newsSearchTimer);
+  newsSearchTimer=setTimeout(()=>{newsSearchTimer=null;applyNewsFilters()},380);
+ }
+ function resetNewsFilters(){
+  if(newsSearchTimer)clearTimeout(newsSearchTimer);
+  ['ccNewsSearch','ccNewsTopic','ccNewsSource','ccNewsFrom','ccNewsTo'].forEach(id=>{if($(id))$(id).value=''});
+  if($('ccNewsSort'))$('ccNewsSort').value='newest';
+  applyNewsFilters();
+ }
+ function newsGoPage(page){
+  const n=Number(page);
+  if(!Number.isInteger(n)||n<1||n===newsArchiveState.page)return;
+  newsArchiveState.page=n;
+  loadNewsArchive();
+  $('ccNewsArchiveSummary')?.scrollIntoView({behavior:'smooth',block:'nearest'});
+ }
  async function renderNewsView(){
-  setHeader('GÜNCEL BİLGİ','Haberler','Gümrük, dış ticaret ve mevzuat haberleri; tarihli, kaynaklı özetler ve Customs Community güncellemeleri.',isAdmin()?'<button class="ccx-primary" onclick="CCHub.openNewsEditor()">＋ Yönetici Haberi Ekle</button>':'');
-  $('cchubContent').innerHTML='<div class="ccx-loading">Haberler hazırlanıyor…</div>';
-  let rows=await loadNews(),updates=rows.filter(x=>x.kind==='update'),allNews=rows.filter(x=>x.kind==='news').slice(0,6),rg=allNews.filter(x=>x.source_type==='resmi_gazete');
-  let issue=rg[0]?.source_issue||'',sourceDate=rg[0]?.source_date||'';
-  let rgHead=rg.length?`<section class="cchub-card cchub-rg-section"><div class="cchub-rg-head"><div><span class="cchub-rg-seal">RG</span><span><b>Resmî Gazete günlük özeti hazır</b><small>${sourceDate?esc(new Date(sourceDate+'T00:00:00').toLocaleDateString('tr-TR',{day:'2-digit',month:'long',year:'numeric'})):''}${issue?' · Sayı '+esc(issue):''} · aşağıdaki haberlerde AI özetiyle sunuluyor</small></span></div><span class="cchub-rg-auto">Her sabah güncellenir</span></div></section>`:'';
-  let cards=allNews.length?allNews.map(n=>`<article class="cchub-news-card" onclick="CCHub.openNews(${n.id})">
-    <div class="cchub-news-card-top"><div class="cchub-news-card-badges">${newsBadge(n)}<span class="cchub-topic-tag" data-tag="${esc(newsTopic(n))}">${esc(newsTopic(n))}</span></div><time>${esc(shortDate(n.source_date||n.created_at))}</time></div>
-    <h3>${esc(n.title)}</h3>
-    <p>${esc(newsExcerpt(n))}</p>
-    <div class="cchub-news-card-footer"><small class="cchub-news-source">${n.source_type==='resmi_gazete'?'Resmî Gazete'+(n.source_issue?' · '+esc(n.source_issue):''):'Customs Community'}</small><button class="ccx-lite" onclick="event.stopPropagation();CCHub.openNews(${n.id})">Haberi Oku</button></div>
-   </article>`).join(''):'<div class="cchub-empty">Bugün Gümrük, Dış Ticaret, İthalat, İhracat veya ilgili Mevzuat kapsamında yeni haber bulunmuyor.</div>';
-  $('cchubContent').innerHTML=`<div class="cchub-news-page">
-    ${rgHead}
-    <section class="cchub-card cchub-section">
-     <div class="cchub-news-list-head"><div><small>SON HABERLER</small><h3>Güncel Haber Akışı</h3></div><p>Yalnızca gümrük ve dış ticaret alanındaki son 6 haber gösterilir. Konu etiketi otomatik belirlenir.</p></div>
-     <div class="cchub-news-grid">${cards}</div>
-    </section>
-    <div class="cchub-news-layout">
-     <main class="cchub-main"></main>
-     <aside class="cchub-side"><section class="cchub-card cchub-section"><div class="cchub-section-title"><div><small>PLATFORM</small><h3>Customs Community Güncellemeleri</h3></div></div>${updates.length?updates.slice(0,5).map(n=>`<button class="cchub-update-card" onclick="CCHub.openNews(${n.id})"><span>${esc(shortDate(n.created_at))}</span><b>${esc(n.title)}</b><small>${esc(n.summary||'Detayları gör')}</small></button>`).join(''):'<div class="cchub-empty">Yeni platform güncellemesi bulunmuyor.</div>'}</section></aside>
-    </div>
-   </div>`
+  setHeader('GÜNCEL BİLGİ','Haber Merkezi',
+    'Gümrük ve dış ticaret haberleri: arama, konu, kaynak ve tarih filtreleriyle tüm yayımlanmış içerik.',
+    isAdmin()?'<button class="ccx-primary" onclick="CCHub.openNewsEditor()">＋ Haber Yayımla</button>':'');
+  const st=newsArchiveState;
+  $('cchubContent').innerHTML=
+   '<div class="cchub-news-page cc-news-center">'+
+    '<section class="cchub-card cchub-section cc-news-archive">'+
+     '<div class="cchub-news-list-head"><div><small>GÜMRÜK · DIŞ TİCARET · MEVZUAT</small><h3>Haber Arşivi</h3></div><p>Yeni tarihten eskiye. Tüm yayımlanmış sektör haberlerine ulaşabilirsiniz.</p></div>'+
+     '<div class="cc-news-filters" role="search" aria-label="Haberlerde ara">'+
+      '<label class="cc-news-filter cc-news-search"><span>Haber ara</span><input id="ccNewsSearch" type="search" autocomplete="off" placeholder="Başlık, GTİP, mevzuat veya anahtar kelime…" maxlength="120" value="'+esc(st.query)+'" oninput="CCHub.newsSearchInput()" onkeydown="if(event.key===\'Enter\'){event.preventDefault();CCHub.applyNewsFilters()}"></label>'+
+      '<label class="cc-news-filter"><span>Konu</span><select id="ccNewsTopic" onchange="CCHub.applyNewsFilters()">'+
+       newsOption('','Tüm konular',st.topic)+newsOption('Gümrük','Gümrük',st.topic)+newsOption('İthalat','İthalat',st.topic)+
+       newsOption('İhracat','İhracat',st.topic)+newsOption('Dış Ticaret','Dış Ticaret',st.topic)+newsOption('Mevzuat','Mevzuat',st.topic)+'</select></label>'+
+      '<label class="cc-news-filter"><span>Kaynak</span><select id="ccNewsSource" onchange="CCHub.applyNewsFilters()">'+
+       newsOption('','Tüm kaynaklar',st.source)+newsOption('resmi_gazete','Resmî Gazete',st.source)+newsOption('ticaret_bakanligi','Ticaret Bakanlığı',st.source)+
+       newsOption('diger','Diğer kaynaklar',st.source)+'</select></label>'+
+      '<label class="cc-news-filter"><span>Başlangıç tarihi</span><input id="ccNewsFrom" type="date" value="'+esc(st.from)+'" onchange="CCHub.applyNewsFilters()"></label>'+
+      '<label class="cc-news-filter"><span>Bitiş tarihi</span><input id="ccNewsTo" type="date" value="'+esc(st.to)+'" onchange="CCHub.applyNewsFilters()"></label>'+
+      '<label class="cc-news-filter"><span>Sıralama</span><select id="ccNewsSort" onchange="CCHub.applyNewsFilters()">'+
+       newsOption('newest','En yeni önce',st.sort)+newsOption('oldest','En eski önce',st.sort)+'</select></label>'+
+      '<button type="button" class="ccx-lite cc-news-reset" onclick="CCHub.resetNewsFilters()">Filtreleri Temizle</button>'+
+     '</div>'+
+     '<div class="cc-news-results-head"><strong id="ccNewsArchiveSummary" role="status">Haberler yükleniyor…</strong><span>Sayfada 12 haber</span></div>'+
+     '<div id="ccNewsArchiveGrid" class="cchub-news-grid" aria-live="polite"><div class="ccx-loading">Haber arşivi yükleniyor…</div></div>'+
+     '<div id="ccNewsArchivePages"></div>'+
+    '</section>'+
+    '<section class="cchub-card cchub-section cc-news-sources"><div><small>GÜVENİLİR KAYNAKLAR</small><h3>Haber kaynakları</h3></div>'+
+     '<p>Haberler resmî duyurular ve sektör kaynakları esas alınarak hazırlanır. Hukuki işlem öncesinde özgün metin kontrol edilmelidir.</p>'+
+     '<div><a href="https://www.resmigazete.gov.tr/" target="_blank" rel="noopener noreferrer">Resmî Gazete ↗</a>'+
+     '<a href="https://ticaret.gov.tr/" target="_blank" rel="noopener noreferrer">Ticaret Bakanlığı ↗</a>'+
+     '<a href="https://eur-lex.europa.eu/" target="_blank" rel="noopener noreferrer">EUR-Lex ↗</a></div>'+
+    '</section>'+
+    '<section class="cchub-card cchub-section cc-news-updates"><div class="cchub-section-title"><div><small>PLATFORM</small><h3>Customs Community Güncellemeleri</h3></div></div>'+
+    '<div id="ccNewsPlatformUpdates"><div class="ccx-loading">Güncellemeler yükleniyor…</div></div></section>'+
+   '</div>';
+  const archiveTask=loadNewsArchive();
+  const updatesTask=(async()=>{
+   const rows=await loadNews();
+   if(current!=='news'||!$('ccNewsPlatformUpdates'))return;
+   const updates=rows.filter(x=>x.kind==='update');
+   $('ccNewsPlatformUpdates').innerHTML=updates.length?updates.slice(0,8).map(n=>
+     '<button type="button" class="cchub-update-card" onclick="CCHub.openNews('+Number(n.id)+')">'+
+      '<span>'+esc(shortDate(n.created_at))+'</span><b>'+esc(n.title)+'</b>'+
+      '<small>'+esc(n.summary||'Detayları gör')+'</small></button>').join(''):
+      '<p class="cc-news-update-empty">Yeni platform güncellemesi bulunmuyor.</p>';
+  })();
+  await Promise.all([archiveTask,updatesTask]);
  }
  function openNews(id){
-  let n=news.find(x=>Number(x.id)===Number(id));if(!n)return;$('cchubDetailBackdrop').classList.add('open');
+  let n=newsArchiveCache.get(Number(id))||news.find(x=>Number(x.id)===Number(id));if(!n)return;$('cchubDetailBackdrop').classList.add('open');
   let official=n.source_type==='resmi_gazete';
-  let meta=official?`<div class="cchub-rg-detail-meta"><span>Resmî Gazete</span><span class="cchub-topic-tag" data-tag="${esc(newsTopic(n))}">${esc(newsTopic(n))}</span>${n.source_date?`<span>${esc(new Date(n.source_date+'T00:00:00').toLocaleDateString('tr-TR',{day:'2-digit',month:'long',year:'numeric'}))}</span>`:''}${n.source_issue?`<span>Sayı ${esc(n.source_issue)}</span>`:''}${n.source_section?`<span>${esc(n.source_section)}</span>`:''}</div>`:`<div class="cchub-rg-detail-meta"><span class="cchub-topic-tag" data-tag="${esc(newsTopic(n))}">${esc(newsTopic(n))}</span><span>Customs Community</span><span>${esc(trDate(n.created_at))}</span></div>`;
+  let meta=official?`<div class="cchub-rg-detail-meta"><span>Resmî Gazete</span><span class="cchub-topic-tag" data-tag="${esc(newsTopic(n))}">${esc(newsTopic(n))}</span>${n.source_date?`<span>${esc(new Date(n.source_date+'T00:00:00').toLocaleDateString('tr-TR',{day:'2-digit',month:'long',year:'numeric'}))}</span>`:''}${n.source_issue?`<span>Sayı ${esc(n.source_issue)}</span>`:''}${n.source_section?`<span>${esc(n.source_section)}</span>`:''}</div>`:`<div class="cchub-rg-detail-meta"><span class="cchub-topic-tag" data-tag="${esc(newsTopic(n))}">${esc(newsTopic(n))}</span><span>${esc(newsSourceLabel(n))}</span><span>${esc(n.source_date?shortDate(n.source_date):trDate(n.created_at))}</span></div>`;
   let link=n.source_url||n.link_url;
-  $('cchubDetail').innerHTML=`<div class="cchub-detail-head"><div><div class="cchub-news-badges">${newsBadge(n)}</div><button class="ccx-icon-btn" onclick="CCHub.closeDetail()">×</button></div><h2>${esc(n.title)}</h2>${n.summary?`<p class="cchub-detail-summary">${esc(n.summary)}</p>`:''}${meta}</div><div class="cchub-detail-body">${bodyHTML(n.body||n.summary||'')}</div><div class="cchub-detail-footer"><span>${official?'AI özeti · Resmî metin esas alınır.':''}</span><div>${link?`<a class="cchub-link" href="${esc(link)}" target="_blank" rel="noopener noreferrer">${official?'Resmî Gazete’de Tam Metin ↗':esc(n.link_label||'Bağlantıyı Aç')}</a>`:''}<button class="ccx-primary" onclick="CCHub.closeDetail()">Kapat</button></div></div>`
+  $('cchubDetail').innerHTML=`<div class="cchub-detail-head"><div><div class="cchub-news-badges">${newsBadge(n)}</div><button class="ccx-icon-btn" onclick="CCHub.closeDetail()">×</button></div><h2>${esc(n.title)}</h2>${n.summary?`<p class="cchub-detail-summary">${esc(n.summary)}</p>`:''}${meta}</div><div class="cchub-detail-body">${bodyHTML(n.body||n.summary||'')}</div><div class="cchub-detail-footer"><span>${official?'Resmî metin esas alınır.':''}</span><div>${link?`<a class="cchub-link" href="${esc(link)}" target="_blank" rel="noopener noreferrer">${official?'Resmî Metni Aç ↗':esc(n.link_label||'Kaynağı Aç ↗')}</a>`:''}<button class="ccx-primary" onclick="CCHub.closeDetail()">Kapat</button></div></div>`
  }
  function openNewsEditor(){
   ['cchubNewsTitle','cchubNewsSummary','cchubNewsBody','cchubNewsUrl','cchubNewsLinkLabel','cchubNewsStart','cchubNewsEnd'].forEach(id=>$(id).value='');$('cchubNewsKind').value='news';$('cchubNewsEditor').classList.add('open')
@@ -6460,7 +6587,7 @@ async function joinWebinarRoom(id){
  function closeDetail(){leaveWebinarRoom();$('cchubDetailBackdrop')?.classList.remove('open')}
 
  document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if($('cchubDetailBackdrop')?.classList.contains('open'))closeDetail();else if($('cchubArticleEditor')?.classList.contains('open'))closeArticleEditor();else if($('cchubWebinarEditor')?.classList.contains('open'))closeWebinarEditor();else if($('cchubNewsEditor')?.classList.contains('open'))closeNewsEditor()});
- return{open,close,isOpen,goTop,refresh,refreshHomeNews,changeWebinarRepeat,loadMoreArticles,openArticleEditor,closeArticleEditor,pickArticleCover,removeArticleCover,saveArticle,openArticle,deleteArticle,renderArticlesView,openNews,openNewsEditor,closeNewsEditor,saveNews,deleteNews,renderNewsView,openWebinarEditor,closeWebinarEditor,pickWebinarCover,removeWebinarCover,saveWebinar,toggleAttendance,openWebinar,openWebinarAndJoin,setWebinarLive,joinWebinarRoom,leaveWebinarRoom,deleteWebinar,renderWebinarView,closeDetail};
+ return{open,close,isOpen,goTop,refresh,refreshHomeNews,newsSearchInput,applyNewsFilters,resetNewsFilters,newsGoPage,changeWebinarRepeat,loadMoreArticles,openArticleEditor,closeArticleEditor,pickArticleCover,removeArticleCover,saveArticle,openArticle,deleteArticle,renderArticlesView,openNews,openNewsEditor,closeNewsEditor,saveNews,deleteNews,renderNewsView,openWebinarEditor,closeWebinarEditor,pickWebinarCover,removeWebinarCover,saveWebinar,toggleAttendance,openWebinar,openWebinarAndJoin,setWebinarLive,joinWebinarRoom,leaveWebinarRoom,deleteWebinar,renderWebinarView,closeDetail};
 })();
 </script>
 
