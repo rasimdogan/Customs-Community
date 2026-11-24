@@ -6140,6 +6140,54 @@ body.dark #ccxOverlay .ccx-header-inner .ccx-brand-title{color:#e5f2f8!important
 </div>
 
 
+<style id="cc-news-center-v20261124">
+/* Customs Community Haber Merkezi — erişilebilir arama ve sınırsız arşiv sayfalaması */
+#ccxOverlay .cc-news-center{display:grid;gap:15px;min-width:0}
+#ccxOverlay .cc-news-archive{min-width:0}
+#ccxOverlay .cc-news-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;align-items:end;margin:17px 0 15px;padding:15px;border:1px solid #e0e9ef;background:#f7fafc;border-radius:14px}
+#ccxOverlay .cc-news-filter{display:flex;flex-direction:column;gap:6px;min-width:0}
+#ccxOverlay .cc-news-filter span{color:#526b80;font-size:11px;font-weight:800;letter-spacing:.12px}
+#ccxOverlay .cc-news-filter input,#ccxOverlay .cc-news-filter select{box-sizing:border-box;display:block;width:100%;min-width:0;min-height:39px;border:1px solid #c8d8e5;border-radius:9px;background:#fff;color:#233e53;font:600 12px inherit;padding:9px 10px;outline-offset:2px}
+#ccxOverlay .cc-news-filter input:focus-visible,#ccxOverlay .cc-news-filter select:focus-visible{outline:2px solid #2c7cad;border-color:#317eac}
+#ccxOverlay .cc-news-search{grid-column:span 2}
+#ccxOverlay .cc-news-reset{min-height:39px;white-space:nowrap;padding:9px 13px;color:#245b7c;background:#edf5fb;border-color:#bfd4e4;font-size:12px;font-weight:800}
+#ccxOverlay .cc-news-results-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:5px 0 14px;color:#526d80}
+#ccxOverlay .cc-news-results-head strong{font-size:13px;color:#263e51}
+#ccxOverlay .cc-news-results-head span{font-size:11px}
+#ccxOverlay #ccNewsArchiveGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+#ccxOverlay #ccNewsArchiveGrid>.ccx-loading,#ccxOverlay #ccNewsArchiveGrid>.cchub-empty{grid-column:1/-1}
+#ccxOverlay .cc-news-article{min-height:235px;cursor:pointer}
+#ccxOverlay .cc-news-article h3{overflow-wrap:anywhere}
+#ccxOverlay .cc-news-article p{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+#ccxOverlay .cc-news-article:focus-visible{outline:3px solid #267eae;outline-offset:3px}
+#ccxOverlay .cc-news-pages{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:7px;margin-top:19px;padding-top:16px;border-top:1px solid #e2eaf0}
+#ccxOverlay .cc-news-pages button{min-width:36px;min-height:36px;padding:7px 11px;border:1px solid #cbdce8;border-radius:9px;background:#fff;color:#315a76;font-size:12px;font-weight:800;cursor:pointer}
+#ccxOverlay .cc-news-pages button.is-current{background:#1f719e;border-color:#1f719e;color:#fff}
+#ccxOverlay .cc-news-pages button:disabled{opacity:.4;cursor:not-allowed}
+#ccxOverlay .cc-news-pages button:focus-visible{outline:2px solid #2484bb;outline-offset:2px}
+#ccxOverlay .cc-news-pages span{color:#688095;padding:0 2px}
+#ccxOverlay .cc-news-sources{display:grid;gap:10px}
+#ccxOverlay .cc-news-sources>div:first-child small{color:#788d9c;font-weight:900;font-size:9px;letter-spacing:1px}
+#ccxOverlay .cc-news-sources h3{font-size:16px;margin:3px 0 0;color:#243f52}
+#ccxOverlay .cc-news-sources p{color:#526f84;font-size:12px;line-height:1.6;margin:0}
+#ccxOverlay .cc-news-sources>div:last-child{display:flex;flex-wrap:wrap;gap:8px}
+#ccxOverlay .cc-news-sources a{display:inline-flex;align-items:center;background:#edf5fb;color:#24648d;border:1px solid #c7dbea;border-radius:9px;text-decoration:none;font-size:11px;font-weight:800;padding:9px 12px}
+#ccxOverlay .cc-news-update-empty{font-size:12px;color:#698094;padding:8px 0}
+body.dark #ccxOverlay .cc-news-filters,body.dark #ccxOverlay .cc-news-archive{background:#17232d;border-color:#344d5c}
+body.dark #ccxOverlay .cc-news-filter input,body.dark #ccxOverlay .cc-news-filter select{background:#1d3445;color:#e8f1f7;border-color:#466178}
+body.dark #ccxOverlay .cc-news-filter span,body.dark #ccxOverlay .cc-news-results-head strong{color:#d2e2ec}
+body.dark #ccxOverlay .cc-news-pages button{background:#1b3445;color:#e3eef5;border-color:#3e5c70}
+body.dark #ccxOverlay .cc-news-pages button.is-current{background:#267eaf;color:#fff}
+@media(max-width:920px){#ccxOverlay .cc-news-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){
+ #ccxOverlay .cc-news-filters{grid-template-columns:minmax(0,1fr);gap:10px;padding:12px}
+ #ccxOverlay .cc-news-search{grid-column:span 1}
+ #ccxOverlay #ccNewsArchiveGrid{grid-template-columns:minmax(0,1fr)}
+ #ccxOverlay .cc-news-article{min-height:0}
+ #ccxOverlay .cc-news-pages button{padding:7px 9px;font-size:11px}
+ #ccxOverlay .cc-news-results-head{align-items:flex-start}
+}
+</style>
 <script id="cc-community-hub-v10265">
 window.CCHub=(()=>{
  const $=id=>document.getElementById(id);
