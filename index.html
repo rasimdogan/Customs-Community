@@ -6242,7 +6242,7 @@ window.CCHub=(()=>{
   let {data,error}=await sb.rpc('cc_news_list',{p_limit:60});if(error){toast(error.message,'err');return []}news=data||[];return news
  }
  function newsBadge(n){
-  if(n.source_type==='resmi_gazete')return '<span class="cchub-badge rg">RESMÎ GAZETE</span><span class="cchub-badge ai">AI ÖZET</span>';
+  if(n.source_type==='resmi_gazete')return '<span class="cchub-badge rg">RESMÎ GAZETE</span>'+(n.ai_summary?'<span class="cchub-badge ai">AI ÖZET</span>':'');
   return n.kind==='update'?'<span class="cchub-badge update">GÜNCELLEME</span>':'<span class="cchub-badge">HABER</span>'
 }
  function newsTopic(n){return n.auto_tag||(n.kind==='update'?'Platform':'Mevzuat')}
@@ -6265,7 +6265,7 @@ window.CCHub=(()=>{
   </button>`).join(''):'<div class="ccx-home-news-empty">Şu anda yeni bir gümrük veya dış ticaret haberi bulunmuyor.</div>';
  }
  async function renderNewsView(){
-  setHeader('GÜNCEL BİLGİ','Haberler','Resmî Gazete AI özetleri, yönetici haberleri ve Customs Community güncellemeleri. Az ama okunabilir içerik; detaylar mümkün olduğunca sayfa içinde kalır.',isAdmin()?'<button class="ccx-primary" onclick="CCHub.openNewsEditor()">＋ Yönetici Haberi Ekle</button>':'');
+  setHeader('GÜNCEL BİLGİ','Haberler','Gümrük, dış ticaret ve mevzuat haberleri; tarihli, kaynaklı özetler ve Customs Community güncellemeleri.',isAdmin()?'<button class="ccx-primary" onclick="CCHub.openNewsEditor()">＋ Yönetici Haberi Ekle</button>':'');
   $('cchubContent').innerHTML='<div class="ccx-loading">Haberler hazırlanıyor…</div>';
   let rows=await loadNews(),updates=rows.filter(x=>x.kind==='update'),allNews=rows.filter(x=>x.kind==='news').slice(0,6),rg=allNews.filter(x=>x.source_type==='resmi_gazete');
   let issue=rg[0]?.source_issue||'',sourceDate=rg[0]?.source_date||'';
