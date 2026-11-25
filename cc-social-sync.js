@@ -73,8 +73,37 @@ async function setup(){
   db.__ccFolderReaderWrapped=true;
  }catch(e){console.warn('Klasör bağlantısı kurulamadı',e)}
 }
+
+/* Hide post-header category/follow-status chips without changing the feed, follow state or post data. */
+function hidePostHeaderChips(){
+ const matches=[...document.querySelectorAll('span,small,strong,button,a,div')].filter(node=>
+  node.children.length===0 && /^(Genel|Takiptesin)$/i.test((node.textContent||'').trim()));
+ for(const node of matches){
+  if(node.dataset.ccHiddenPostChip==='1')continue;
+  let parent=node.parentElement,card=null;
+  for(let depth=0;parent&&depth<9;depth++,parent=parent.parentElement){
+   const text=parent.textContent||'';
+   if(text.length>7000)break;
+   if(/@[^\\s]+/.test(text) && /\\bYorum\\b/i.test(text) && text.length>35){card=parent;break;}
+  }
+  if(!card)continue;
+  const chipRect=node.getBoundingClientRect(),cardRect=card.getBoundingClientRect();
+  if(chipRect.top-cardRect.top>230)continue;
+  node.dataset.ccHiddenPostChip='1';
+  node.style.setProperty('display','none','important');
+ }
+}
+function watchPostHeaderChips(){
+ let queued=false;
+ const run=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;hidePostHeaderChips()})};
+ run();
+ const main=document.getElementById('view-community')||document.body;
+ new MutationObserver(run).observe(main,{subtree:true,childList:true});
+ window.addEventListener('cc-authenticated',run);
+}
+
 function init(){
- css();setup();
+ css();setup();watchPostHeaderChips();
  const profile=document.getElementById('ccxUserProfilePage');
  if(profile){
   let scheduled=false;
