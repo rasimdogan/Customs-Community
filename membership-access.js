@@ -139,7 +139,7 @@ function installClickGuards(){
   if(!logged())return;
   const target=e.target?.closest?.('button,a,[role="button"],[data-chapter],[data-fasil],[data-scene-index],[data-scene-order]');
   if(!target)return;
-  const label=(target.textContent||'').trim().replace(/\\s+/g,' ').toLocaleLowerCase('tr-TR');
+  const label=(target.textContent||'').trim().replace(/\s+/g,' ').toLocaleLowerCase('tr-TR');
   const action=String(target.dataset.action||target.dataset.ccAction||'').toLocaleLowerCase('tr-TR');
   /* Katıl/izle/takvime ekle işlemleri her kayıtlı kullanıcıya açıktır. */
   if(!canHost() && (/^(sınıf oluştur|yeni sınıf|webinar oluştur|yeni webinar|webinar planla|canlı sınıf oluştur)$/.test(label)||/^(create-class|create-webinar|new-class|new-webinar)$/.test(action))){
@@ -148,11 +148,11 @@ function installClickGuards(){
   /* Oyunlara giriş açık, kilitli fasıl ve sahne seçimleri kısıtlı. */
   if(hasTariff())return;
   const ch=target.dataset.chapter??target.dataset.fasil??target.dataset.chapterNumber;
-  if(ch!==undefined && /^\\d{1,2}$/.test(String(ch)) && !chapterAllowed(ch)){
+  if(ch!==undefined && /^\d{1,2}$/.test(String(ch)) && !chapterAllowed(ch)){
    e.preventDefault();e.stopImmediatePropagation();upgrade('tariff');return;
   }
   const scene=target.dataset.sceneIndex??target.dataset.sceneOrder;
-  if(scene!==undefined && /^\\d+$/.test(String(scene)) && Number(scene)>(target.dataset.sceneIndex!==undefined?4:5)){
+  if(scene!==undefined && /^\d+$/.test(String(scene)) && Number(scene)>(target.dataset.sceneIndex!==undefined?4:5)){
    e.preventDefault();e.stopImmediatePropagation();upgrade('tariff');return;
   }
  },true);
