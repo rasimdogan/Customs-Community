@@ -1,7 +1,7 @@
 /* Customs Community — Testler ve Yönetici Soru Bankası */
 (function(){
 'use strict';
-const TYPES={izahname:'İzahname',gtip:'Yönetici GTİP Soruları'};
+const TYPES={izahname:'İzahname',gtip:'Yönetici Soruları'};
 const el=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const admin=()=>window.CC_AUTH?.getProfile?.()?.role==='admin';
@@ -44,7 +44,7 @@ async function showIntro(){
   const list=await fetchQuestions(mode,false);if(serial!==renderSerial||mode==='position')return;
   rows=list;
   const label=TYPES[mode]||'Test';
-  box.innerHTML='<div class="cct-panel"><div class="cct-head"><div><h3>'+esc(label)+'</h3><p>Yönetici tarafından hazırlanan dört seçenekli soruları çöz. Her sorunun ardından açıklamayı ve doğru cevabı görebilirsin.</p></div><span class="cct-count">'+list.length+' soru</span></div>'+
+  box.innerHTML='<div class="cct-panel"><div class="cct-head"><div><h3>'+esc(label)+'</h3><p>Yönetici tarafından hazırlanan beş seçenekli soruları çöz. Her sorunun ardından açıklamayı ve doğru cevabı görebilirsin.</p></div><span class="cct-count">'+list.length+' soru</span></div>'+
    '<div class="cct-controls"><label>Soru sayısı <select id="cctCount"><option value="5">5 soru</option><option value="10" selected>10 soru</option><option value="20">20 soru</option><option value="all">Tüm sorular</option></select></label><button type="button" id="cctStart">Testi Başlat</button></div>'+
    (list.length?'':'<div class="cct-empty">Bu test türünde henüz yayımlanmış soru bulunmuyor.</div>')+'</div>';
   el('cctStart').disabled=!list.length;el('cctStart').onclick=start;
@@ -53,13 +53,13 @@ async function showIntro(){
 function start(){
  const size=el('cctCount')?.value||'10';let pool=rows.slice();
  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
- const n=size==='all'?pool.length:Math.min(Number(size),pool.length);
+ const n=Math.min(50,size==='all'?pool.length:Number(size),pool.length);
  active={questions:pool.slice(0,n),index:0,correct:0};answers=[];answerIndex=-1;renderQuestion();
 }
 function renderQuestion(){
  const q=active?.questions[active.index];if(!q)return;
  const n=active.questions.length,i=active.index;
- el('ccCustomTests').innerHTML='<div class="cct-panel"><div class="cct-head"><div><span class="cct-kicker">'+esc(TYPES[mode])+'</span><h3>Soru '+(i+1)+' / '+n+'</h3></div><span class="cct-count">'+active.correct+' doğru</span></div><div class="cct-progress"><i style="width:'+Math.round(i/n*100)+'%"></i></div><div class="cct-question">'+esc(q.question)+'</div><div class="cct-options">'+q.options.map((o,j)=>'<button type="button" data-cct-option="'+j+'"><b>'+String.fromCharCode(65+j)+'</b><span>'+esc(o)+'</span></button>').join('')+'</div><div id="cctFeedback"></div><div class="cct-footer"><button type="button" class="cct-neutral" id="cctLeave">Test Seçimine Dön</button><button type="button" id="cctNext" disabled>'+(i===n-1?'Sonuçları Gör':'Sonraki Soru')+'</button></div></div>';
+ el('ccCustomTests').innerHTML='<div class="cct-panel"><div class="cct-head"><div><span class="cct-kicker">'+esc(TYPES[mode])+'</span><h3>Soru '+(i+1)+' / '+n+'</h3></div><span class="cct-count">'+active.correct+' doğru</span></div><div class="cct-progress"><i style="width:'+Math.round(i/n*100)+'%"></i></div><div class="cct-question">'+esc(q.question)+'</div><div class="cct-options">'+q.options.map((o,j)=>'<button type="button" data-cct-option="'+j+'"><b>'+String.fromCharCode(65+j)+'</b><span>'+esc(o)+'</span></button>').join('')+'</div><div id="cctFeedback"></div><div class="cct-footer"><button type="button" class="cct-neutral" id="cctLeave">Test Seçimine Dön</button><button type="button" id="cctNext" disabled>'+(i===n-1?'Testi Bitir':'Sonraki Soru')+'</button></div></div>';
  el('cctLeave').onclick=()=>{active=null;showIntro()};
  el('cctNext').onclick=next;
  el('ccCustomTests').querySelectorAll('[data-cct-option]').forEach(b=>b.onclick=()=>answer(Number(b.dataset.cctOption)));
@@ -83,8 +83,8 @@ function next(){
 }
 function finish(){
  const n=active.questions.length,correct=active.correct;
- el('ccCustomTests').innerHTML='<div class="cct-panel cct-finish"><span class="cct-kicker">TEST TAMAMLANDI</span><h3>'+correct+' / '+n+' doğru</h3><p>Başarı oranı: %'+Math.round(100*correct/n)+'</p><div class="cct-finish-actions"><button type="button" id="cctAgain">Yeni Test Çöz</button><button type="button" class="cct-neutral" id="cctHome">Test Seçimine Dön</button></div></div>';
- el('cctAgain').onclick=()=>{active=null;showIntro()};el('cctHome').onclick=()=>{active=null;showIntro()};
+ el('ccCustomTests').innerHTML='<div class="cct-panel cct-finish"><span class="cct-kicker">TEST TAMAMLANDI</span><h3>'+correct+' / '+n+' doğru</h3><p>Başarı oranı: %'+Math.round(100*correct/n)+'</p><div class="cct-finish-actions"><button type="button" class="cct-neutral" id="cctHome">Test Seçimine Dön</button></div></div>';
+ el('cctHome').onclick=()=>{active=null;showIntro()};
 }
 async function openAdmin(){
  if(!admin()){nav('home');return}
