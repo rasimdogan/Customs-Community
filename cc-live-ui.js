@@ -142,8 +142,8 @@ function init(){
  if(initialized)return;initialized=true;
  style();repairUpcoming();renderCard();renderBadges();window.CCCommunity?.refreshNotificationBadge?.();refresh();
  window.setInterval(()=>{if(!document.hidden)refresh()},12000);
- window.addEventListener('cc-authenticated',()=>{lastRun=0;refresh()});
- window.addEventListener('cc-logged-out',()=>{uid='';classes=[];alerts=[];clearPopup();renderCard();renderBadges();notices()});
+ window.addEventListener('cc-authenticated',()=>{lastRun=0;toastSeen.clear();classes=[];alerts=[];cardSignature='';refresh()});
+ window.addEventListener('cc-logged-out',()=>{uid='';classes=[];alerts=[];toastSeen.clear();cardSignature='';lastRun=0;clearPopup();renderCard();renderBadges();window.CCCommunity?.refreshNotificationBadge?.()});
  document.addEventListener('visibilitychange',()=>{if(!document.hidden){lastRun=0;refresh()}});
  window.addEventListener('focus',()=>{lastRun=0;refresh()});
  // Observe only navigation containers, not the full feed and thousands of card nodes.
