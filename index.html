@@ -6750,7 +6750,7 @@ async function joinWebinarRoom(id){
 window.CCCommunity=(()=>{
  const PROJECT_URL='https://sdyezaukbjgwxvyvtpts.supabase.co';
  const KEY='sb_publishable_ORdDDUINHAz02NQvRjB4hA_HOKGqdFJ';
- let sb=null,session=null,my=null,stats={posts:0,followers:0,following:0},feedMode='all',profileComplete=false,postFile=null,postPreviewUrl='',avatarData='',editingId=null,feedRows=[],mediaCache=new Map(),lastPublicUser=null,profileReturnView=null,connectionsContext=null,notificationTimer=null,userSearchTimer=null,feedCursor=null,feedHasMore=true,feedLoading=false,feedObserver=null,profilePostRows=[],profilePostCursor=null,profilePostHasMore=true,profilePostLoading=false,mentionTimer=null,mentionActiveInput=null,mentionStart=-1;
+ let sb=null,session=null,my=null,stats={posts:0,followers:0,following:0},feedMode='all',profileComplete=null,postFile=null,postPreviewUrl='',avatarData='',editingId=null,feedRows=[],mediaCache=new Map(),lastPublicUser=null,profileReturnView=null,connectionsContext=null,notificationTimer=null,userSearchTimer=null,feedCursor=null,feedHasMore=true,feedLoading=false,feedObserver=null,profilePostRows=[],profilePostCursor=null,profilePostHasMore=true,profilePostLoading=false,mentionTimer=null,mentionActiveInput=null,mentionStart=-1;
  const $=id=>document.getElementById(id);
  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
  const formatBody=v=>{
@@ -6820,7 +6820,7 @@ window.CCCommunity=(()=>{
   toast(m,'err');return false
  }
  function renderProfileGate(){
-  $('ccxProfileRequired')?.classList.toggle('show',!profileComplete);
+  $('ccxProfileRequired')?.classList.toggle('show',profileComplete===false);
  }
  function peopleHTML(rows,{onlineTitle=false}={}){
   let body=(rows||[]).map(u=>`<div class="ccx-user-result">
@@ -6850,10 +6850,31 @@ window.CCCommunity=(()=>{
  }
  function ccFullNameOK(v){return String(v||'').trim().split(/\s+/).filter(Boolean).length>=2}
  async function loadMe(){
-  const profileTask=profileApi('get');
-  const statsTask=(async()=>{try{return await sb.rpc('cc_community_public_profile',{p_target:uid()})}catch{return null}})();
-  let j=await profileTask;
-  my=j.profile||{};stats=j.stats||stats;profileComplete=emailOK(my.email)&&ccFullNameOK(my.display_name);
+  const currentUser=uid();
+  const profileTask=(async()=>{
+   try{return await profileApi('get')}
+   catch(edgeError){
+    // If the profile Edge Function is unavailable, fetch the same user's
+    // verified profile from the protected Supabase table.
+    const result=await sb.from('profiles')
+      .select('user_id,username,display_name,role,is_active,email,bio,avatar_path')
+      .eq('user_id',currentUser).maybeSingle();
+    if(result.error||!result.data||!result.data.is_active)throw edgeError;
+    console.warn('Profil servisine erişilemedi; güvenli profil sorgusu kullanıldı.');
+    return {profile:result.data,stats:null};
+   }
+  })();
+  const statsTask=(async()=>{try{return await sb.rpc('cc_community_public_profile',{p_target:currentUser})}catch{return null}})();
+  let j;
+  try{j=await profileTask}
+  catch(e){
+   // A temporary loading failure must not be presented as missing profile data.
+   profileComplete=null;renderProfileGate();
+   throw e;
+  }
+  if(String(uid())!==String(currentUser))return null;
+  my=j.profile||{};stats=j.stats||stats;
+  profileComplete=emailOK(my.email)&&ccFullNameOK(my.display_name);
   renderProfileGate();renderMy();
   const avatarTask=(async()=>{try{return my.avatar_path?await sign(my.avatar_path):''}catch{return ''}})();
   try{
@@ -6870,10 +6891,10 @@ window.CCCommunity=(()=>{
   $('ccxFeed').innerHTML='<div class="ccx-loading">Akış hazırlanıyor…</div>';
   try{
    let cached=window.CC_AUTH?.getProfile?.();
-   if(!my&&cached){my={...cached};profileComplete=emailOK(my.email)&&ccFullNameOK(my.display_name);renderProfileGate();renderMy()}
+   if(!my&&cached){my={...cached};profileComplete=emailOK(my.email)&&ccFullNameOK(my.display_name)?true:null;renderProfileGate();renderMy()}
   }catch{}
   const feedTask=loadFeed(true);
-  Promise.resolve().then(()=>loadMe()).catch(e=>console.warn('Profil yüklenemedi',e));
+  Promise.resolve().then(()=>loadMe()).catch(e=>{console.warn('Profil yüklenemedi',e);toast('Profil bilgileri şu anda doğrulanamadı; bilgilerin eksik olduğu anlamına gelmiyor.','err')});
   Promise.resolve().then(()=>window.CCCards?.refreshWeekly?.()).catch(()=>{});
   Promise.resolve().then(()=>window.CCHub?.refreshHomeNews?.()).catch(()=>{});
   Promise.resolve().then(()=>pingPresence()).then(()=>loadOnlineUsers()).catch(()=>{});
