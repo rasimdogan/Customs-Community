@@ -84,7 +84,7 @@ function hidePostHeaderChips(){
   for(let depth=0;parent&&depth<9;depth++,parent=parent.parentElement){
    const text=parent.textContent||'';
    if(text.length>7000)break;
-   if(/@[^\\s]+/.test(text) && /\\bYorum\\b/i.test(text) && text.length>35){card=parent;break;}
+   if(/@[^\s]+/.test(text) && /\bYorum\b/i.test(text) && text.length>35){card=parent;break;}
   }
   if(!card)continue;
   const chipRect=node.getBoundingClientRect(),cardRect=card.getBoundingClientRect();
