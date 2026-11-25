@@ -6,7 +6,7 @@ window.__ccLiveUiInstalled=true;
 const $=id=>document.getElementById(id);
 const escape=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let classes=[],alerts=[],busy=false,uid='',lastRun=0,toastSeen=new Set(),initialized=false,cardSignature='',toastTimer=null,toastDeadline=0;
-function auth(){return window.CC_AUTH?.getSession?.()?.user?.id||''}
+function auth(){const session=window.CC_AUTH?.getSession?.();return session?.access_token?session.user?.id||'':''}
 function style(){
  if($('ccLiveUiStyle'))return;
  const el=document.createElement('style');el.id='ccLiveUiStyle';
@@ -121,10 +121,12 @@ async function refresh(){
  busy=true;uid=id;lastRun=now;
  try{
   const db=await window.CC_AUTH.getClient();
+  if(auth()!==id)return; // Session changed while obtaining the client.
   const [a,b]=await Promise.all([
    db.from('cc_my_live_classes').select('id,title,is_live').eq('user_id',id),
    db.from('cc_class_live_notifications').select('id,class_id,started_at,created_at,read_at').eq('user_id',id).order('created_at',{ascending:false}).limit(30)
   ]);
+  if(auth()!==id)return; // Ignore responses for an account that signed out or switched.
   if(a.error)throw a.error;
   if(b.error)console.warn('Canlı bildirim sorgusu',b.error);
   classes=a.data||[];alerts=b.error?[]:(b.data||[]);
