@@ -6771,14 +6771,36 @@ window.CCCommunity=(()=>{
   if(sec<60)return 'şimdi';if(sec<3600)return Math.floor(sec/60)+' dk';if(sec<86400)return Math.floor(sec/3600)+' sa';if(sec<604800)return Math.floor(sec/86400)+' gün';
   try{return new Date(v).toLocaleDateString('tr-TR',{day:'2-digit',month:'short'})}catch{return ''}
  }
+ let sessionRepairPromise=null;
  async function ensure(){
-  session=window.CC_AUTH?.getSession?.();
-  if(!session?.access_token){toast('Önce giriş yapmalısın.','err');return false}
+  const authSession=window.CC_AUTH?.getSession?.();
+  if(!authSession?.access_token)return false;
   if(!sb)sb=await window.CC_AUTH.getClient();
-  return !!sb
+  // Community and the rest of the site must use the SAME authenticated Supabase client.
+  // A temporarily empty client session otherwise sends protected RPC calls as anon.
+  let live=await sb.auth.getSession();
+  if(!live.error&&!live.data?.session?.access_token&&authSession.refresh_token){
+   if(!sessionRepairPromise){
+    sessionRepairPromise=sb.auth.setSession({
+     access_token:authSession.access_token,
+     refresh_token:authSession.refresh_token
+    }).finally(()=>{sessionRepairPromise=null});
+   }
+   const restored=await sessionRepairPromise;
+   if(restored.error)throw new Error('Oturum yenilenemedi: '+restored.error.message);
+   live={data:restored.data,error:null};
+  }
+  if(live.error||!live.data?.session?.access_token)return false;
+  if(authSession.user?.id&&live.data.session.user?.id!==authSession.user.id)return false;
+  session={...authSession,
+   access_token:live.data.session.access_token,
+   refresh_token:live.data.session.refresh_token,
+   user:live.data.session.user||authSession.user
+  };
+  return true
  }
  async function profileApi(action,payload={}){
-  if(!await ensure())throw new Error('Giriş yapmanız gerekiyor.');
+  if(!await ensure())throw new Error('Profil için doğrulanmış oturum bulunamadı.');
   // The Supabase client may have silently refreshed its token since CC_AUTH activated.
   // The edge function must receive the *current* access token, not the login-time token.
   const fresh=await sb.auth.getSession();
@@ -6883,12 +6905,20 @@ window.CCCommunity=(()=>{
   }
   if(String(uid())!==String(currentUser))return null;
   if(!j?.profile){
-   profileComplete=null;renderProfileGate();
-   throw edgeFailure||new Error('Profil doğrulanamadı');
+   // If connectivity is interrupted, keep the already authenticated display data.
+   // This is not a claim that profile completeness was verified.
+   const cached=window.CC_AUTH?.getProfile?.();
+   if(cached?.display_name&&cached?.user_id===currentUser){
+    j={profile:cached,stats:null,cached_only:true};
+    console.warn('Profil servisi yanıt vermedi, mevcut oturum profili korunuyor.',edgeFailure);
+   }else{
+    profileComplete=null;renderProfileGate();
+    throw edgeFailure||new Error('Profil doğrulanamadı');
+   }
   }
   my=j.profile;
   if(j.stats)stats=j.stats;
-  profileComplete=emailOK(my.email)&&ccFullNameOK(my.display_name);
+  profileComplete=j.cached_only?null:(emailOK(my.email)&&ccFullNameOK(my.display_name));
   renderProfileGate();renderMy();
   // A successful Edge profile response already contains authoritative counts.
   // Only request the profile RPC when the fallback returned no statistics.
