@@ -51,9 +51,9 @@ function css(){
  '#ccNotesPage .ccn-folder>button[data-act=folder-menu]{padding:6px;border:0;background:transparent;flex:0 0 auto}',
  '#ccNotesPage .ccn-folder.ccn-drop-target{background:#d5eee5!important;outline:2px dashed #398d73;outline-offset:-2px;border-radius:10px;box-shadow:0 0 0 3px #68ae8c20}',
  '#ccNotesPage .ccn-folder.ccn-drop-target>button:first-child{color:#205d4c;font-weight:850}',
- '#ccNotesPage .ccn-draghandle{display:inline-flex;align-items:center;gap:4px;cursor:grab!important;user-select:none;touch-action:none;color:#536c7d;background:#ffffff9c!important;border:1px solid #ffffff70!important;padding:5px 9px!important;border-radius:8px;font-size:13px!important}',
+
  '#ccNotesPage .ccn-card.ccn-dragging{opacity:.48;outline:2px dashed #568ba2;outline-offset:3px}',
- '#ccNotesPage .ccn-draghandle:active{cursor:grabbing!important}',
+
  '#ccNotesPage .ccn-newfolder{width:100%;margin:14px 0 0;border:1px dashed #abc9da!important;background:#f7fbfd!important}',
  '#ccNotesPage .ccn-work{padding:26px clamp(13px,2.8vw,38px);min-width:0}',
  '#ccNotesPage .ccn-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:23px}',
@@ -63,9 +63,17 @@ function css(){
  '#ccNotesPage .ccn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,345px),1fr));align-items:start;gap:19px}',
  '#ccNotesPage .ccn-card{min-height:318px;border:1px solid #00000008;box-shadow:0 6px 20px #12345313;border-radius:15px;display:flex;flex-direction:column;padding:19px;gap:12px;color:#273f51}',
  '#ccNotesPage .ccn-yellow{background:#fff2bd}#ccNotesPage .ccn-blue{background:#dbedff}#ccNotesPage .ccn-pink{background:#f9e0ed}#ccNotesPage .ccn-green{background:#e0f2db}',
- '#ccNotesPage .ccn-cardhead{display:flex;gap:7px;align-items:center;justify-content:space-between}',
- '#ccNotesPage .ccn-cardhead button{border:0;background:#ffffff91;font-size:12px;padding:5px 8px}',
- '#ccNotesPage .ccn-cardhead select{border:1px solid #d7d6ce;background:#ffffffaa;border-radius:7px;padding:5px;color:#415967;font-size:11px}',
+ '#ccNotesPage .ccn-cardhead{display:flex;align-items:center;gap:9px;min-height:48px;cursor:grab;user-select:none}',
+ '#ccNotesPage .ccn-cardhead:active{cursor:grabbing}',
+ '#ccNotesPage .ccn-cardhead .ccn-pin{flex:0 0 46px;width:46px;height:46px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #ffffffaa;background:#ffffffb0;border-radius:13px;font-size:23px;line-height:1;padding:0;transition:background .15s,transform .15s}',
+ '#ccNotesPage .ccn-cardhead .ccn-pin[aria-pressed=true]{background:#fff;border-color:#dfc47e;box-shadow:0 2px 8px #79683520}',
+ '#ccNotesPage .ccn-cardhead .ccn-pin:active{transform:scale(.96)}',
+ '#ccNotesPage .ccn-cardhead .ccn-headspace{flex:1 1 auto;align-self:stretch;min-width:12px;cursor:grab}',
+ '#ccNotesPage .ccn-cardhead .ccn-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}',
+ '#ccNotesPage .ccn-cardhead select{height:36px;max-width:98px;border:1px solid #ffffffb0;background:#ffffffa3;border-radius:10px;padding:0 9px;color:#415967;font-size:12px;font-weight:650;cursor:pointer}',
+ '#ccNotesPage .ccn-cardhead .ccn-delete{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #ffffff84;border-radius:10px;background:#ffffff65;color:#6b7782;padding:0;font-size:19px;line-height:1}',
+ '#ccNotesPage .ccn-cardhead .ccn-delete:hover{background:#ffe0db;border-color:#edb5ab;color:#a73b35}',
+ '@media(max-width:420px){#ccNotesPage .ccn-cardhead .ccn-pin{width:43px;height:43px;flex-basis:43px}#ccNotesPage .ccn-cardhead select{max-width:87px}#ccNotesPage .ccn-cardhead .ccn-actions{gap:6px}}',
  '#ccNotesPage .ccn-title{border:0;border-bottom:1px solid #00000015;background:transparent;outline:0;width:100%;padding:6px 1px;font-size:17px;font-weight:800;color:#213d51;line-height:1.4}',
  '#ccNotesPage .ccn-richbar{display:flex;align-items:center;gap:5px}',
  '#ccNotesPage .ccn-richbar button{background:#ffffff81;border:0;padding:5px 9px;font-size:13px}',
@@ -138,7 +146,7 @@ function render(){
   const foldersOptions='<option value="">📂 Klasörsüz</option>'+folders.map(f=>'<option value="'+escapeHtml(f.id)+'" '+(n.folder_id===f.id?'selected':'')+'>'+escapeHtml(f.name)+'</option>').join('');
   const lines=checks.map(item=>'<div class="ccn-checkrow" data-item="'+escapeHtml(item.id)+'" data-done="'+!!item.done+'"><input type="checkbox" data-act="check-done" aria-label="Maddeyi tamamla" '+(item.done?'checked':'')+'><input type="text" data-act="check-text" maxlength="250" placeholder="Madde yaz..." value="'+escapeHtml(item.text||'')+'"><button type="button" data-act="check-delete" aria-label="Maddeyi sil">×</button></div>').join('');
   const html=n.body_rich?safeMarkup(n.body_rich):escapeHtml(n.body||'').replace(/\n/g,'<br>');
-  return '<article class="ccn-card ccn-'+color+(n.done?' ccn-end':'')+'" data-id="'+escapeHtml(n.id)+'" draggable="true"><div class="ccn-cardhead"><button type="button" class="ccn-draghandle" draggable="true" aria-label="Notu sürükleyerek klasöre taşı" title="Notu sürükleyip soldaki klasörün üzerine bırak">⠿</button><button type="button" data-act="pin" aria-label="Notu sabitle">'+(n.pinned?'📌':'📍')+'</button><select data-act="color" aria-label="Not rengi">'+COLORS.map((c,i)=>'<option value="'+c+'" '+(color===c?'selected':'')+'>'+COLORS_TR[i]+'</option>').join('')+'</select><button type="button" data-act="delete" aria-label="Notu sil">✕</button></div><input class="ccn-title" data-act="title" type="text" maxlength="140" placeholder="Not başlığı" value="'+escapeHtml(n.title||'')+'"><div class="ccn-richbar" role="toolbar" aria-label="Yazı biçimlendirme"><button type="button" data-command="bold" title="Kalın">B</button><button type="button" data-command="italic" title="İtalik">I</button><button type="button" data-command="underline" title="Altı çizili">U̲</button><button type="button" data-command="insertUnorderedList" title="Madde işaretleri">• Liste</button><button type="button" data-command="insertOrderedList" title="Numaralı liste">1. Liste</button></div><div class="ccn-editor" data-act="body-rich" contenteditable="true" role="textbox" aria-label="Not içeriği" aria-multiline="true" data-placeholder="Notunu yaz...">'+html+'</div><div class="ccn-checks">'+lines+'</div><button type="button" class="ccn-addline" data-act="check-add">＋ Yapılacak madde ekle</button><div class="ccn-opts"><label><input type="checkbox" data-act="done" '+(n.done?'checked':'')+'> Not tamamlandı</label><input type="date" data-act="due_date" aria-label="Bitiş tarihi" value="'+escapeHtml(n.due_date||'')+'"></div><div class="ccn-bottom"><select class="ccn-dest" data-act="folder" aria-label="Notun klasörü">'+foldersOptions+'</select><span><button type="button" data-act="left" title="Sola taşı">←</button><button type="button" data-act="right" title="Sağa taşı">→</button></span></div></article>';
+  return '<article class="ccn-card ccn-'+color+(n.done?' ccn-end':'')+'" data-id="'+escapeHtml(n.id)+'" draggable="true"><div class="ccn-cardhead" title="Boş alandan tutup kartı sürükleyebilirsin"><button type="button" class="ccn-pin" data-act="pin" aria-pressed="'+!!n.pinned+'" aria-label="'+(n.pinned?'Sabitlemeyi kaldır':'Notu başa sabitle')+'" title="'+(n.pinned?'Sabitlemeyi kaldır':'Notu başa sabitle')+'">'+(n.pinned?'📌':'📍')+'</button><span class="ccn-headspace" aria-hidden="true"></span><div class="ccn-actions"><select data-act="color" aria-label="Not rengi">'+COLORS.map((c,i)=>'<option value="'+c+'" '+(color===c?'selected':'')+'>'+COLORS_TR[i]+'</option>').join('')+'</select><button type="button" class="ccn-delete" data-act="delete" aria-label="Notu sil" title="Notu sil">×</button></div></div><input class="ccn-title" data-act="title" type="text" maxlength="140" placeholder="Not başlığı" value="'+escapeHtml(n.title||'')+'"><div class="ccn-richbar" role="toolbar" aria-label="Yazı biçimlendirme"><button type="button" data-command="bold" title="Kalın">B</button><button type="button" data-command="italic" title="İtalik">I</button><button type="button" data-command="underline" title="Altı çizili">U̲</button><button type="button" data-command="insertUnorderedList" title="Madde işaretleri">• Liste</button><button type="button" data-command="insertOrderedList" title="Numaralı liste">1. Liste</button></div><div class="ccn-editor" data-act="body-rich" contenteditable="true" role="textbox" aria-label="Not içeriği" aria-multiline="true" data-placeholder="Notunu yaz...">'+html+'</div><div class="ccn-checks">'+lines+'</div><button type="button" class="ccn-addline" data-act="check-add">＋ Yapılacak madde ekle</button><div class="ccn-opts"><label><input type="checkbox" data-act="done" '+(n.done?'checked':'')+'> Not tamamlandı</label><input type="date" data-act="due_date" aria-label="Bitiş tarihi" value="'+escapeHtml(n.due_date||'')+'"></div><div class="ccn-bottom"><select class="ccn-dest" data-act="folder" aria-label="Notun klasörü">'+foldersOptions+'</select><span><button type="button" data-act="left" title="Sola taşı">←</button><button type="button" data-act="right" title="Sağa taşı">→</button></span></div></article>';
  }).join('');
 }
 async function open(){
@@ -393,8 +401,8 @@ function init(){
  document.addEventListener('dragstart',e=>{
   const card=e.target.closest?.('#ccNotesPage .ccn-card');
   if(!card||dropBusy)return;
-  const handle=e.target.closest('.ccn-draghandle');
-  if(!handle&&e.target.closest('input,[contenteditable],select,button,textarea')){e.preventDefault();return}
+  // The card and its empty header space are draggable; editor fields and controls are not.
+  if(e.target.closest('input,[contenteditable],select,button,textarea')){e.preventDefault();return}
   dragging=card.dataset.id;
   card.classList.add('ccn-dragging');
   if(e.dataTransfer){
