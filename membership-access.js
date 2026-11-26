@@ -203,12 +203,11 @@ function installCommunityLogout(){
  if($('ccCommunityLogoutStyle'))return;
  const style=document.createElement('style');
  style.id='ccCommunityLogoutStyle';
- style.textContent='#ccxOverlay #ccCommunityLogout[hidden]{display:none!important}#ccxOverlay header.gmt-header nav.gmt-nav #ccCommunityLogout{position:static!important;inset:auto!important;display:inline-flex!important;flex:0 0 auto!important;align-items:center;gap:5px;color:#a63c3c!important;white-space:nowrap!important;box-shadow:none!important;cursor:pointer}#ccxOverlay header.gmt-header nav.gmt-nav #ccCommunityLogout[hidden]{display:none!important}#ccCommunityLogout:focus-visible{outline:2px solid #2685b6;outline-offset:-2px}#ccCommunityLogout[disabled]{opacity:.65;cursor:wait}';
+ style.textContent='#ccCommunityLogout[hidden]{display:none!important}#ccxOverlay #ccCommunityLogout{position:absolute;right:18px;bottom:18px;z-index:10050;display:inline-flex;align-items:center;gap:8px;padding:10px 15px;border:1px solid #cbdbe6;border-radius:10px;background:#fff;color:#2c4d62;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 4px 15px #173b521c}#ccCommunityLogout:focus-visible{outline:3px solid #2685b6;outline-offset:2px}#ccCommunityLogout[disabled]{opacity:.65;cursor:wait}@media(max-width:640px){#ccxOverlay #ccCommunityLogout{right:12px;bottom:12px;padding:9px 12px;font-size:12px}}';
  document.head.appendChild(style);
  const sync=()=>{
   const hub=$('ccxOverlay');
-  const nav=hub?.querySelector('header.gmt-header nav.gmt-nav .ccx-nav-buttons');
-  if(!hub||!nav)return;
+  if(!hub)return;
   let btn=$('ccCommunityLogout');
   if(!btn){
    btn=document.createElement('button');
@@ -240,7 +239,7 @@ function installCommunityLogout(){
     }
    });
   }
-  if(btn.parentElement!==nav)nav.appendChild(btn);
+  if(btn.parentElement!==hub)hub.appendChild(btn);
   btn.hidden=!logged();
  };
  sync();
@@ -249,7 +248,7 @@ function installCommunityLogout(){
  if(hub){
   let scheduled=false;
   const observer=new MutationObserver(()=>{
-   if(scheduled||$('ccCommunityLogout'))return;
+   if(scheduled)return;
    scheduled=true;
    setTimeout(()=>{scheduled=false;sync()},200);
   });
@@ -307,7 +306,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  if(document.getElementById('ccNotesBoardLoader'))return;
  const script=document.createElement('script');
  script.id='ccNotesBoardLoader';
- script.src='cc-notes-board.js?v=20261126-responsive1';
+ script.src='cc-notes-board.js?v=20261126-keep2';
  script.defer=true;
  script.onerror=()=>{console.warn('Not Panom arayüzü yüklenemedi');script.remove()};
  document.head.appendChild(script);
