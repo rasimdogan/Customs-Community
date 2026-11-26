@@ -66,10 +66,8 @@ function updateIndicators(){
  const quota=$('ccCardQuotaText');
  if(quota)quota.textContent=currentPlan()==='free'?'Ücretsiz kart hakkı: '+Math.min(cardCount,10)+' / 10': 'Kart oluşturma: sınırsız';
  document.body.dataset.ccPlan=currentPlan();
- let b=$('ccCardLibraryQuota');
- const header=document.querySelector('#ccxCardLibraryPanel .cckl-head');
- if(header&&!b){b=document.createElement('span');b.id='ccCardLibraryQuota';b.className='cc-library-quota';header.appendChild(b)}
- if(b)b.textContent=currentPlan()==='free'?Math.min(cardCount,10)+'/10 kart oluşturuldu':PACKAGES[currentPlan()].name+' · sınırsız kart';
+ // Keep plan entitlements unchanged; the redundant library-header label is not shown.
+ $('ccCardLibraryQuota')?.remove();
 }
 function createMemberSummary(){
  if($('ccCurrentMembershipBadge'))return;
