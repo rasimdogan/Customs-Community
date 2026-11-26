@@ -28,7 +28,7 @@ function style(){
  '#ccNotesOverlay .ccn-yellow{background:#fff0a9}#ccNotesOverlay .ccn-blue{background:#daeeff}#ccNotesOverlay .ccn-pink{background:#f9dcf0}#ccNotesOverlay .ccn-green{background:#dcf0d6}',
  '#ccNotesOverlay .ccn-card button{padding:5px 8px;background:#ffffffa6;border-color:#ffffffa0}',
  '#ccNotesOverlay .ccn-card select{background:#ffffffa6;color:#254258;border-radius:6px;padding:5px;max-width:85px;border:1px solid #a9b9bd;font-size:11px}',
- '#ccNotesOverlay textarea{resize:vertical;flex:1;min-height:105px;border:none;background:transparent;color:#1c4059;font:14px/1.5 inherit;width:100%;padding:4px;outline-offset:1px}',
+ '#ccNotesOverlay textarea{resize:vertical;flex:1;min-height:105px;border:none;background:transparent;color:#1c4059;font-family:inherit;font-size:14px;line-height:1.5;width:100%;padding:4px;outline-offset:1px}',
  '#ccNotesOverlay .ccn-card[data-done=true]{opacity:.7}#ccNotesOverlay .ccn-card[data-done=true] textarea{text-decoration:line-through}',
  '#ccNotesOverlay .ccn-bottom{font-size:12px}#ccNotesOverlay .ccn-bottom label{display:flex;gap:5px;align-items:center;font-weight:750}',
  '#ccNotesOverlay .ccn-date{padding:5px;border:1px solid #a4b5bb;border-radius:7px;max-width:136px;background:#ffffffa6;color:#244458;font-size:11px}',
@@ -83,7 +83,7 @@ async function open(){
   const r=await db.from('cc_personal_sticky_notes').select('id,user_id,body,color,done,pinned,due_date,sort_order,created_at').eq('user_id',id).order('created_at',{ascending:false});
   if(r.error)throw r.error;if(user()!==id)return;
   notes=r.data||[];render();status('Notların hesabına özel olarak saklanır.');
- }catch(e){status('Notlar yüklenemedi: '+e.message)}
+ }catch(e){opened=false;status('Notlar yüklenemedi: '+e.message+' — paneli yeniden açıp deneyebilirsin.')}
 }
 function close(){
  for(const id of [...timers.keys()])flush(id);
