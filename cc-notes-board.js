@@ -8,7 +8,7 @@ const escapeText=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 const user=()=>{const s=window.CC_AUTH?.getSession?.();return s?.access_token?s.user?.id||'':''};
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 let db=null,owner='',notes=[],filter='today',opened=false,busy=false;
-const timers=new Map(),queues=new Map();
+const timers=new Map(),titleTimers=new Map(),checkTimers=new Map(),queues=new Map();
 function style(){
  if($('ccNotesStyle'))return;
  const s=document.createElement('style');s.id='ccNotesStyle';
@@ -38,6 +38,30 @@ function style(){
  '@media(max-width:560px){#ccNotesOverlay{padding:0}#ccNotesOverlay .ccn-shell{max-height:100dvh;min-height:100dvh;border-radius:0;padding:15px}#ccNotesOverlay .ccn-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}#ccNotesOverlay .ccn-card{padding:9px}#ccNotesOverlay textarea{font-size:12px}}',
  '@media(max-width:460px){#ccNotesOverlay .ccn-grid{grid-template-columns:1fr}#ccNotesOverlay .ccn-date{max-width:100%}}'
  ].join('');
+
+ s.textContent += [
+ '#ccNotesOverlay{position:fixed!important;inset:0!important;padding:0!important;background:#f4f7fa!important;align-items:stretch!important;justify-content:stretch!important;overflow-y:auto!important}',
+ '#ccNotesOverlay .ccn-shell{width:100%!important;max-width:none!important;max-height:none!important;min-height:100dvh!important;overflow:visible!important;border-radius:0!important;box-shadow:none!important;padding:clamp(20px,3vw,48px)!important}',
+ '#ccNotesOverlay .ccn-head{max-width:1480px;margin:0 auto;padding-bottom:18px;border-bottom:1px solid #dde6eb}',
+ '#ccNotesOverlay h2{font-size:clamp(24px,3vw,33px)!important}',
+ '#ccNotesOverlay .ccn-toolbar{max-width:1480px;margin:20px auto 22px}',
+ '#ccNotesOverlay .ccn-grid{max-width:1480px;margin:0 auto;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr))!important;gap:20px!important}',
+ '#ccNotesOverlay .ccn-card{min-height:320px!important;padding:21px!important;border:1px solid #0000000b;border-radius:17px!important;gap:13px!important;box-shadow:0 6px 18px #1b3c5217!important}',
+ '#ccNotesOverlay .ccn-card-title{width:100%;padding:6px 3px;background:transparent;border:0;border-bottom:1px solid #00000019;font:800 17px/1.5 inherit;color:#233f50;min-width:0}',
+ '#ccNotesOverlay .ccn-card-title:focus{outline:2px solid #568da5;border-radius:5px}',
+ '#ccNotesOverlay textarea{min-height:125px!important;font-size:15px!important;line-height:1.55!important}',
+ '#ccNotesOverlay .ccn-list{display:flex;flex-direction:column;gap:8px;margin:0 0 4px}',
+ '#ccNotesOverlay .ccn-listrow{display:flex;align-items:center;gap:8px;min-height:32px}',
+ '#ccNotesOverlay .ccn-listrow>input[type=checkbox]{width:18px;height:18px;accent-color:#2d806a;flex:0 0 auto}',
+ '#ccNotesOverlay .ccn-listrow>input[type=text]{flex:1;min-width:0;background:#ffffff80;border:1px solid #ffffffaa;border-radius:7px;padding:8px 9px;color:#213e51;font:13px/1.3 inherit}',
+ '#ccNotesOverlay .ccn-listrow[data-checked=true]>input[type=text]{text-decoration:line-through;opacity:.55}',
+ '#ccNotesOverlay .ccn-listrow button{padding:5px 8px!important}',
+ '#ccNotesOverlay .ccn-additem{align-self:flex-start;background:#ffffff90!important}',
+ '#ccNotesOverlay .ccn-card[data-done=true] .ccn-card-title{text-decoration:line-through;opacity:.7}',
+ '#ccNotesOverlay .ccn-status{max-width:1480px;margin:18px auto}',
+ '@media(max-width:700px){#ccNotesOverlay .ccn-shell{padding:17px!important}#ccNotesOverlay .ccn-grid{grid-template-columns:1fr!important;gap:14px!important}#ccNotesOverlay .ccn-card{min-height:280px!important;padding:17px!important}}'
+ ].join('');
+
  document.head.appendChild(s);
 }
 function mount(){
@@ -47,17 +71,17 @@ function mount(){
  let b=$('ccNotesOpen');
  if(b){if(b.parentElement!==head)head.appendChild(b);return;}
  b=document.createElement('button');b.type='button';b.id='ccNotesOpen';
- b.textContent='🗒️ Not Panom';b.setAttribute('aria-label','Kişisel Not Panom ekranını aç');
+ b.textContent='🗒️ Notlarım';b.setAttribute('aria-label','Kişisel Not Panom ekranını aç');
  b.addEventListener('click',open);head.appendChild(b);
 }
 function ensure(){
  if($('ccNotesOverlay'))return;
- const root=document.createElement('div');root.id='ccNotesOverlay';root.hidden=true;root.setAttribute('role','dialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-label','Not Panom');
- root.innerHTML='<section class="ccn-shell"><div class="ccn-head"><div><h2>🗒️ Not Panom</h2><p class="ccn-sub">Günlük yapılacaklar ve sana özel sticker notlar</p></div><button type="button" id="ccNotesClose">← Kütüphaneye Dön</button></div><div class="ccn-toolbar"><button type="button" class="ccn-add" id="ccNotesAdd">＋ Yeni Not</button><button type="button" class="ccn-filter" data-filter="today">Bugün</button><button type="button" class="ccn-filter" data-filter="upcoming">Yaklaşan</button><button type="button" class="ccn-filter" data-filter="all">Tüm Notlar</button><button type="button" class="ccn-filter" data-filter="done">Tamamlananlar</button></div><div class="ccn-grid" id="ccNotesGrid"></div><p class="ccn-status" id="ccNotesStatus" role="status"></p></section>';
+ const root=document.createElement('div');root.id='ccNotesOverlay';root.hidden=true;root.setAttribute('role','main');root.setAttribute('aria-label','Notlarım sayfası');
+ root.innerHTML='<section class="ccn-shell"><div class="ccn-head"><div><h2>🗒️ Notlarım</h2><p class="ccn-sub">Notlarını düzenle, maddeleri işaretle ve yapılacaklarını takip et</p></div><button type="button" id="ccNotesClose">← Kütüphaneye Dön</button></div><div class="ccn-toolbar"><button type="button" class="ccn-add" id="ccNotesAdd">＋ Yeni Not</button><button type="button" class="ccn-filter" data-filter="today">Bugün</button><button type="button" class="ccn-filter" data-filter="upcoming">Yaklaşan</button><button type="button" class="ccn-filter" data-filter="all">Tüm Notlar</button><button type="button" class="ccn-filter" data-filter="done">Tamamlananlar</button></div><div class="ccn-grid" id="ccNotesGrid"></div><p class="ccn-status" id="ccNotesStatus" role="status"></p></section>';
  document.body.appendChild(root);
  $('ccNotesClose').onclick=close;$('ccNotesAdd').onclick=add;
  root.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{filter=b.dataset.filter;render()}));
- root.addEventListener('click',e=>{if(e.target===root)close()});
+ 
  root.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
 }
 function status(v){if($('ccNotesStatus'))$('ccNotesStatus').textContent=v}
@@ -75,7 +99,12 @@ function render(){
  if(!list.length){grid.innerHTML='<div class="ccn-empty">Burada henüz notun yok. <b>＋ Yeni Not</b> ile başlayabilirsin.</div>';return}
  grid.innerHTML=list.map(n=>{
   const col=colors.includes(n.color)?n.color:'yellow';
-  return '<article class="ccn-card ccn-'+col+'" data-id="'+escapeText(n.id)+'" data-done="'+n.done+'" draggable="true"><div class="ccn-top"><button type="button" data-action="pin" title="Sabitle" aria-pressed="'+n.pinned+'">'+(n.pinned?'📌':'📍')+'</button><select aria-label="Sticker rengi" data-action="color">'+colors.map((c,i)=>'<option value="'+c+'" '+(col===c?'selected':'')+'>'+['Sarı','Mavi','Pembe','Yeşil'][i]+'</option>').join('')+'</select><button type="button" data-action="delete" title="Notu sil">✕</button></div><textarea maxlength="1500" data-action="body" placeholder="Buraya yaz...">'+escapeText(n.body)+'</textarea><div class="ccn-bottom"><label><input type="checkbox" data-action="done" '+(n.done?'checked':'')+'> Tamamlandı</label><input class="ccn-date" aria-label="Bitiş tarihi" type="date" data-action="due_date" value="'+escapeText(n.due_date||'')+'"></div><div class="ccn-bottom"><small>↕ Sırala</small><span><button data-action="left" title="Öne al">←</button><button data-action="right" title="Sonraya al">→</button></span></div></article>';
+  const checks=Array.isArray(n.checklist)?n.checklist:[];
+  const rows=checks.map(item=>{
+   const id=escapeText(item.id||'');
+   return '<div class="ccn-listrow" data-item="'+id+'" data-checked="'+!!item.done+'"><input type="checkbox" data-action="item-done" aria-label="Madde tamamlandı" '+(item.done?'checked':'')+'><input type="text" data-action="item-text" maxlength="250" placeholder="Yapılacak madde" value="'+escapeText(item.text||'')+'"><button type="button" data-action="item-remove" title="Maddeyi sil">×</button></div>';
+  }).join('');
+  return '<article class="ccn-card ccn-'+col+'" data-id="'+escapeText(n.id)+'" data-done="'+n.done+'" draggable="true"><div class="ccn-top"><button type="button" data-action="pin" title="Sabitle" aria-pressed="'+n.pinned+'">'+(n.pinned?'📌':'📍')+'</button><select aria-label="Sticker rengi" data-action="color">'+colors.map((c,i)=>'<option value="'+c+'" '+(col===c?'selected':'')+'>'+['Sarı','Mavi','Pembe','Yeşil'][i]+'</option>').join('')+'</select><button type="button" data-action="delete" title="Notu sil">✕</button></div><input class="ccn-card-title" type="text" data-action="title" maxlength="140" placeholder="Başlık" value="'+escapeText(n.title||'')+'"><textarea maxlength="1500" data-action="body" placeholder="Notunu yaz...">'+escapeText(n.body)+'</textarea><div class="ccn-list">'+rows+'</div><button type="button" class="ccn-additem" data-action="item-add">＋ Liste maddesi ekle</button><div class="ccn-bottom"><label><input type="checkbox" data-action="done" '+(n.done?'checked':'')+'> Not tamamlandı</label><input class="ccn-date" aria-label="Bitiş tarihi" type="date" data-action="due_date" value="'+escapeText(n.due_date||'')+'"></div><div class="ccn-bottom"><small>↕ Notu sırala</small><span><button type="button" data-action="left" title="Öne al">←</button><button type="button" data-action="right" title="Sonraya al">→</button></span></div></article>';
  }).join('');
 }
 async function open(){
@@ -85,7 +114,7 @@ async function open(){
  owner=id;opened=true;notes=[];render();status('Notlar yükleniyor…');
  try{
   db=await window.CC_AUTH.getClient();
-  const r=await db.from('cc_personal_sticky_notes').select('id,user_id,body,color,done,pinned,due_date,sort_order,created_at').eq('user_id',id).order('created_at',{ascending:false});
+  const r=await db.from('cc_personal_sticky_notes').select('id,user_id,title,body,checklist,color,done,pinned,due_date,sort_order,created_at').eq('user_id',id).order('created_at',{ascending:false});
   if(r.error)throw r.error;if(user()!==id)return;
   notes=r.data||[];render();status('Notların hesabına özel olarak saklanır.');
  }catch(e){opened=false;status('Notlar yüklenemedi: '+e.message+' — paneli yeniden açıp deneyebilirsin.')}
@@ -97,7 +126,7 @@ function close(){
 async function add(){
  if(busy||!db||user()!==owner)return;busy=true;status('Yeni not kaydediliyor…');
  try{
-  const r=await db.from('cc_personal_sticky_notes').insert({user_id:owner,body:'',color:colors[notes.length%4],sort_order:notes.length*10}).select().single();
+  const r=await db.from('cc_personal_sticky_notes').insert({user_id:owner,title:'',body:'',checklist:[],color:colors[notes.length%4],sort_order:notes.length*10}).select().single();
   if(r.error)throw r.error;
   notes.unshift(r.data);filter='all';render();status('Yeni not eklendi.');
   $('ccNotesGrid').querySelector('[data-id="'+r.data.id+'"] textarea')?.focus();
@@ -119,10 +148,23 @@ function flush(id){
  const t=timers.get(id);if(t)clearTimeout(t);timers.delete(id);
  const n=notes.find(x=>x.id===id);if(n)save(id,{body:n.body});
 }
+function flushTitle(id){
+ const t=titleTimers.get(id);if(t)clearTimeout(t);titleTimers.delete(id);
+ const n=notes.find(x=>x.id===id);if(n)save(id,{title:n.title||''});
+}
+function flushChecklist(id){
+ const t=checkTimers.get(id);if(t)clearTimeout(t);checkTimers.delete(id);
+ const n=notes.find(x=>x.id===id);if(n)save(id,{checklist:n.checklist||[]});
+}
+function listItem(note,itemId){
+ return (Array.isArray(note.checklist)?note.checklist:[]).find(x=>x.id===itemId);
+}
 function edit(n,patch){Object.assign(n,patch);save(n.id,patch)}
 async function remove(n){
  if(!confirm('Bu sticker notu silinsin mi?'))return;
  if(timers.has(n.id))flush(n.id);
+ if(titleTimers.has(n.id))flushTitle(n.id);
+ if(checkTimers.has(n.id))flushChecklist(n.id);
  try{
   await(queues.get(n.id)||Promise.resolve());
   const r=await db.from('cc_personal_sticky_notes').delete().eq('id',n.id).eq('user_id',owner).select('id').maybeSingle();
@@ -148,18 +190,37 @@ function init(){
   n.body=t.value;if(timers.has(n.id))clearTimeout(timers.get(n.id));
   timers.set(n.id,setTimeout(()=>flush(n.id),650));status('Kaydedilecek…');
  });
- document.addEventListener('focusout',e=>{const t=e.target;if(!t.matches?.('#ccNotesOverlay textarea[data-action="body"]'))return;const id=t.closest('[data-id]')?.dataset.id;if(timers.has(id))flush(id)});
+ document.addEventListener('input',e=>{
+  const el=e.target,card=el.closest?.('#ccNotesOverlay .ccn-card');
+  if(!card||!['title','item-text'].includes(el.dataset.action))return;
+  const n=notes.find(x=>x.id===card.dataset.id);if(!n)return;
+  if(el.dataset.action==='title'){
+   n.title=el.value.slice(0,140);
+   if(titleTimers.has(n.id))clearTimeout(titleTimers.get(n.id));
+   titleTimers.set(n.id,setTimeout(()=>flushTitle(n.id),550));
+  } else {
+   const item=listItem(n,el.closest('[data-item]')?.dataset.item);
+   if(!item)return;item.text=el.value.slice(0,250);
+   if(checkTimers.has(n.id))clearTimeout(checkTimers.get(n.id));
+   checkTimers.set(n.id,setTimeout(()=>flushChecklist(n.id),550));
+  }
+  status('Kaydedilecek…');
+ });
+ document.addEventListener('focusout',e=>{const t=e.target;const card=t.closest?.('#ccNotesOverlay .ccn-card');if(!card)return;const id=card.dataset.id;if(t.dataset.action==='body'&&timers.has(id))flush(id);if(t.dataset.action==='title'&&titleTimers.has(id))flushTitle(id);if(t.dataset.action==='item-text'&&checkTimers.has(id))flushChecklist(id)});
  document.addEventListener('change',e=>{
   const t=e.target,card=t.closest?.('#ccNotesOverlay .ccn-card');if(!card)return;
   const n=notes.find(x=>x.id===card.dataset.id);if(!n)return;
   if(t.dataset.action==='color'&&colors.includes(t.value)){edit(n,{color:t.value});render()}
   if(t.dataset.action==='done'){edit(n,{done:t.checked});render()}
+  if(t.dataset.action==='item-done'){const item=listItem(n,t.closest('[data-item]')?.dataset.item);if(item){if(checkTimers.has(n.id))flushChecklist(n.id);item.done=t.checked;edit(n,{checklist:n.checklist});render()}}
   if(t.dataset.action==='due_date'){edit(n,{due_date:t.value||null});render()}
  });
  document.addEventListener('click',e=>{
   const b=e.target.closest?.('#ccNotesOverlay button[data-action]');if(!b)return;
   const n=notes.find(x=>x.id===b.closest('[data-id]')?.dataset.id);if(!n)return;
   if(b.dataset.action==='pin'){edit(n,{pinned:!n.pinned});render()}
+  if(b.dataset.action==='item-add'){if(!Array.isArray(n.checklist))n.checklist=[];if(n.checklist.length>=100){status('Bir notta en fazla 100 madde olabilir.');return}if(checkTimers.has(n.id))flushChecklist(n.id);n.checklist.push({id:window.crypto?.randomUUID?.()||String(Date.now())+Math.random(),text:'',done:false});edit(n,{checklist:n.checklist});render();$('ccNotesGrid')?.querySelector('[data-id="'+n.id+'"] .ccn-listrow:last-child input[type=text]')?.focus()}
+  if(b.dataset.action==='item-remove'){const itemId=b.closest('[data-item]')?.dataset.item;if(checkTimers.has(n.id))flushChecklist(n.id);n.checklist=(n.checklist||[]).filter(x=>x.id!==itemId);edit(n,{checklist:n.checklist});render()}
   if(b.dataset.action==='delete')remove(n);
   if(b.dataset.action==='left')move(n.id,-1);
   if(b.dataset.action==='right')move(n.id,1);
@@ -175,7 +236,7 @@ function init(){
   list.forEach((n,i)=>{if(n.sort_order!==i*10){n.sort_order=i*10;save(n.id,{sort_order:n.sort_order})}});render();
  });
  document.addEventListener('dragend',()=>dragging='');
- window.addEventListener('cc-logged-out',()=>{for(const t of timers.values())clearTimeout(t);timers.clear();notes=[];db=null;owner='';opened=false;$('ccNotesOverlay').hidden=true;document.body.style.overflow=''});
+ window.addEventListener('cc-logged-out',()=>{for(const t of [...timers.values(),...titleTimers.values(),...checkTimers.values()])clearTimeout(t);timers.clear();titleTimers.clear();checkTimers.clear();notes=[];db=null;owner='';opened=false;$('ccNotesOverlay').hidden=true;document.body.style.overflow=''});
  window.addEventListener('cc-authenticated',()=>{if(owner&&owner!==user()){notes=[];db=null;owner='';opened=false}});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
