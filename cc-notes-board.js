@@ -36,7 +36,7 @@ function style(){
  '#ccNotesOverlay .ccn-empty{padding:40px 13px;text-align:center;border:1px dashed #bfd3dd;border-radius:11px;color:#577389;grid-column:1/-1}',
  '#ccNotesOverlay button:focus-visible,#ccNotesOpen:focus-visible{outline:3px solid #5d9dbd;outline-offset:2px}',
  '@media(max-width:560px){#ccNotesOverlay{padding:0}#ccNotesOverlay .ccn-shell{max-height:100dvh;min-height:100dvh;border-radius:0;padding:15px}#ccNotesOverlay .ccn-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}#ccNotesOverlay .ccn-card{padding:9px}#ccNotesOverlay textarea{font-size:12px}}',
- '@media(max-width:350px){#ccNotesOverlay .ccn-grid{grid-template-columns:1fr}}'
+ '@media(max-width:460px){#ccNotesOverlay .ccn-grid{grid-template-columns:1fr}#ccNotesOverlay .ccn-date{max-width:100%}}'
  ].join('');
  document.head.appendChild(s);
 }
@@ -45,7 +45,7 @@ function mount(){
  if(!panel)return;
  const head=panel.querySelector('.cckl-head')||panel.querySelector('header')||panel;
  let b=$('ccNotesOpen');
- if(b){if(!panel.contains(b))head.appendChild(b);return;}
+ if(b){if(b.parentElement!==head)head.appendChild(b);return;}
  b=document.createElement('button');b.type='button';b.id='ccNotesOpen';
  b.textContent='🗒️ Not Panom';b.setAttribute('aria-label','Kişisel Not Panom ekranını aç');
  b.addEventListener('click',open);head.appendChild(b);
@@ -138,10 +138,10 @@ function move(id,direction){
 }
 function init(){
  style();ensure();mount();
- const root=document.body;let scheduled=false;
- new MutationObserver(records=>{if(scheduled||$('ccNotesOpen'))return;if(!records.some(r=>[...r.addedNodes].some(n=>n.nodeType===1&&(n.id==='ccxCardLibraryPanel'||n.querySelector?.('#ccxCardLibraryPanel')))))return;scheduled=true;setTimeout(()=>{scheduled=false;mount()},250)}).observe(root,{subtree:true,childList:true});
+ const root=$('ccxCardLibraryPanel')||document.body;let scheduled=false;
+ new MutationObserver(()=>{if(scheduled||$('ccNotesOpen'))return;scheduled=true;setTimeout(()=>{scheduled=false;mount()},100)}).observe(root,{subtree:true,childList:true});
  window.addEventListener('cc-authenticated',mount);
- document.addEventListener('click',e=>{if(e.target.closest?.('#ccxTabLibrary,#ccxCardLibraryPanel,[data-cc-library]'))setTimeout(mount,250)},true);
+ document.addEventListener('click',e=>{if(e.target.closest?.('#ccxTabCards,#ccxCardLibraryPanel,[data-cc-library]'))setTimeout(mount,250)},true);
  document.addEventListener('input',e=>{
   const t=e.target;if(!t.matches?.('#ccNotesOverlay textarea[data-action="body"]'))return;
   const n=notes.find(x=>x.id===t.closest('[data-id]')?.dataset.id);if(!n)return;
