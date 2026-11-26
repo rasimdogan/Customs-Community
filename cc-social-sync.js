@@ -105,7 +105,7 @@ function watchPostHeaderChips(){
 function init(){
  css();setup();watchPostHeaderChips();
  if(!document.getElementById('ccNotesBoardLoader')){
-  const script=document.createElement('script');script.id='ccNotesBoardLoader';script.src='cc-notes-board.js?v=20261126-folderdrop4';script.defer=true;document.head.appendChild(script);
+  const script=document.createElement('script');script.id='ccNotesBoardLoader';script.src='cc-notes-board.js?v=20261126-icononly5';script.defer=true;document.head.appendChild(script);
  }
  const profile=document.getElementById('ccxUserProfilePage');
  if(profile){
