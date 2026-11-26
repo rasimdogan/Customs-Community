@@ -1,243 +1,356 @@
-/* Customs Community: personal notes board, isolated from library cards. */
+/* Customs Community Notlarim v3 — independent full-page notes, folders and rich formatting */
 (function(){
 'use strict';
 if(window.CC_NOTES_BOARD)return;
 window.CC_NOTES_BOARD=true;
-const $=id=>document.getElementById(id),colors=['yellow','blue','pink','green'];
-const escapeText=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const user=()=>{const s=window.CC_AUTH?.getSession?.();return s?.access_token?s.user?.id||'':''};
+const $=id=>document.getElementById(id);
+const COLORS=['yellow','blue','pink','green'];
+const COLORS_TR=['Sarı','Mavi','Pembe','Yeşil'];
+const escapeHtml=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const currentUser=()=>{const s=window.CC_AUTH?.getSession?.();return s?.access_token?s.user?.id||'':''};
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
-let db=null,owner='',notes=[],filter='today',opened=false,busy=false;
-const timers=new Map(),titleTimers=new Map(),checkTimers=new Map(),queues=new Map();
-function style(){
- if($('ccNotesStyle'))return;
- const s=document.createElement('style');s.id='ccNotesStyle';
+let db=null,uid='',notes=[],folders=[],scope='all',filter='all',loaded=false,loading=false,adding=false,active=false;
+const pending=new Map(),timers=new Map();
+function status(msg){if($('ccNotesStatus'))$('ccNotesStatus').textContent=msg}
+function safeMarkup(input){
+ const documentData=new DOMParser().parseFromString('<div>'+String(input||'')+'</div>','text/html');
+ const whitelist=new Set(['B','STRONG','I','EM','U','BR','P','DIV','UL','OL','LI']);
+ function walk(node){
+  if(node.nodeType===3)return escapeHtml(node.textContent);
+  if(node.nodeType!==1)return '';
+  const inner=Array.from(node.childNodes).map(walk).join('');
+  if(!whitelist.has(node.tagName))return inner;
+  const tag=node.tagName.toLowerCase();
+  return tag==='br'?'<br>':'<'+tag+'>'+inner+'</'+tag+'>';
+ }
+ return Array.from(documentData.body.firstElementChild?.childNodes||[]).map(walk).join('');
+}
+function noteText(note){return String(note.body||'')}
+function css(){
+ if($('ccNotesV3Style'))return;
+ const s=document.createElement('style');s.id='ccNotesV3Style';
  s.textContent=[
- '#ccNotesOpen{display:inline-flex;align-items:center;gap:7px;background:#fff1c3;color:#59451c;border:1px solid #e7c96f;padding:9px 13px;border-radius:10px;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap}',
- '#ccNotesOverlay{position:fixed;inset:0;z-index:100700;background:#102b3dbb;display:flex;align-items:center;justify-content:center;padding:15px;color:#284358}',
- '#ccNotesOverlay[hidden]{display:none!important}#ccNotesOverlay *{box-sizing:border-box}',
- '#ccNotesOverlay .ccn-shell{width:min(1100px,100%);max-height:94dvh;overflow:auto;background:#f5f8fb;border-radius:20px;padding:23px;box-shadow:0 20px 60px #142c3b55}',
- '#ccNotesOverlay .ccn-head,#ccNotesOverlay .ccn-toolbar,#ccNotesOverlay .ccn-top,#ccNotesOverlay .ccn-bottom{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap}',
- '#ccNotesOverlay h2{margin:0;color:#193d55;font-size:21px}#ccNotesOverlay .ccn-sub{margin:4px 0 0;font-size:12px;color:#637b8e}',
- '#ccNotesOverlay button{cursor:pointer;border-radius:9px;padding:8px 11px;background:#fff;border:1px solid #c4d6df;font-size:12px;color:#2c5369;font-weight:750}',
- '#ccNotesOverlay .ccn-toolbar{justify-content:flex-start;margin:19px 0 14px}',
- '#ccNotesOverlay .ccn-add{background:#236c8e;color:#fff;border-color:#236c8e}',
- '#ccNotesOverlay .ccn-filter[aria-pressed=true]{background:#d9eaf4;border-color:#84b9d0}',
- '#ccNotesOverlay .ccn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,235px),1fr));align-items:start;gap:13px;min-height:100px}',
- '#ccNotesOverlay .ccn-card{display:flex;flex-direction:column;gap:9px;min-height:222px;border-radius:10px;padding:12px;box-shadow:1px 5px 10px #122e4b17;color:#254258}',
- '#ccNotesOverlay .ccn-yellow{background:#fff0a9}#ccNotesOverlay .ccn-blue{background:#daeeff}#ccNotesOverlay .ccn-pink{background:#f9dcf0}#ccNotesOverlay .ccn-green{background:#dcf0d6}',
- '#ccNotesOverlay .ccn-card button{padding:5px 8px;background:#ffffffa6;border-color:#ffffffa0}',
- '#ccNotesOverlay .ccn-card select{background:#ffffffa6;color:#254258;border-radius:6px;padding:5px;max-width:85px;border:1px solid #a9b9bd;font-size:11px}',
- '#ccNotesOverlay textarea{resize:vertical;flex:1;min-height:105px;border:none;background:transparent;color:#1c4059;font-family:inherit;font-size:14px;line-height:1.5;width:100%;padding:4px;outline-offset:1px}',
- '#ccNotesOverlay .ccn-card[data-done=true]{opacity:.7}#ccNotesOverlay .ccn-card[data-done=true] textarea{text-decoration:line-through}',
- '#ccNotesOverlay .ccn-bottom{font-size:12px}#ccNotesOverlay .ccn-bottom label{display:flex;gap:5px;align-items:center;font-weight:750}',
- '#ccNotesOverlay .ccn-date{padding:5px;border:1px solid #a4b5bb;border-radius:7px;max-width:136px;background:#ffffffa6;color:#244458;font-size:11px}',
- '#ccNotesOverlay .ccn-status{min-height:18px;margin:13px 0 0;font-size:11px;color:#5b7183}',
- '#ccNotesOverlay .ccn-empty{padding:40px 13px;text-align:center;border:1px dashed #bfd3dd;border-radius:11px;color:#577389;grid-column:1/-1}',
- '#ccNotesOverlay button:focus-visible,#ccNotesOpen:focus-visible{outline:3px solid #5d9dbd;outline-offset:2px}',
- '@media(max-width:560px){#ccNotesOverlay{padding:0}#ccNotesOverlay .ccn-shell{max-height:100dvh;min-height:100dvh;border-radius:0;padding:15px}#ccNotesOverlay .ccn-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}#ccNotesOverlay .ccn-card{padding:9px}#ccNotesOverlay textarea{font-size:12px}}',
- '@media(max-width:460px){#ccNotesOverlay .ccn-grid{grid-template-columns:1fr}#ccNotesOverlay .ccn-date{max-width:100%}}'
+ '#ccNotesOpen{display:inline-flex;gap:7px;align-items:center;justify-content:center;background:#fff4d9;border:1px solid #e2c57c;color:#705327;border-radius:10px;padding:9px 14px;font:700 12px/1.3 inherit;cursor:pointer}',
+ '#ccNotesPage[hidden]{display:none!important}',
+ '#ccNotesPage{position:fixed;inset:0;z-index:100700;overflow:auto;background:#f6f8fb;color:#253f53;font-family:inherit}',
+ '#ccNotesPage *{box-sizing:border-box}',
+ '#ccNotesPage button,#ccNotesPage input,#ccNotesPage select{font-family:inherit}',
+ '#ccNotesPage button{cursor:pointer;border:1px solid #d5e0e8;background:white;border-radius:9px;color:#31536b;padding:8px 11px;font-weight:700;font-size:12px}',
+ '#ccNotesPage button:focus-visible,#ccNotesPage input:focus-visible,#ccNotesPage [contenteditable]:focus-visible{outline:2px solid #4383a7;outline-offset:2px}',
+ '#ccNotesPage .ccn-mainhead{padding:23px clamp(18px,3vw,40px);background:#fff;border-bottom:1px solid #e4eaf0;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}',
+ '#ccNotesPage .ccn-heading h2{font-size:clamp(22px,2.4vw,30px);font-weight:800;margin:0;letter-spacing:-.5px;color:#1b4056}',
+ '#ccNotesPage .ccn-heading p{margin:4px 0 0;color:#7a8d9a;font-size:12px}',
+ '#ccNotesPage .ccn-back{background:#f2f7fb!important}',
+ '#ccNotesPage .ccn-layout{display:grid;grid-template-columns:236px minmax(0,1fr);max-width:1600px;margin:auto;min-height:calc(100dvh - 95px)}',
+ '#ccNotesPage .ccn-side{background:#fff;border-right:1px solid #e3eaf0;padding:22px 12px;min-width:0}',
+ '#ccNotesPage .ccn-sidehead{font-size:11px;font-weight:800;color:#7890a2;text-transform:uppercase;letter-spacing:.7px;margin:0 9px 12px}',
+ '#ccNotesPage .ccn-folder{display:flex;gap:6px;align-items:center;min-width:0;margin:4px 0}',
+ '#ccNotesPage .ccn-folder>button:first-child{flex:1;text-align:left;min-width:0;border:0;background:transparent;padding:10px 12px;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+ '#ccNotesPage .ccn-folder.active{background:#e8f3fa;border-radius:10px}',
+ '#ccNotesPage .ccn-folder>button[data-act=folder-menu]{padding:6px;border:0;background:transparent;flex:0 0 auto}',
+ '#ccNotesPage .ccn-newfolder{width:100%;margin:14px 0 0;border:1px dashed #abc9da!important;background:#f7fbfd!important}',
+ '#ccNotesPage .ccn-work{padding:26px clamp(13px,2.8vw,38px);min-width:0}',
+ '#ccNotesPage .ccn-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:23px}',
+ '#ccNotesPage .ccn-create{background:#246a8a!important;border-color:#246a8a!important;color:#fff!important;padding:11px 15px!important}',
+ '#ccNotesPage .ccn-filter[aria-pressed=true]{background:#dbeef8;border-color:#accbdb;color:#245571}',
+ '#ccNotesPage .ccn-count{font-size:12px;color:#7891a1;margin-left:auto}',
+ '#ccNotesPage .ccn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,345px),1fr));align-items:start;gap:19px}',
+ '#ccNotesPage .ccn-card{min-height:318px;border:1px solid #00000008;box-shadow:0 6px 20px #12345313;border-radius:15px;display:flex;flex-direction:column;padding:19px;gap:12px;color:#273f51}',
+ '#ccNotesPage .ccn-yellow{background:#fff2bd}#ccNotesPage .ccn-blue{background:#dbedff}#ccNotesPage .ccn-pink{background:#f9e0ed}#ccNotesPage .ccn-green{background:#e0f2db}',
+ '#ccNotesPage .ccn-cardhead{display:flex;gap:7px;align-items:center;justify-content:space-between}',
+ '#ccNotesPage .ccn-cardhead button{border:0;background:#ffffff91;font-size:12px;padding:5px 8px}',
+ '#ccNotesPage .ccn-cardhead select{border:1px solid #d7d6ce;background:#ffffffaa;border-radius:7px;padding:5px;color:#415967;font-size:11px}',
+ '#ccNotesPage .ccn-title{border:0;border-bottom:1px solid #00000015;background:transparent;outline:0;width:100%;padding:6px 1px;font-size:17px;font-weight:800;color:#213d51;line-height:1.4}',
+ '#ccNotesPage .ccn-richbar{display:flex;align-items:center;gap:5px}',
+ '#ccNotesPage .ccn-richbar button{background:#ffffff81;border:0;padding:5px 9px;font-size:13px}',
+ '#ccNotesPage .ccn-richbar button[data-command=bold]{font-weight:900}#ccNotesPage .ccn-richbar button[data-command=italic]{font-style:italic}',
+ '#ccNotesPage .ccn-editor{background:#ffffff3b;min-height:102px;max-height:340px;overflow-y:auto;border-radius:6px;font-size:14px;line-height:1.65;padding:8px;overflow-wrap:anywhere;outline-offset:2px}',
+ '#ccNotesPage .ccn-editor:empty:before{content:attr(data-placeholder);color:#6c8492;pointer-events:none}',
+ '#ccNotesPage .ccn-editor ul,#ccNotesPage .ccn-editor ol{padding-left:22px;margin:7px 0}',
+ '#ccNotesPage .ccn-checks{display:flex;flex-direction:column;gap:8px}',
+ '#ccNotesPage .ccn-checkrow{display:flex;align-items:center;gap:7px}',
+ '#ccNotesPage .ccn-checkrow input[type=checkbox]{height:17px;width:17px;flex:0 0 auto;accent-color:#237b6c;cursor:pointer}',
+ '#ccNotesPage .ccn-checkrow input[type=text]{min-width:0;flex:1;background:#ffffff70;border:1px solid #ffffffd0;border-radius:7px;padding:9px 8px;color:#243f51;font-size:13px;line-height:1.4}',
+ '#ccNotesPage .ccn-checkrow[data-done=true] input[type=text]{text-decoration:line-through;opacity:.57}',
+ '#ccNotesPage .ccn-checkrow button{border:0;background:transparent;padding:4px 7px}',
+ '#ccNotesPage .ccn-addline{align-self:flex-start;border:0!important;background:#ffffff83!important;font-size:12px!important}',
+ '#ccNotesPage .ccn-opts{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:11px;margin-top:7px}',
+ '#ccNotesPage .ccn-opts label{display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-weight:700}',
+ '#ccNotesPage .ccn-opts input[type=date]{border:1px solid #00000012;border-radius:6px;background:#ffffff90;color:#40586c;padding:6px;max-width:132px;font-size:11px}',
+ '#ccNotesPage .ccn-bottom{display:flex;justify-content:space-between;align-items:center;gap:7px;flex-wrap:wrap}',
+ '#ccNotesPage .ccn-dest{max-width:165px;width:100%;border:1px solid #00000015;border-radius:7px;background:#ffffff99;color:#40586c;padding:7px;font-size:11px}',
+ '#ccNotesPage .ccn-end{opacity:.62}#ccNotesPage .ccn-end .ccn-title{text-decoration:line-through}',
+ '#ccNotesPage .ccn-blank{padding:35px;text-align:center;grid-column:1/-1;background:white;border-radius:13px;border:1px dashed #b3c8d7;color:#708999}',
+ '#ccNotesPage #ccNotesStatus{padding:12px 3px;font-size:12px;color:#638095;min-height:25px}',
+ '@media(max-width:760px){#ccNotesPage .ccn-layout{grid-template-columns:1fr}#ccNotesPage .ccn-side{padding:10px 15px;border-right:0;border-bottom:1px solid #e3eaf0;display:flex;align-items:center;overflow-x:auto;gap:6px}#ccNotesPage .ccn-sidehead{display:none}#ccNotesPage .ccn-folder{flex:0 0 auto;white-space:nowrap}#ccNotesPage .ccn-folder>button:first-child{padding:8px 10px}#ccNotesPage .ccn-newfolder{width:auto;white-space:nowrap;margin:0}#ccNotesPage .ccn-work{padding:18px 15px}#ccNotesPage .ccn-grid{grid-template-columns:1fr;gap:14px}}',
+ '@media(min-width:761px) and (max-width:1100px){#ccNotesPage .ccn-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}'
  ].join('');
-
- s.textContent += [
- '#ccNotesOverlay{position:fixed!important;inset:0!important;padding:0!important;background:#f4f7fa!important;align-items:stretch!important;justify-content:stretch!important;overflow-y:auto!important}',
- '#ccNotesOverlay .ccn-shell{width:100%!important;max-width:none!important;max-height:none!important;min-height:100dvh!important;overflow:visible!important;border-radius:0!important;box-shadow:none!important;padding:clamp(20px,3vw,48px)!important}',
- '#ccNotesOverlay .ccn-head{max-width:1480px;margin:0 auto;padding-bottom:18px;border-bottom:1px solid #dde6eb}',
- '#ccNotesOverlay h2{font-size:clamp(24px,3vw,33px)!important}',
- '#ccNotesOverlay .ccn-toolbar{max-width:1480px;margin:20px auto 22px}',
- '#ccNotesOverlay .ccn-grid{max-width:1480px;margin:0 auto;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr))!important;gap:20px!important}',
- '#ccNotesOverlay .ccn-card{min-height:320px!important;padding:21px!important;border:1px solid #0000000b;border-radius:17px!important;gap:13px!important;box-shadow:0 6px 18px #1b3c5217!important}',
- '#ccNotesOverlay .ccn-card-title{width:100%;padding:6px 3px;background:transparent;border:0;border-bottom:1px solid #00000019;font-family:inherit;font-size:17px;line-height:1.5;font-weight:800;color:#233f50;min-width:0}',
- '#ccNotesOverlay .ccn-card-title:focus{outline:2px solid #568da5;border-radius:5px}',
- '#ccNotesOverlay textarea{min-height:125px!important;font-size:15px!important;line-height:1.55!important}',
- '#ccNotesOverlay .ccn-list{display:flex;flex-direction:column;gap:8px;margin:0 0 4px}',
- '#ccNotesOverlay .ccn-listrow{display:flex;align-items:center;gap:8px;min-height:32px}',
- '#ccNotesOverlay .ccn-listrow>input[type=checkbox]{width:18px;height:18px;accent-color:#2d806a;flex:0 0 auto}',
- '#ccNotesOverlay .ccn-listrow>input[type=text]{flex:1;min-width:0;background:#ffffff80;border:1px solid #ffffffaa;border-radius:7px;padding:8px 9px;color:#213e51;font-family:inherit;font-size:13px;line-height:1.3}',
- '#ccNotesOverlay .ccn-listrow[data-checked=true]>input[type=text]{text-decoration:line-through;opacity:.55}',
- '#ccNotesOverlay .ccn-listrow button{padding:5px 8px!important}',
- '#ccNotesOverlay .ccn-additem{align-self:flex-start;background:#ffffff90!important}',
- '#ccNotesOverlay .ccn-card[data-done=true] .ccn-card-title{text-decoration:line-through;opacity:.7}',
- '#ccNotesOverlay .ccn-status{max-width:1480px;margin:18px auto}',
- '@media(max-width:700px){#ccNotesOverlay .ccn-shell{padding:17px!important}#ccNotesOverlay .ccn-grid{grid-template-columns:1fr!important;gap:14px!important}#ccNotesOverlay .ccn-card{min-height:280px!important;padding:17px!important}}'
- ].join('');
-
  document.head.appendChild(s);
 }
-function mount(){
- const panel=$('ccxCardLibraryPanel');
- if(!panel)return;
- const head=panel.querySelector('.cckl-head')||panel.querySelector('header')||panel;
- let b=$('ccNotesOpen');
- if(b){if(b.parentElement!==head)head.appendChild(b);return;}
- b=document.createElement('button');b.type='button';b.id='ccNotesOpen';
- b.textContent='🗒️ Notlarım';b.setAttribute('aria-label','Kişisel Not Panom ekranını aç');
- b.addEventListener('click',open);head.appendChild(b);
+function mountButton(){
+ const parent=$('ccxCardLibraryPanel');if(!parent)return;
+ const header=parent.querySelector('.cckl-head')||parent.querySelector('header')||parent;
+ let btn=$('ccNotesOpen');
+ if(!btn){btn=document.createElement('button');btn.id='ccNotesOpen';btn.type='button';btn.textContent='🗒️ Notlarım';btn.onclick=open}
+ if(btn.parentElement!==header)header.appendChild(btn);
 }
-function ensure(){
- if($('ccNotesOverlay'))return;
- const root=document.createElement('div');root.id='ccNotesOverlay';root.hidden=true;root.setAttribute('role','main');root.setAttribute('aria-label','Notlarım sayfası');
- root.innerHTML='<section class="ccn-shell"><div class="ccn-head"><div><h2>🗒️ Notlarım</h2><p class="ccn-sub">Notlarını düzenle, maddeleri işaretle ve yapılacaklarını takip et</p></div><button type="button" id="ccNotesClose">← Kütüphaneye Dön</button></div><div class="ccn-toolbar"><button type="button" class="ccn-add" id="ccNotesAdd">＋ Yeni Not</button><button type="button" class="ccn-filter" data-filter="today">Bugün</button><button type="button" class="ccn-filter" data-filter="upcoming">Yaklaşan</button><button type="button" class="ccn-filter" data-filter="all">Tüm Notlar</button><button type="button" class="ccn-filter" data-filter="done">Tamamlananlar</button></div><div class="ccn-grid" id="ccNotesGrid"></div><p class="ccn-status" id="ccNotesStatus" role="status"></p></section>';
- document.body.appendChild(root);
- $('ccNotesClose').onclick=close;$('ccNotesAdd').onclick=add;
- root.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{filter=b.dataset.filter;render()}));
- 
- root.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+function buildPage(){
+ if($('ccNotesPage'))return;
+ const page=document.createElement('div');page.id='ccNotesPage';page.hidden=true;
+ page.setAttribute('role','main');page.setAttribute('aria-label','Notlarım');
+ page.innerHTML='<header class="ccn-mainhead"><div class="ccn-heading"><h2>🗒️ Notlarım</h2><p>Kişisel notlar, yapılacaklar ve kontrol listeleri</p></div><button type="button" id="ccNotesClose" class="ccn-back">← Kütüphaneye Dön</button></header><div class="ccn-layout"><aside class="ccn-side"><span class="ccn-sidehead">Klasörler</span><div id="ccNotesFolders"></div><button type="button" id="ccNotesNewFolder" class="ccn-newfolder">＋ Yeni Klasör</button></aside><main class="ccn-work"><div class="ccn-toolbar"><button type="button" id="ccNotesAdd" class="ccn-create">＋ Yeni Not</button><button type="button" class="ccn-filter" data-filter="all">Tüm Notlar</button><button type="button" class="ccn-filter" data-filter="today">Bugün</button><button type="button" class="ccn-filter" data-filter="upcoming">Yaklaşan</button><button type="button" class="ccn-filter" data-filter="done">Tamamlananlar</button><span class="ccn-count" id="ccNotesCount"></span></div><div id="ccNotesGrid" class="ccn-grid"></div><div id="ccNotesStatus" role="status"></div></main></div>';
+ document.body.appendChild(page);
+ $('ccNotesClose').onclick=close;
+ $('ccNotesAdd').onclick=add;
+ $('ccNotesNewFolder').onclick=createFolder;
+ page.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{flushAll();filter=b.dataset.filter;render()});
 }
-function status(v){if($('ccNotesStatus'))$('ccNotesStatus').textContent=v}
+function countInFolder(id){return notes.filter(n=>id==='all'||(id==='unfiled'?!n.folder_id:n.folder_id===id)).length}
+function renderFolders(){
+ const root=$('ccNotesFolders');if(!root)return;
+ const items=[{id:'all',name:'Tüm Notlar',icon:'📋'},{id:'unfiled',name:'Klasörsüz',icon:'🗒️'},...folders.map(f=>({id:f.id,name:f.name,icon:'📁'}))];
+ root.innerHTML=items.map(x=>'<div class="ccn-folder '+(scope===x.id?'active':'')+'"><button type="button" data-act="folder-open" data-folder="'+escapeHtml(x.id)+'" title="'+escapeHtml(x.name)+'">'+x.icon+' '+escapeHtml(x.name)+' ('+countInFolder(x.id)+')</button>'+(x.id!=='all'&&x.id!=='unfiled'?'<button type="button" data-act="folder-menu" data-folder="'+escapeHtml(x.id)+'" aria-label="Klasör işlemleri">⋯</button>':'')+'</div>').join('');
+}
 function visible(n){
- if(filter==='all')return true;
+ if(scope==='unfiled'&&n.folder_id)return false;
+ if(scope!=='all'&&scope!=='unfiled'&&n.folder_id!==scope)return false;
  if(filter==='done')return n.done;
- if(filter==='upcoming')return !n.done&&n.due_date&&n.due_date>today();
- return !n.done&&(!n.due_date||n.due_date<=today());
+ if(filter==='today')return !n.done&&(!n.due_date||n.due_date<=today());
+ if(filter==='upcoming')return !n.done&&!!n.due_date&&n.due_date>today();
+ return true;
 }
-const ordered=()=>notes.filter(visible).sort((a,b)=>Number(b.pinned)-Number(a.pinned)||a.sort_order-b.sort_order||new Date(b.created_at)-new Date(a.created_at));
+function ordered(){return notes.filter(visible).sort((a,b)=>Number(b.pinned)-Number(a.pinned)||a.sort_order-b.sort_order||new Date(b.created_at)-new Date(a.created_at))}
 function render(){
- const grid=$('ccNotesGrid');if(!grid)return;
- document.querySelectorAll('#ccNotesOverlay [data-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.filter===filter)));
- const list=ordered();
- if(!list.length){grid.innerHTML='<div class="ccn-empty">Burada henüz notun yok. <b>＋ Yeni Not</b> ile başlayabilirsin.</div>';return}
+ renderFolders();
+ document.querySelectorAll('#ccNotesPage .ccn-filter').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.filter===filter)));
+ const list=ordered(),grid=$('ccNotesGrid');if(!grid)return;
+ $('ccNotesCount').textContent=list.length+' not';
+ if(!list.length){grid.innerHTML='<div class="ccn-blank">Bu alanda not yok. <b>＋ Yeni Not</b> ile başlayabilirsin.</div>';return}
  grid.innerHTML=list.map(n=>{
-  const col=colors.includes(n.color)?n.color:'yellow';
+  const color=COLORS.includes(n.color)?n.color:'yellow';
   const checks=Array.isArray(n.checklist)?n.checklist:[];
-  const rows=checks.map(item=>{
-   const id=escapeText(item.id||'');
-   return '<div class="ccn-listrow" data-item="'+id+'" data-checked="'+!!item.done+'"><input type="checkbox" data-action="item-done" aria-label="Madde tamamlandı" '+(item.done?'checked':'')+'><input type="text" data-action="item-text" maxlength="250" placeholder="Yapılacak madde" value="'+escapeText(item.text||'')+'"><button type="button" data-action="item-remove" title="Maddeyi sil">×</button></div>';
-  }).join('');
-  return '<article class="ccn-card ccn-'+col+'" data-id="'+escapeText(n.id)+'" data-done="'+n.done+'" draggable="true"><div class="ccn-top"><button type="button" data-action="pin" title="Sabitle" aria-pressed="'+n.pinned+'">'+(n.pinned?'📌':'📍')+'</button><select aria-label="Sticker rengi" data-action="color">'+colors.map((c,i)=>'<option value="'+c+'" '+(col===c?'selected':'')+'>'+['Sarı','Mavi','Pembe','Yeşil'][i]+'</option>').join('')+'</select><button type="button" data-action="delete" title="Notu sil">✕</button></div><input class="ccn-card-title" type="text" data-action="title" maxlength="140" placeholder="Başlık" value="'+escapeText(n.title||'')+'"><textarea maxlength="1500" data-action="body" placeholder="Notunu yaz...">'+escapeText(n.body)+'</textarea><div class="ccn-list">'+rows+'</div><button type="button" class="ccn-additem" data-action="item-add">＋ Liste maddesi ekle</button><div class="ccn-bottom"><label><input type="checkbox" data-action="done" '+(n.done?'checked':'')+'> Not tamamlandı</label><input class="ccn-date" aria-label="Bitiş tarihi" type="date" data-action="due_date" value="'+escapeText(n.due_date||'')+'"></div><div class="ccn-bottom"><small>↕ Notu sırala</small><span><button type="button" data-action="left" title="Öne al">←</button><button type="button" data-action="right" title="Sonraya al">→</button></span></div></article>';
+  const foldersOptions='<option value="">📂 Klasörsüz</option>'+folders.map(f=>'<option value="'+escapeHtml(f.id)+'" '+(n.folder_id===f.id?'selected':'')+'>'+escapeHtml(f.name)+'</option>').join('');
+  const lines=checks.map(item=>'<div class="ccn-checkrow" data-item="'+escapeHtml(item.id)+'" data-done="'+!!item.done+'"><input type="checkbox" data-act="check-done" aria-label="Maddeyi tamamla" '+(item.done?'checked':'')+'><input type="text" data-act="check-text" maxlength="250" placeholder="Madde yaz..." value="'+escapeHtml(item.text||'')+'"><button type="button" data-act="check-delete" aria-label="Maddeyi sil">×</button></div>').join('');
+  const html=n.body_rich?safeMarkup(n.body_rich):escapeHtml(n.body||'').replace(/\n/g,'<br>');
+  return '<article class="ccn-card ccn-'+color+(n.done?' ccn-end':'')+'" data-id="'+escapeHtml(n.id)+'" draggable="true"><div class="ccn-cardhead"><button type="button" data-act="pin" aria-label="Notu sabitle">'+(n.pinned?'📌':'📍')+'</button><select data-act="color" aria-label="Not rengi">'+COLORS.map((c,i)=>'<option value="'+c+'" '+(color===c?'selected':'')+'>'+COLORS_TR[i]+'</option>').join('')+'</select><button type="button" data-act="delete" aria-label="Notu sil">✕</button></div><input class="ccn-title" data-act="title" type="text" maxlength="140" placeholder="Not başlığı" value="'+escapeHtml(n.title||'')+'"><div class="ccn-richbar" role="toolbar" aria-label="Yazı biçimlendirme"><button type="button" data-command="bold" title="Kalın">B</button><button type="button" data-command="italic" title="İtalik">I</button><button type="button" data-command="underline" title="Altı çizili">U̲</button><button type="button" data-command="insertUnorderedList" title="Madde işaretleri">• Liste</button><button type="button" data-command="insertOrderedList" title="Numaralı liste">1. Liste</button></div><div class="ccn-editor" data-act="body-rich" contenteditable="true" role="textbox" aria-label="Not içeriği" aria-multiline="true" data-placeholder="Notunu yaz...">'+html+'</div><div class="ccn-checks">'+lines+'</div><button type="button" class="ccn-addline" data-act="check-add">＋ Yapılacak madde ekle</button><div class="ccn-opts"><label><input type="checkbox" data-act="done" '+(n.done?'checked':'')+'> Not tamamlandı</label><input type="date" data-act="due_date" aria-label="Bitiş tarihi" value="'+escapeHtml(n.due_date||'')+'"></div><div class="ccn-bottom"><select class="ccn-dest" data-act="folder" aria-label="Notun klasörü">'+foldersOptions+'</select><span><button type="button" data-act="left" title="Sola taşı">←</button><button type="button" data-act="right" title="Sağa taşı">→</button></span></div></article>';
  }).join('');
 }
 async function open(){
- const id=user();if(!id){window.ccToast?.('Not Panom için giriş yapmalısın.','info');return}
- ensure();$('ccNotesOverlay').hidden=false;document.body.style.overflow='hidden';
- if(opened&&owner===id){render();return}
- owner=id;opened=true;notes=[];render();status('Notlar yükleniyor…');
+ if(!currentUser()){window.ccToast?.('Notlarım için giriş yapmalısın.','info');return}
+ buildPage();$('ccNotesPage').hidden=false;document.body.style.overflow='hidden';active=true;
+ if(loaded&&uid===currentUser()){render();return}
+ await load();
+}
+async function load(){
+ const id=currentUser();if(!id||loading)return;
+ loading=true;uid=id;status('Notlar yükleniyor…');
  try{
   db=await window.CC_AUTH.getClient();
-  const r=await db.from('cc_personal_sticky_notes').select('id,user_id,title,body,checklist,color,done,pinned,due_date,sort_order,created_at').eq('user_id',id).order('created_at',{ascending:false});
-  if(r.error)throw r.error;if(user()!==id)return;
-  notes=r.data||[];render();status('Notların hesabına özel olarak saklanır.');
- }catch(e){opened=false;status('Notlar yüklenemedi: '+e.message+' — paneli yeniden açıp deneyebilirsin.')}
+  const [nr,fr]=await Promise.all([
+   db.from('cc_personal_sticky_notes').select('id,user_id,title,body,body_rich,checklist,color,done,pinned,due_date,sort_order,created_at,folder_id').eq('user_id',id).order('created_at',{ascending:false}),
+   db.from('cc_personal_note_folders').select('id,user_id,name,sort_order,created_at').eq('user_id',id).order('sort_order',{ascending:true})
+  ]);
+  if(nr.error)throw nr.error;if(fr.error)throw fr.error;
+  if(currentUser()!==id)return;
+  notes=nr.data||[];folders=fr.data||[];loaded=true;render();status('Notların kaydediliyor ve hesabınla eşitleniyor.');
+ }catch(e){loaded=false;status('Notlar alınamadı: '+(e.message||String(e)))}
+ finally{loading=false}
 }
 function close(){
- for(const id of [...timers.keys()])flush(id);
- $('ccNotesOverlay').hidden=true;document.body.style.overflow='';
+ flushAll();$('ccNotesPage').hidden=true;active=false;document.body.style.overflow='';
 }
-async function add(){
- if(busy||!db||user()!==owner)return;busy=true;status('Yeni not kaydediliyor…');
- try{
-  const r=await db.from('cc_personal_sticky_notes').insert({user_id:owner,title:'',body:'',checklist:[],color:colors[notes.length%4],sort_order:notes.length*10}).select().single();
-  if(r.error)throw r.error;
-  notes.unshift(r.data);filter='all';render();status('Yeni not eklendi.');
-  $('ccNotesGrid').querySelector('[data-id="'+r.data.id+'"] textarea')?.focus();
- }catch(e){status('Not eklenemedi: '+e.message)}
- finally{busy=false}
+function schedule(id,field,patch){
+ const key=id+':'+field,old=timers.get(key);
+ if(old)clearTimeout(old);
+ timers.set(key,setTimeout(()=>{timers.delete(key);save(id,patch())},600));
+}
+function flushAll(){
+ for(const [key,handle] of [...timers.entries()]){
+  clearTimeout(handle);timers.delete(key);
+  const index=key.indexOf(':'),id=key.slice(0,index),field=key.slice(index+1);
+  const note=notes.find(n=>n.id===id);if(!note)continue;
+  if(field==='title')save(id,{title:note.title||''});
+  if(field==='body')save(id,{body:note.body||'',body_rich:note.body_rich||''});
+  if(field==='checklist')save(id,{checklist:note.checklist||[]});
+ }
 }
 function save(id,patch){
- if(user()!==owner||!db)return;
- const previous=queues.get(id)||Promise.resolve();
- const q=previous.catch(()=>{}).then(async()=>{
-  if(user()!==owner)return;
-  const r=await db.from('cc_personal_sticky_notes').update({...patch,updated_at:new Date().toISOString()}).eq('id',id).eq('user_id',owner).select('id').maybeSingle();
-  if(r.error||!r.data)throw r.error||new Error('Kayıt bulunamadı');
+ if(currentUser()!==uid||!db)return Promise.resolve();
+ const prior=pending.get(id)||Promise.resolve();
+ const job=prior.catch(()=>{}).then(async()=>{
+  if(currentUser()!==uid)return;
+  const res=await db.from('cc_personal_sticky_notes').update({...patch,updated_at:new Date().toISOString()}).eq('id',id).eq('user_id',uid).select('id').maybeSingle();
+  if(res.error||!res.data)throw res.error||new Error('Not kaydedilemedi');
  });
- queues.set(id,q);status('Kaydediliyor…');
- q.then(()=>{if(queues.get(id)===q)status('Kaydedildi ✓')}).catch(e=>status('Kaydetme hatası: '+e.message));
+ pending.set(id,job);status('Kaydediliyor…');
+ job.then(()=>{if(pending.get(id)===job)status('Kaydedildi ✓')}).catch(e=>status('Kaydetme hatası: '+e.message));
+ return job;
 }
-function flush(id){
- const t=timers.get(id);if(t)clearTimeout(t);timers.delete(id);
- const n=notes.find(x=>x.id===id);if(n)save(id,{body:n.body});
-}
-function flushTitle(id){
- const t=titleTimers.get(id);if(t)clearTimeout(t);titleTimers.delete(id);
- const n=notes.find(x=>x.id===id);if(n)save(id,{title:n.title||''});
-}
-function flushChecklist(id){
- const t=checkTimers.get(id);if(t)clearTimeout(t);checkTimers.delete(id);
- const n=notes.find(x=>x.id===id);if(n)save(id,{checklist:n.checklist||[]});
-}
-function listItem(note,itemId){
- return (Array.isArray(note.checklist)?note.checklist:[]).find(x=>x.id===itemId);
-}
-function edit(n,patch){Object.assign(n,patch);save(n.id,patch)}
-async function remove(n){
- if(!confirm('Bu sticker notu silinsin mi?'))return;
- if(timers.has(n.id))flush(n.id);
- if(titleTimers.has(n.id))flushTitle(n.id);
- if(checkTimers.has(n.id))flushChecklist(n.id);
+async function add(){
+ if(!db||currentUser()!==uid||adding)return;
+ adding=true;
  try{
-  await(queues.get(n.id)||Promise.resolve());
-  const r=await db.from('cc_personal_sticky_notes').delete().eq('id',n.id).eq('user_id',owner).select('id').maybeSingle();
-  if(r.error||!r.data)throw r.error||new Error('Silme başarısız');
-  notes=notes.filter(x=>x.id!==n.id);render();status('Not silindi.');
- }catch(e){status('Silinemedi: '+e.message)}
+  const folder_id=scope==='all'||scope==='unfiled'?null:scope;
+  const res=await db.from('cc_personal_sticky_notes').insert({user_id:uid,title:'',body:'',body_rich:'',checklist:[],color:COLORS[notes.length%4],folder_id,sort_order:notes.length*10}).select().single();
+  if(res.error)throw res.error;
+  notes.unshift(res.data);filter='all';render();status('Yeni not eklendi.');
+  $('ccNotesGrid')?.querySelector('[data-id="'+res.data.id+'"] [data-act=title]')?.focus();
+ }catch(e){status('Not ekleme hatası: '+e.message)}finally{adding=false}
 }
-function move(id,direction){
- const list=ordered(),index=list.findIndex(x=>x.id===id),adjacent=list[index+direction];if(!adjacent)return;
- const item=list[index];if(item.sort_order===adjacent.sort_order){notes.forEach((x,i)=>x.sort_order=i*10)}
- const before=item.sort_order;item.sort_order=adjacent.sort_order;adjacent.sort_order=before;
- save(item.id,{sort_order:item.sort_order});save(adjacent.id,{sort_order:adjacent.sort_order});render();
+async function createFolder(){
+ if(!db||currentUser()!==uid)return;
+ const name=prompt('Yeni klasör adı:');if(!name||!name.trim())return;
+ const clean=name.trim().slice(0,80);
+ try{
+  const r=await db.from('cc_personal_note_folders').insert({user_id:uid,name:clean,sort_order:folders.length*10}).select().single();
+  if(r.error)throw r.error;folders.push(r.data);scope=r.data.id;render();status('Klasör oluşturuldu.');
+ }catch(e){status('Klasör oluşturulamadı: '+e.message)}
+}
+async function folderMenu(id){
+ const folder=folders.find(f=>f.id===id);if(!folder)return;
+ const action=prompt('Klasör için R = yeniden adlandır, S = sil', 'R');
+ if(action===null)return;
+ if(action.trim().toLocaleUpperCase('tr-TR')==='R'){
+  const name=prompt('Klasör adı:',folder.name);if(!name||!name.trim())return;
+  const r=await db.from('cc_personal_note_folders').update({name:name.trim().slice(0,80)}).eq('id',id).eq('user_id',uid).select().single();
+  if(r.error){status('Ad değiştirilemedi: '+r.error.message);return}
+  folder.name=r.data.name;render();status('Klasör adı güncellendi.');
+ }else if(action.trim().toLocaleUpperCase('tr-TR')==='S'){
+  if(!confirm('"'+folder.name+'" klasörü silinsin mi? İçindeki notlar Klasörsüz alanına taşınacak.'))return;
+  const r=await db.from('cc_personal_note_folders').delete().eq('id',id).eq('user_id',uid).select('id').maybeSingle();
+  if(r.error||!r.data){status('Klasör silinemedi: '+(r.error?.message||''));return}
+  folders=folders.filter(f=>f.id!==id);notes.forEach(n=>{if(n.folder_id===id)n.folder_id=null});
+  scope='unfiled';render();status('Klasör silindi; notların korundu.');
+ }
+}
+function change(note,patch){Object.assign(note,patch);save(note.id,patch)}
+function queueChecks(note){
+ const patch=()=>({checklist:note.checklist||[]});
+ schedule(note.id,'checklist',patch);
+}
+function addItem(note){
+ if(!Array.isArray(note.checklist))note.checklist=[];
+ if(note.checklist.length>=100){status('Bir notta en fazla 100 madde olabilir.');return}
+ const id=window.crypto?.randomUUID?.()||String(Date.now())+String(Math.random());
+ note.checklist.push({id,text:'',done:false});
+ queueChecks(note);
+ const card=$('ccNotesGrid')?.querySelector('[data-id="'+note.id+'"]');
+ if(!card)return;
+ const list=card.querySelector('.ccn-checks');
+ const row=document.createElement('div');row.className='ccn-checkrow';row.dataset.item=id;row.dataset.done='false';
+ row.innerHTML='<input type="checkbox" data-act="check-done" aria-label="Maddeyi tamamla"><input type="text" data-act="check-text" maxlength="250" placeholder="Madde yaz..."><button type="button" data-act="check-delete" aria-label="Maddeyi sil">×</button>';
+ list.appendChild(row);
+ row.querySelector('[data-act=check-text]').focus();
+}
+async function removeNote(note){
+ if(!confirm('Not silinsin mi?'))return;
+ flushAll();
+ try{
+  await(pending.get(note.id)||Promise.resolve());
+  const r=await db.from('cc_personal_sticky_notes').delete().eq('id',note.id).eq('user_id',uid).select('id').maybeSingle();
+  if(r.error||!r.data)throw r.error||Error('Silinemedi');
+  notes=notes.filter(n=>n.id!==note.id);render();status('Not silindi.');
+ }catch(e){status('Silme hatası: '+e.message)}
+}
+function move(note,direction){
+ const list=ordered(),pos=list.findIndex(n=>n.id===note.id),target=list[pos+direction];
+ if(!target)return;
+ const a=note.sort_order,b=target.sort_order;
+ if(a===b){list.forEach((n,i)=>n.sort_order=i*10)}
+ const temp=note.sort_order;note.sort_order=target.sort_order;target.sort_order=temp;
+ save(note.id,{sort_order:note.sort_order});save(target.id,{sort_order:target.sort_order});render();
 }
 function init(){
- style();ensure();mount();
- const root=$('ccxCardLibraryPanel')||document.body;let scheduled=false;
- new MutationObserver(()=>{if(scheduled||$('ccNotesOpen'))return;scheduled=true;setTimeout(()=>{scheduled=false;mount()},100)}).observe(root,{subtree:true,childList:true});
- window.addEventListener('cc-authenticated',mount);
- document.addEventListener('click',e=>{if(e.target.closest?.('#ccxTabCards,#ccxCardLibraryPanel,[data-cc-library]'))setTimeout(mount,250)},true);
- document.addEventListener('input',e=>{
-  const t=e.target;if(!t.matches?.('#ccNotesOverlay textarea[data-action="body"]'))return;
-  const n=notes.find(x=>x.id===t.closest('[data-id]')?.dataset.id);if(!n)return;
-  n.body=t.value;if(timers.has(n.id))clearTimeout(timers.get(n.id));
-  timers.set(n.id,setTimeout(()=>flush(n.id),650));status('Kaydedilecek…');
- });
- document.addEventListener('input',e=>{
-  const el=e.target,card=el.closest?.('#ccNotesOverlay .ccn-card');
-  if(!card||!['title','item-text'].includes(el.dataset.action))return;
-  const n=notes.find(x=>x.id===card.dataset.id);if(!n)return;
-  if(el.dataset.action==='title'){
-   n.title=el.value.slice(0,140);
-   if(titleTimers.has(n.id))clearTimeout(titleTimers.get(n.id));
-   titleTimers.set(n.id,setTimeout(()=>flushTitle(n.id),550));
-  } else {
-   const item=listItem(n,el.closest('[data-item]')?.dataset.item);
-   if(!item)return;item.text=el.value.slice(0,250);
-   if(checkTimers.has(n.id))clearTimeout(checkTimers.get(n.id));
-   checkTimers.set(n.id,setTimeout(()=>flushChecklist(n.id),550));
-  }
-  status('Kaydedilecek…');
- });
- document.addEventListener('focusout',e=>{const t=e.target;const card=t.closest?.('#ccNotesOverlay .ccn-card');if(!card)return;const id=card.dataset.id;if(t.dataset.action==='body'&&timers.has(id))flush(id);if(t.dataset.action==='title'&&titleTimers.has(id))flushTitle(id);if(t.dataset.action==='item-text'&&checkTimers.has(id))flushChecklist(id)});
- document.addEventListener('change',e=>{
-  const t=e.target,card=t.closest?.('#ccNotesOverlay .ccn-card');if(!card)return;
-  const n=notes.find(x=>x.id===card.dataset.id);if(!n)return;
-  if(t.dataset.action==='color'&&colors.includes(t.value)){edit(n,{color:t.value});render()}
-  if(t.dataset.action==='done'){edit(n,{done:t.checked});render()}
-  if(t.dataset.action==='item-done'){const item=listItem(n,t.closest('[data-item]')?.dataset.item);if(item){if(checkTimers.has(n.id))flushChecklist(n.id);item.done=t.checked;edit(n,{checklist:n.checklist});render()}}
-  if(t.dataset.action==='due_date'){edit(n,{due_date:t.value||null});render()}
+ css();buildPage();mountButton();
+ let mountScheduled=false;
+ const root=$('ccxCardLibraryPanel')||document.body;
+ new MutationObserver(records=>{
+  if($('ccNotesOpen')||mountScheduled)return;
+  if(!records.some(r=>[...r.addedNodes].some(n=>n.nodeType===1)))return;
+  mountScheduled=true;setTimeout(()=>{mountScheduled=false;mountButton()},300);
+ }).observe(root,{subtree:true,childList:true});
+ window.addEventListener('cc-authenticated',()=>{mountButton();if(uid&&uid!==currentUser()){loaded=false;notes=[];folders=[];uid=''}});
+ window.addEventListener('cc-logged-out',()=>{
+  for(const t of timers.values())clearTimeout(t);timers.clear();
+  db=null;uid='';loaded=false;notes=[];folders=[];active=false;$('ccNotesPage').hidden=true;document.body.style.overflow='';
  });
  document.addEventListener('click',e=>{
-  const b=e.target.closest?.('#ccNotesOverlay button[data-action]');if(!b)return;
-  const n=notes.find(x=>x.id===b.closest('[data-id]')?.dataset.id);if(!n)return;
-  if(b.dataset.action==='pin'){edit(n,{pinned:!n.pinned});render()}
-  if(b.dataset.action==='item-add'){if(!Array.isArray(n.checklist))n.checklist=[];if(n.checklist.length>=100){status('Bir notta en fazla 100 madde olabilir.');return}if(checkTimers.has(n.id))flushChecklist(n.id);n.checklist.push({id:window.crypto?.randomUUID?.()||String(Date.now())+Math.random(),text:'',done:false});edit(n,{checklist:n.checklist});render();$('ccNotesGrid')?.querySelector('[data-id="'+n.id+'"] .ccn-listrow:last-child input[type=text]')?.focus()}
-  if(b.dataset.action==='item-remove'){const itemId=b.closest('[data-item]')?.dataset.item;if(checkTimers.has(n.id))flushChecklist(n.id);n.checklist=(n.checklist||[]).filter(x=>x.id!==itemId);edit(n,{checklist:n.checklist});render()}
-  if(b.dataset.action==='delete')remove(n);
-  if(b.dataset.action==='left')move(n.id,-1);
-  if(b.dataset.action==='right')move(n.id,1);
+  const b=e.target.closest?.('#ccNotesPage button[data-act]');
+  if(b){
+   const action=b.dataset.act;
+   if(action==='folder-open'){flushAll();scope=b.dataset.folder;render();return}
+   if(action==='folder-menu'){folderMenu(b.dataset.folder);return}
+   const card=b.closest('.ccn-card'),n=notes.find(x=>x.id===card?.dataset.id);if(!n)return;
+   if(action==='pin'){flushAll();change(n,{pinned:!n.pinned});render()}
+   else if(action==='delete')removeNote(n);
+   else if(action==='check-add')addItem(n);
+   else if(action==='check-delete'){
+    const id=b.closest('.ccn-checkrow')?.dataset.item;
+    n.checklist=(n.checklist||[]).filter(x=>x.id!==id);queueChecks(n);
+    b.closest('.ccn-checkrow')?.remove();renderFolders();status('Madde kaldırıldı.');
+   }else if(action==='left'||action==='right'){flushAll();move(n,action==='left'?-1:1)}
+   return;
+  }
+  const fmt=e.target.closest?.('#ccNotesPage .ccn-richbar button[data-command]');
+  if(fmt){
+   const card=fmt.closest('.ccn-card'),editor=card?.querySelector('.ccn-editor');
+   if(!editor)return;
+   editor.focus();document.execCommand(fmt.dataset.command,false,null);
+   editor.dispatchEvent(new Event('input',{bubbles:true}));
+  }
  });
- let dragging='';
- document.addEventListener('dragstart',e=>{const card=e.target.closest?.('#ccNotesOverlay .ccn-card');if(card)dragging=card.dataset.id});
- document.addEventListener('dragover',e=>{if(dragging&&e.target.closest?.('#ccNotesOverlay .ccn-card'))e.preventDefault()});
+ document.addEventListener('mousedown',e=>{if(e.target.closest?.('#ccNotesPage .ccn-richbar button[data-command]'))e.preventDefault()});
+ document.addEventListener('input',e=>{
+  const el=e.target,card=el.closest?.('#ccNotesPage .ccn-card');if(!card)return;
+  const n=notes.find(x=>x.id===card.dataset.id);if(!n)return;
+  if(el.dataset.act==='title'){
+   n.title=el.value;
+   schedule(n.id,'title',()=>({title:n.title||''}));
+  }else if(el.dataset.act==='check-text'){
+   const item=(n.checklist||[]).find(x=>x.id===el.closest('.ccn-checkrow')?.dataset.item);if(!item)return;
+   item.text=el.value;
+   queueChecks(n);
+  }else if(el.dataset.act==='body-rich'){
+   const plain=el.innerText||'';
+   const html=safeMarkup(el.innerHTML);
+   if(plain.length>1500||html.length>12000){status('Not metni en fazla 1500 karakter olabilir.');return}
+   n.body=plain;n.body_rich=html;
+   schedule(n.id,'body',()=>({body:n.body||'',body_rich:n.body_rich||''}));
+  }
+ });
+ document.addEventListener('focusout',e=>{
+  const el=e.target,card=el.closest?.('#ccNotesPage .ccn-card');if(!card)return;
+  if(['title','check-text','body-rich'].includes(el.dataset.act))flushAll();
+ });
+ document.addEventListener('change',e=>{
+  const el=e.target,card=el.closest?.('#ccNotesPage .ccn-card');if(!card)return;
+  const n=notes.find(x=>x.id===card.dataset.id);if(!n)return;
+  if(el.dataset.act==='check-done'){
+   const item=(n.checklist||[]).find(x=>x.id===el.closest('.ccn-checkrow')?.dataset.item);
+   if(!item)return;item.done=el.checked;queueChecks(n);
+   el.closest('.ccn-checkrow').dataset.done=String(item.done);return;
+  }
+  if(el.dataset.act==='color'&&COLORS.includes(el.value)){
+   change(n,{color:el.value});
+   card.classList.remove(...COLORS.map(x=>'ccn-'+x));card.classList.add('ccn-'+el.value);return;
+  }
+  if(el.dataset.act==='done'){change(n,{done:el.checked});card.classList.toggle('ccn-end',el.checked);return}
+  if(el.dataset.act==='due_date'){change(n,{due_date:el.value||null});return}
+  if(el.dataset.act==='folder'){flushAll();change(n,{folder_id:el.value||null});render();return}
+ });
+ let dragging=null;
+ document.addEventListener('dragstart',e=>{const c=e.target.closest?.('#ccNotesPage .ccn-card');if(c&&!e.target.closest('input,[contenteditable],select,button'))dragging=c.dataset.id});
+ document.addEventListener('dragover',e=>{if(dragging&&e.target.closest?.('#ccNotesPage .ccn-card'))e.preventDefault()});
  document.addEventListener('drop',e=>{
-  const target=e.target.closest?.('#ccNotesOverlay .ccn-card');if(!dragging||!target)return;
-  e.preventDefault();const list=ordered(),from=list.findIndex(n=>n.id===dragging),to=list.findIndex(n=>n.id===target.dataset.id);
-  dragging='';if(from<0||to<0)return;
-  const [item]=list.splice(from,1);list.splice(to,0,item);
-  list.forEach((n,i)=>{if(n.sort_order!==i*10){n.sort_order=i*10;save(n.id,{sort_order:n.sort_order})}});render();
+  const card=e.target.closest?.('#ccNotesPage .ccn-card');if(!dragging||!card)return;e.preventDefault();
+  const list=ordered(),start=list.findIndex(n=>n.id===dragging),end=list.findIndex(n=>n.id===card.dataset.id);
+  dragging=null;if(start<0||end<0)return;
+  const [item]=list.splice(start,1);list.splice(end,0,item);
+  list.forEach((n,i)=>{if(n.sort_order!==i*10){n.sort_order=i*10;save(n.id,{sort_order:n.sort_order})}});
+  render();
  });
- document.addEventListener('dragend',()=>dragging='');
- window.addEventListener('cc-logged-out',()=>{for(const t of [...timers.values(),...titleTimers.values(),...checkTimers.values()])clearTimeout(t);timers.clear();titleTimers.clear();checkTimers.clear();notes=[];db=null;owner='';opened=false;$('ccNotesOverlay').hidden=true;document.body.style.overflow=''});
- window.addEventListener('cc-authenticated',()=>{if(owner&&owner!==user()){notes=[];db=null;owner='';opened=false}});
+ document.addEventListener('dragend',()=>dragging=null);
+ window.CC_NOTES_OPEN=open;
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
