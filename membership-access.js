@@ -300,3 +300,14 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 
 
+
+/* Load the private notes board independently from the social feed module. */
+(function(){
+ if(document.getElementById('ccNotesBoardLoader'))return;
+ const script=document.createElement('script');
+ script.id='ccNotesBoardLoader';
+ script.src='cc-notes-board.js?v=20261126b';
+ script.defer=true;
+ script.onerror=()=>{console.warn('Not Panom arayüzü yüklenemedi');script.remove()};
+ document.head.appendChild(script);
+})();
