@@ -82,11 +82,11 @@ function css(){
  '#ccNotesPage .ccn-editor:empty:before{content:attr(data-placeholder);color:#6c8492;pointer-events:none}',
  '#ccNotesPage .ccn-editor ul,#ccNotesPage .ccn-editor ol{padding-left:22px;margin:7px 0}',
  '#ccNotesPage .ccn-checks{display:flex;flex-direction:column;gap:8px}',
- '#ccNotesPage .ccn-checkrow{display:flex;align-items:center;gap:7px}',
- '#ccNotesPage .ccn-checkrow input[type=checkbox]{height:17px;width:17px;flex:0 0 auto;accent-color:#237b6c;cursor:pointer}',
- '#ccNotesPage .ccn-checkrow input[type=text]{min-width:0;flex:1;background:#ffffff70;border:1px solid #ffffffd0;border-radius:7px;padding:9px 8px;color:#243f51;font-size:13px;line-height:1.4}',
- '#ccNotesPage .ccn-checkrow[data-done=true] input[type=text]{text-decoration:line-through;opacity:.57}',
- '#ccNotesPage .ccn-checkrow button{border:0;background:transparent;padding:4px 7px}',
+ '#ccNotesPage .ccn-checkrow{display:flex;align-items:flex-start;gap:8px;width:100%}',
+ '#ccNotesPage .ccn-checkrow input[type=checkbox]{height:17px;width:17px;flex:0 0 auto;accent-color:#237b6c;cursor:pointer;margin-top:12px}',
+ '#ccNotesPage .ccn-checkrow textarea[data-act=check-text]{display:block;min-width:0;width:100%;flex:1 1 auto;min-height:43px;max-height:none;resize:none;overflow:hidden;overflow-wrap:anywhere;white-space:pre-wrap;background:#ffffff70;border:1px solid #ffffffd0;border-radius:10px;padding:10px 11px;color:#243f51;font-family:inherit;font-size:14px;line-height:1.55;box-sizing:border-box}',
+ '#ccNotesPage .ccn-checkrow[data-done=true] textarea[data-act=check-text]{text-decoration:line-through;opacity:.57}',
+ '#ccNotesPage .ccn-checkrow button{border:0;background:transparent;padding:4px 7px;margin-top:7px;flex:0 0 auto}',
  '#ccNotesPage .ccn-addline{align-self:flex-start;border:0!important;background:#ffffff83!important;font-size:12px!important}',
  '#ccNotesPage .ccn-opts{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:11px;margin-top:7px}',
  '#ccNotesPage .ccn-opts label{display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-weight:700}',
@@ -134,6 +134,14 @@ function visible(n){
  return true;
 }
 function ordered(){return notes.filter(visible).sort((a,b)=>Number(b.pinned)-Number(a.pinned)||a.sort_order-b.sort_order||new Date(b.created_at)-new Date(a.created_at))}
+function growChecklistTextarea(el){
+ if(!el||el.tagName!=='TEXTAREA')return;
+ el.style.height='auto';
+ el.style.height=Math.max(43,el.scrollHeight+2)+'px';
+}
+function growAllChecklistTextareas(){
+ document.querySelectorAll('#ccNotesGrid textarea[data-act="check-text"]').forEach(growChecklistTextarea);
+}
 function render(){
  renderFolders();
  document.querySelectorAll('#ccNotesPage .ccn-filter').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.filter===filter)));
@@ -144,10 +152,11 @@ function render(){
   const color=COLORS.includes(n.color)?n.color:'yellow';
   const checks=Array.isArray(n.checklist)?n.checklist:[];
   const foldersOptions='<option value="">📂 Klasörsüz</option>'+folders.map(f=>'<option value="'+escapeHtml(f.id)+'" '+(n.folder_id===f.id?'selected':'')+'>'+escapeHtml(f.name)+'</option>').join('');
-  const lines=checks.map(item=>'<div class="ccn-checkrow" data-item="'+escapeHtml(item.id)+'" data-done="'+!!item.done+'"><input type="checkbox" data-act="check-done" aria-label="Maddeyi tamamla" '+(item.done?'checked':'')+'><input type="text" data-act="check-text" maxlength="250" placeholder="Madde yaz..." value="'+escapeHtml(item.text||'')+'"><button type="button" data-act="check-delete" aria-label="Maddeyi sil">×</button></div>').join('');
+  const lines=checks.map(item=>'<div class="ccn-checkrow" data-item="'+escapeHtml(item.id)+'" data-done="'+!!item.done+'"><input type="checkbox" data-act="check-done" aria-label="Maddeyi tamamla" '+(item.done?'checked':'')+'><textarea data-act="check-text" rows="1" maxlength="250" placeholder="Madde yaz...">'+escapeHtml(item.text||'')+'</textarea><button type="button" data-act="check-delete" aria-label="Maddeyi sil">×</button></div>').join('');
   const html=n.body_rich?safeMarkup(n.body_rich):escapeHtml(n.body||'').replace(/\n/g,'<br>');
   return '<article class="ccn-card ccn-'+color+(n.done?' ccn-end':'')+'" data-id="'+escapeHtml(n.id)+'" draggable="true"><div class="ccn-cardhead" title="Boş alandan tutup kartı sürükleyebilirsin"><button type="button" class="ccn-pin" data-act="pin" aria-pressed="'+!!n.pinned+'" aria-label="'+(n.pinned?'Sabitlemeyi kaldır':'Notu başa sabitle')+'" title="'+(n.pinned?'Sabitlemeyi kaldır':'Notu başa sabitle')+'">'+(n.pinned?'📌':'📍')+'</button><span class="ccn-headspace" aria-hidden="true"></span><div class="ccn-actions"><select data-act="color" aria-label="Not rengi">'+COLORS.map((c,i)=>'<option value="'+c+'" '+(color===c?'selected':'')+'>'+COLORS_TR[i]+'</option>').join('')+'</select><button type="button" class="ccn-delete" data-act="delete" aria-label="Notu sil" title="Notu sil">×</button></div></div><input class="ccn-title" data-act="title" type="text" maxlength="140" placeholder="Not başlığı" value="'+escapeHtml(n.title||'')+'"><div class="ccn-richbar" role="toolbar" aria-label="Yazı biçimlendirme"><button type="button" data-command="bold" title="Kalın">B</button><button type="button" data-command="italic" title="İtalik">I</button><button type="button" data-command="underline" title="Altı çizili">U̲</button><button type="button" data-command="insertUnorderedList" title="Madde işaretleri">• Liste</button><button type="button" data-command="insertOrderedList" title="Numaralı liste">1. Liste</button></div><div class="ccn-editor" data-act="body-rich" contenteditable="true" role="textbox" aria-label="Not içeriği" aria-multiline="true" data-placeholder="Notunu yaz...">'+html+'</div><div class="ccn-checks">'+lines+'</div><button type="button" class="ccn-addline" data-act="check-add">＋ Yapılacak madde ekle</button><div class="ccn-opts"><label><input type="checkbox" data-act="done" '+(n.done?'checked':'')+'> Not tamamlandı</label><input type="date" data-act="due_date" aria-label="Bitiş tarihi" value="'+escapeHtml(n.due_date||'')+'"></div><div class="ccn-bottom"><select class="ccn-dest" data-act="folder" aria-label="Notun klasörü">'+foldersOptions+'</select><span><button type="button" data-act="left" title="Sola taşı">←</button><button type="button" data-act="right" title="Sağa taşı">→</button></span></div></article>';
  }).join('');
+ growAllChecklistTextareas();
 }
 async function open(){
  if(!currentUser()){window.ccToast?.('Notlarım için giriş yapmalısın.','info');return}
@@ -252,9 +261,10 @@ function addItem(note){
  if(!card)return;
  const list=card.querySelector('.ccn-checks');
  const row=document.createElement('div');row.className='ccn-checkrow';row.dataset.item=id;row.dataset.done='false';
- row.innerHTML='<input type="checkbox" data-act="check-done" aria-label="Maddeyi tamamla"><input type="text" data-act="check-text" maxlength="250" placeholder="Madde yaz..."><button type="button" data-act="check-delete" aria-label="Maddeyi sil">×</button>';
+ row.innerHTML='<input type="checkbox" data-act="check-done" aria-label="Maddeyi tamamla"><textarea data-act="check-text" rows="1" maxlength="250" placeholder="Madde yaz..."></textarea><button type="button" data-act="check-delete" aria-label="Maddeyi sil">×</button>';
  list.appendChild(row);
  row.querySelector('[data-act=check-text]').focus();
+ growChecklistTextarea(row.querySelector('[data-act=check-text]'));
 }
 async function removeNote(note){
  if(!confirm('Not silinsin mi?'))return;
@@ -323,6 +333,7 @@ function init(){
   }else if(el.dataset.act==='check-text'){
    const item=(n.checklist||[]).find(x=>x.id===el.closest('.ccn-checkrow')?.dataset.item);if(!item)return;
    item.text=el.value;
+   growChecklistTextarea(el);
    queueChecks(n);
   }else if(el.dataset.act==='body-rich'){
    const plain=el.innerText||'';
@@ -334,7 +345,7 @@ function init(){
  });
  document.addEventListener('keydown',e=>{
   const el=e.target;
-  if(el.matches?.('#ccNotesPage input[data-act=check-text]')&&e.key==='Enter'){
+  if(el.matches?.('#ccNotesPage textarea[data-act=check-text]')&&e.key==='Enter'&&(e.ctrlKey||e.metaKey)){
    e.preventDefault();
    const n=notes.find(x=>x.id===el.closest('.ccn-card')?.dataset.id);
    if(!n)return;
