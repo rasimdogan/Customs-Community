@@ -49,6 +49,11 @@ function css(){
  '#ccNotesPage .ccn-folder>button:first-child{flex:1;text-align:left;min-width:0;border:0;background:transparent;padding:10px 12px;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
  '#ccNotesPage .ccn-folder.active{background:#e8f3fa;border-radius:10px}',
  '#ccNotesPage .ccn-folder>button[data-act=folder-menu]{padding:6px;border:0;background:transparent;flex:0 0 auto}',
+ '#ccNotesPage .ccn-folder.ccn-drop-target{background:#d5eee5!important;outline:2px dashed #398d73;outline-offset:-2px;border-radius:10px;box-shadow:0 0 0 3px #68ae8c20}',
+ '#ccNotesPage .ccn-folder.ccn-drop-target>button:first-child{color:#205d4c;font-weight:850}',
+ '#ccNotesPage .ccn-draghandle{display:inline-flex;align-items:center;gap:4px;cursor:grab!important;user-select:none;touch-action:none;color:#536c7d;background:#ffffff9c!important;border:1px solid #ffffff70!important;padding:5px 9px!important;border-radius:8px;font-size:13px!important}',
+ '#ccNotesPage .ccn-card.ccn-dragging{opacity:.48;outline:2px dashed #568ba2;outline-offset:3px}',
+ '#ccNotesPage .ccn-draghandle:active{cursor:grabbing!important}',
  '#ccNotesPage .ccn-newfolder{width:100%;margin:14px 0 0;border:1px dashed #abc9da!important;background:#f7fbfd!important}',
  '#ccNotesPage .ccn-work{padding:26px clamp(13px,2.8vw,38px);min-width:0}',
  '#ccNotesPage .ccn-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:23px}',
@@ -133,7 +138,7 @@ function render(){
   const foldersOptions='<option value="">📂 Klasörsüz</option>'+folders.map(f=>'<option value="'+escapeHtml(f.id)+'" '+(n.folder_id===f.id?'selected':'')+'>'+escapeHtml(f.name)+'</option>').join('');
   const lines=checks.map(item=>'<div class="ccn-checkrow" data-item="'+escapeHtml(item.id)+'" data-done="'+!!item.done+'"><input type="checkbox" data-act="check-done" aria-label="Maddeyi tamamla" '+(item.done?'checked':'')+'><input type="text" data-act="check-text" maxlength="250" placeholder="Madde yaz..." value="'+escapeHtml(item.text||'')+'"><button type="button" data-act="check-delete" aria-label="Maddeyi sil">×</button></div>').join('');
   const html=n.body_rich?safeMarkup(n.body_rich):escapeHtml(n.body||'').replace(/\n/g,'<br>');
-  return '<article class="ccn-card ccn-'+color+(n.done?' ccn-end':'')+'" data-id="'+escapeHtml(n.id)+'" draggable="true"><div class="ccn-cardhead"><button type="button" data-act="pin" aria-label="Notu sabitle">'+(n.pinned?'📌':'📍')+'</button><select data-act="color" aria-label="Not rengi">'+COLORS.map((c,i)=>'<option value="'+c+'" '+(color===c?'selected':'')+'>'+COLORS_TR[i]+'</option>').join('')+'</select><button type="button" data-act="delete" aria-label="Notu sil">✕</button></div><input class="ccn-title" data-act="title" type="text" maxlength="140" placeholder="Not başlığı" value="'+escapeHtml(n.title||'')+'"><div class="ccn-richbar" role="toolbar" aria-label="Yazı biçimlendirme"><button type="button" data-command="bold" title="Kalın">B</button><button type="button" data-command="italic" title="İtalik">I</button><button type="button" data-command="underline" title="Altı çizili">U̲</button><button type="button" data-command="insertUnorderedList" title="Madde işaretleri">• Liste</button><button type="button" data-command="insertOrderedList" title="Numaralı liste">1. Liste</button></div><div class="ccn-editor" data-act="body-rich" contenteditable="true" role="textbox" aria-label="Not içeriği" aria-multiline="true" data-placeholder="Notunu yaz...">'+html+'</div><div class="ccn-checks">'+lines+'</div><button type="button" class="ccn-addline" data-act="check-add">＋ Yapılacak madde ekle</button><div class="ccn-opts"><label><input type="checkbox" data-act="done" '+(n.done?'checked':'')+'> Not tamamlandı</label><input type="date" data-act="due_date" aria-label="Bitiş tarihi" value="'+escapeHtml(n.due_date||'')+'"></div><div class="ccn-bottom"><select class="ccn-dest" data-act="folder" aria-label="Notun klasörü">'+foldersOptions+'</select><span><button type="button" data-act="left" title="Sola taşı">←</button><button type="button" data-act="right" title="Sağa taşı">→</button></span></div></article>';
+  return '<article class="ccn-card ccn-'+color+(n.done?' ccn-end':'')+'" data-id="'+escapeHtml(n.id)+'" draggable="true"><div class="ccn-cardhead"><button type="button" class="ccn-draghandle" draggable="true" aria-label="Notu sürükleyerek klasöre taşı" title="Notu sürükleyip soldaki klasörün üzerine bırak">⠿ Taşı</button><button type="button" data-act="pin" aria-label="Notu sabitle">'+(n.pinned?'📌':'📍')+'</button><select data-act="color" aria-label="Not rengi">'+COLORS.map((c,i)=>'<option value="'+c+'" '+(color===c?'selected':'')+'>'+COLORS_TR[i]+'</option>').join('')+'</select><button type="button" data-act="delete" aria-label="Notu sil">✕</button></div><input class="ccn-title" data-act="title" type="text" maxlength="140" placeholder="Not başlığı" value="'+escapeHtml(n.title||'')+'"><div class="ccn-richbar" role="toolbar" aria-label="Yazı biçimlendirme"><button type="button" data-command="bold" title="Kalın">B</button><button type="button" data-command="italic" title="İtalik">I</button><button type="button" data-command="underline" title="Altı çizili">U̲</button><button type="button" data-command="insertUnorderedList" title="Madde işaretleri">• Liste</button><button type="button" data-command="insertOrderedList" title="Numaralı liste">1. Liste</button></div><div class="ccn-editor" data-act="body-rich" contenteditable="true" role="textbox" aria-label="Not içeriği" aria-multiline="true" data-placeholder="Notunu yaz...">'+html+'</div><div class="ccn-checks">'+lines+'</div><button type="button" class="ccn-addline" data-act="check-add">＋ Yapılacak madde ekle</button><div class="ccn-opts"><label><input type="checkbox" data-act="done" '+(n.done?'checked':'')+'> Not tamamlandı</label><input type="date" data-act="due_date" aria-label="Bitiş tarihi" value="'+escapeHtml(n.due_date||'')+'"></div><div class="ccn-bottom"><select class="ccn-dest" data-act="folder" aria-label="Notun klasörü">'+foldersOptions+'</select><span><button type="button" data-act="left" title="Sola taşı">←</button><button type="button" data-act="right" title="Sağa taşı">→</button></span></div></article>';
  }).join('');
 }
 async function open(){
@@ -348,18 +353,89 @@ function init(){
   if(el.dataset.act==='due_date'){change(n,{due_date:el.value||null});return}
   if(el.dataset.act==='folder'){flushAll();change(n,{folder_id:el.value||null});render();return}
  });
- let dragging=null;
- document.addEventListener('dragstart',e=>{const c=e.target.closest?.('#ccNotesPage .ccn-card');if(c&&!e.target.closest('input,[contenteditable],select,button'))dragging=c.dataset.id});
- document.addEventListener('dragover',e=>{if(dragging&&e.target.closest?.('#ccNotesPage .ccn-card'))e.preventDefault()});
+ let dragging=null,dropBusy=false;
+ const clearDrop=()=>{
+  document.querySelectorAll('#ccNotesPage .ccn-drop-target').forEach(x=>x.classList.remove('ccn-drop-target'));
+  document.querySelectorAll('#ccNotesPage .ccn-dragging').forEach(x=>x.classList.remove('ccn-dragging'));
+ };
+ function folderFromElement(el){
+  const folderEl=el?.closest?.('#ccNotesPage .ccn-folder');
+  if(!folderEl)return null;
+  const id=folderEl.querySelector('[data-act=folder-open]')?.dataset.folder;
+  if(!id||id==='all')return null;
+  if(id!=='unfiled'&&!folders.some(f=>f.id===id))return null;
+  return {element:folderEl,id};
+ }
+ async function moveToFolder(noteId,destination){
+  if(dropBusy||currentUser()!==uid||!db)return;
+  const note=notes.find(n=>n.id===noteId);
+  if(!note)return;
+  const folder_id=destination==='unfiled'?null:destination;
+  if(folder_id!==null&&!folders.some(f=>f.id===folder_id))return;
+  if(note.folder_id===folder_id){status('Not zaten bu klasörde.');return}
+  dropBusy=true;
+  try{
+   flushAll();
+   await (pending.get(noteId)||Promise.resolve());
+   if(currentUser()!==uid)return;
+   status('Not klasöre taşınıyor…');
+   const {data,error}=await db.from('cc_personal_sticky_notes')
+    .update({folder_id,updated_at:new Date().toISOString()})
+    .eq('id',noteId).eq('user_id',uid).select('id,folder_id').maybeSingle();
+   if(error||!data)throw error||new Error('Klasör değişikliği kaydedilemedi.');
+   if(currentUser()!==uid)return;
+   note.folder_id=data.folder_id;
+   render();
+   status(folder_id===null?'Not Klasörsüz alanına taşındı.':'Not "'+(folders.find(f=>f.id===folder_id)?.name||'Klasör')+'" klasörüne taşındı.');
+  }catch(e){status('Not taşınamadı: '+(e?.message||String(e))+'. Not eski klasöründe duruyor.')}
+  finally{dropBusy=false}
+ }
+ document.addEventListener('dragstart',e=>{
+  const card=e.target.closest?.('#ccNotesPage .ccn-card');
+  if(!card||dropBusy)return;
+  const handle=e.target.closest('.ccn-draghandle');
+  if(!handle&&e.target.closest('input,[contenteditable],select,button,textarea')){e.preventDefault();return}
+  dragging=card.dataset.id;
+  card.classList.add('ccn-dragging');
+  if(e.dataTransfer){
+   e.dataTransfer.effectAllowed='move';
+   e.dataTransfer.setData('text/plain','cc-note:'+dragging);
+  }
+ });
+ document.addEventListener('dragover',e=>{
+  if(!dragging||dropBusy)return;
+  const target=folderFromElement(e.target);
+  const card=e.target.closest?.('#ccNotesPage .ccn-card');
+  clearDrop();
+  if(target){
+   e.preventDefault();
+   if(e.dataTransfer)e.dataTransfer.dropEffect='move';
+   target.element.classList.add('ccn-drop-target');
+  }else if(card){
+   e.preventDefault();
+   if(e.dataTransfer)e.dataTransfer.dropEffect='move';
+  }
+ });
  document.addEventListener('drop',e=>{
-  const card=e.target.closest?.('#ccNotesPage .ccn-card');if(!dragging||!card)return;e.preventDefault();
-  const list=ordered(),start=list.findIndex(n=>n.id===dragging),end=list.findIndex(n=>n.id===card.dataset.id);
-  dragging=null;if(start<0||end<0)return;
+  if(!dragging||dropBusy)return;
+  const noteId=dragging,target=folderFromElement(e.target);
+  const card=e.target.closest?.('#ccNotesPage .ccn-card');
+  dragging=null;clearDrop();
+  if(target){
+   e.preventDefault();
+   void moveToFolder(noteId,target.id);
+   return;
+  }
+  if(!card)return;
+  e.preventDefault();
+  const list=ordered(),start=list.findIndex(n=>n.id===noteId),end=list.findIndex(n=>n.id===card.dataset.id);
+  if(start<0||end<0||start===end)return;
+  flushAll();
   const [item]=list.splice(start,1);list.splice(end,0,item);
   list.forEach((n,i)=>{if(n.sort_order!==i*10){n.sort_order=i*10;save(n.id,{sort_order:n.sort_order})}});
   render();
  });
- document.addEventListener('dragend',()=>dragging=null);
+ document.addEventListener('dragend',()=>{dragging=null;clearDrop()});
  window.CC_NOTES_OPEN=open;
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
