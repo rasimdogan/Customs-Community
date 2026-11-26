@@ -304,7 +304,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  if(document.getElementById('ccNotesBoardLoader'))return;
  const script=document.createElement('script');
  script.id='ccNotesBoardLoader';
- script.src='cc-notes-board.js?v=20261126-icononly5';
+ script.src='cc-notes-board.js?v=20261126-head6';
  script.defer=true;
  script.onerror=()=>{console.warn('Not Panom arayüzü yüklenemedi');script.remove()};
  document.head.appendChild(script);
