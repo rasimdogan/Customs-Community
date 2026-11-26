@@ -6849,41 +6849,65 @@ window.CCCommunity=(()=>{
   let boxes=$('ccxMyStats')?.querySelectorAll('strong');if(boxes?.length===3){boxes[0].textContent=stats.posts||0;boxes[1].textContent=stats.followers||0;boxes[2].textContent=stats.following||0}
  }
  function ccFullNameOK(v){return String(v||'').trim().split(/\s+/).filter(Boolean).length>=2}
+ let loadMePromise=null, lastProfileToastAt=0;
  async function loadMe(){
+  // Login/navigation may open Community twice. Only one profile request per user at a time.
+  if(loadMePromise)return loadMePromise;
+  const task=loadMeCore();
+  loadMePromise=task;
+  try{return await task}
+  finally{if(loadMePromise===task)loadMePromise=null}
+ }
+ async function loadMeCore(){
   const currentUser=uid();
-  const profileTask=(async()=>{
-   try{return await profileApi('get')}
-   catch(edgeError){
-    // If the profile Edge Function is unavailable, fetch the same user's
-    // verified profile from the protected Supabase table.
-    const result=await sb.from('profiles')
-      .select('user_id,username,display_name,role,is_active,email,bio,avatar_path')
-      .eq('user_id',currentUser).maybeSingle();
-    if(result.error||!result.data||!result.data.is_active)throw edgeError;
-    console.warn('Profil servisine erişilemedi; güvenli profil sorgusu kullanıldı.');
-    return {profile:result.data,stats:null};
+  if(!currentUser)return null;
+  let j=null,edgeFailure=null;
+  // Wait for the Supabase session to settle. Retrying a transient 401 / refresh race
+  // is safer than incorrectly claiming that an existing profile is incomplete.
+  for(let attempt=0;attempt<2;attempt++){
+   if(String(uid())!==String(currentUser))return null;
+   try{j=await profileApi('get');break}
+   catch(e){
+    edgeFailure=e;
+    if(attempt===0)await new Promise(resolve=>setTimeout(resolve,350));
    }
-  })();
-  const statsTask=(async()=>{try{return await sb.rpc('cc_community_public_profile',{p_target:currentUser})}catch{return null}})();
-  let j;
-  try{j=await profileTask}
-  catch(e){
-   // A temporary loading failure must not be presented as missing profile data.
-   profileComplete=null;renderProfileGate();
-   throw e;
+  }
+  if(!j){
+   // Fallback may only read the currently authenticated user's RLS-protected row.
+   try{
+    const result=await sb.from('profiles')
+     .select('user_id,username,display_name,role,is_active,email,bio,avatar_path')
+     .eq('user_id',currentUser).maybeSingle();
+    if(!result.error&&result.data?.is_active)j={profile:result.data,stats:null};
+   }catch{}
   }
   if(String(uid())!==String(currentUser))return null;
-  my=j.profile||{};stats=j.stats||stats;
+  if(!j?.profile){
+   profileComplete=null;renderProfileGate();
+   throw edgeFailure||new Error('Profil doğrulanamadı');
+  }
+  my=j.profile;
+  if(j.stats)stats=j.stats;
   profileComplete=emailOK(my.email)&&ccFullNameOK(my.display_name);
   renderProfileGate();renderMy();
-  const avatarTask=(async()=>{try{return my.avatar_path?await sign(my.avatar_path):''}catch{return ''}})();
-  try{
-   let pr=await statsTask,row=Array.isArray(pr?.data)?pr.data[0]:pr?.data;
-   if(pr&&!pr.error&&row)stats={posts:Number(row.posts_count||0),followers:Number(row.followers_count||0),following:Number(row.following_count||0)}
-  }catch{}
-  try{my.avatar_url=await avatarTask}catch{my.avatar_url=''}
-  try{Object.assign(window.CC_AUTH.getProfile(),{display_name:my.display_name,email:my.email,bio:my.bio,avatar_path:my.avatar_path})}catch{}
-  renderProfileGate();renderMy();return j
+  // A successful Edge profile response already contains authoritative counts.
+  // Only request the profile RPC when the fallback returned no statistics.
+  if(!j.stats){
+   try{
+    const pr=await sb.rpc('cc_community_public_profile',{p_target:currentUser});
+    const row=Array.isArray(pr?.data)?pr.data[0]:pr?.data;
+    if(!pr.error&&row)stats={
+     posts:Number(row.posts_count??stats.posts),
+     followers:Number(row.followers_count??stats.followers),
+     following:Number(row.following_count??stats.following)
+    };
+   }catch{}
+  }
+  if(String(uid())!==String(currentUser))return null;
+  try{my.avatar_url=my.avatar_url||await sign(my.avatar_path)}catch{my.avatar_url=''}
+  try{const cached=window.CC_AUTH?.getProfile?.();if(cached)Object.assign(cached,{display_name:my.display_name,email:my.email,bio:my.bio,avatar_path:my.avatar_path})}catch{}
+  renderProfileGate();renderMy();
+  return j
  }
  async function open(){
   if(!await ensure())return;
@@ -6894,7 +6918,16 @@ window.CCCommunity=(()=>{
    if(!my&&cached){my={...cached};profileComplete=emailOK(my.email)&&ccFullNameOK(my.display_name)?true:null;renderProfileGate();renderMy()}
   }catch{}
   const feedTask=loadFeed(true);
-  Promise.resolve().then(()=>loadMe()).catch(e=>{console.warn('Profil yüklenemedi',e);toast('Profil bilgileri şu anda doğrulanamadı; bilgilerin eksik olduğu anlamına gelmiyor.','err')});
+  Promise.resolve().then(()=>loadMe()).catch(e=>{
+   console.warn('Profil yüklenemedi',e);
+   // Do not show a misleading error when a verified/cached profile is already displayed.
+   if(my&&profileComplete===true)return;
+   const now=Date.now();
+   if(now-lastProfileToastAt>30000){
+    lastProfileToastAt=now;
+    toast('Profil yüklenemedi. Oturum doğrulamasını yeniden denemek için sayfayı yenileyebilirsin.','err');
+   }
+  });
   Promise.resolve().then(()=>window.CCCards?.refreshWeekly?.()).catch(()=>{});
   Promise.resolve().then(()=>window.CCHub?.refreshHomeNews?.()).catch(()=>{});
   Promise.resolve().then(()=>pingPresence()).then(()=>loadOnlineUsers()).catch(()=>{});
