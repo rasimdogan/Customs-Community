@@ -3,6 +3,8 @@
 'use strict';
 if(window.CC_SOCIAL_V2)return;
 window.CC_SOCIAL_V2=true;
+const CC_PRO_TOPICS=['Uygulamadaki Sorunlar','Mevzuat Sorunu','Gümrük Gündem','GTİP Sor'];
+let ccProTopic='Gümrük Gündem',ccProDb=null;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const norm=v=>String(v??'').toLocaleLowerCase('tr-TR').replace(/\s+/g,' ').trim();
 const me=()=>window.CC_AUTH?.getSession?.()?.user?.id;
@@ -71,6 +73,7 @@ async function setup(){
    return result;
   };
   db.__ccFolderReaderWrapped=true;
+  installProfessionalTopics(db);
  }catch(e){console.warn('Klasör bağlantısı kurulamadı',e)}
 }
 
@@ -102,8 +105,27 @@ function watchPostHeaderChips(){
  window.addEventListener('cc-authenticated',run);
 }
 
+function installProfessionalTopics(client){
+ if(!client||client.__ccProTopicsWrapped)return;
+ const rpc=client.rpc.bind(client);ccProDb=client;
+ client.rpc=function(name,args,options){
+  if((name==='cc_community_publish'||name==='cc_community_edit_post')&&args){args={...args,p_topic:ccProTopic};}
+  const out=rpc(name,args,options);
+  if((name==='cc_community_comments'||name==='cc_community_comments_v2')&&args?.p_post_id){Promise.resolve(out).then(async res=>{if(res?.error)return;try{const st=await rpc('cc_community_solution_status',{p_post_id:args.p_post_id});setTimeout(()=>decorateSolutionComments(args.p_post_id,res.data||[],st.data?.[0]||st.data||{}),80)}catch(_){}})}
+  return out;
+ };
+ client.__ccProTopicsWrapped=true;
+ mountProfessionalTopics();
+}
+function proCss(){if(document.getElementById('ccProTopicCss'))return;const s=document.createElement('style');s.id='ccProTopicCss';s.textContent=`#ccProTopics{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 10px}#ccProTopics button{border:1px solid #d4e0ea;background:#f8fbfd;color:#35556d;border-radius:999px;padding:7px 10px;font:700 12px/1.2 inherit;cursor:pointer}#ccProTopics button[aria-pressed=true]{background:#e8f3ff;border-color:#77aee5;color:#0b5fa8}.cc-solution-btn{border:1px solid #9bd9ad;background:#f0fff4;color:#16733a;border-radius:8px;padding:5px 8px;font-weight:750;font-size:11px;cursor:pointer;margin-left:6px}.cc-solution-badge{display:inline-flex;align-items:center;gap:4px;background:#e9fbef;color:#16733a;border:1px solid #9bd9ad;border-radius:999px;padding:4px 8px;font-weight:800;font-size:11px;margin-left:6px}`;document.head.appendChild(s)}
+function composerTextarea(){return [...document.querySelectorAll('#view-community textarea,textarea')].find(x=>{const p=x.closest('#view-community')||x.parentElement;return p&&!x.closest('#ccFolderBrowse')&&/paylaş|gönder|aklından|ne düşün/i.test((x.placeholder||'')+' '+(p?.textContent||'').slice(0,900))})}
+function mountProfessionalTopics(){proCss();const ta=composerTextarea();if(!ta)return;let bar=document.getElementById('ccProTopics');if(!bar){bar=document.createElement('div');bar.id='ccProTopics';bar.setAttribute('aria-label','Paylaşım türü');bar.innerHTML=CC_PRO_TOPICS.map(x=>`<button type="button" data-pro-topic="${x}">${x}</button>`).join('');bar.querySelectorAll('button').forEach(b=>b.onclick=()=>{ccProTopic=b.dataset.proTopic;paintProTopics()})}if(!ta.parentElement.contains(bar))ta.insertAdjacentElement('afterend',bar);paintProTopics()}
+function paintProTopics(){document.querySelectorAll('#ccProTopics button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.proTopic===ccProTopic)))}
+function decorateSolutionComments(postId,rows,status){if(!rows?.length)return;const accepted=Number(status?.accepted_comment_id||0),can=!!status?.can_accept;for(const row of rows){const candidates=[...document.querySelectorAll('#view-community p,#view-community div,#view-community span')].filter(n=>n.children.length===0&&(n.textContent||'').trim()===(row.body||'').trim());for(const n of candidates){let box=n.parentElement;for(let i=0;box&&i<4;i++,box=box.parentElement){if((box.textContent||'').includes(row.display_name||row.username||''))break}if(!box)continue;if(box.querySelector(`[data-solution-comment="${row.id}"]`))break;const el=document.createElement(accepted===Number(row.id)?'span':'button');el.dataset.solutionComment=row.id;if(accepted===Number(row.id)){el.className='cc-solution-badge';el.textContent='✓ Çözüm';}else if(can&&!accepted){el.type='button';el.className='cc-solution-btn';el.textContent='✓ Çözüm olarak işaretle';el.onclick=async()=>{el.disabled=true;const r=await ccProDb.rpc('cc_community_accept_solution',{p_post_id:postId,p_comment_id:row.id});if(r.error){alert(r.error.message||'Çözüm işaretlenemedi.');el.disabled=false;return}decorateSolutionComments(postId,rows,{accepted_comment_id:row.id,can_accept:true})};}else continue;n.insertAdjacentElement('afterend',el);break;}}}
+function watchProfessionalTopics(){let q=false;const run=()=>{if(q)return;q=true;requestAnimationFrame(()=>{q=false;mountProfessionalTopics()})};run();new MutationObserver(run).observe(document.getElementById('view-community')||document.body,{subtree:true,childList:true})}
+
 function init(){
- css();setup();watchPostHeaderChips();
+ css();setup();watchPostHeaderChips();watchProfessionalTopics();
  if(!document.getElementById('ccNotesBoardLoader')){
   const script=document.createElement('script');script.id='ccNotesBoardLoader';script.src='cc-notes-board.js?v=20261126-head7';script.defer=true;document.head.appendChild(script);
  }
